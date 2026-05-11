@@ -577,13 +577,14 @@ button{font:inherit;color:inherit;background:none;border:0;}
   .bg-video,.video-overlay,.video-vignette,.hud-progress{display:none!important;}
   .content-block{
     position:relative;inset:auto;
-    opacity:1!important;
-    transform:none!important;
+    /* opacity controlled by gsap.from() — must NOT use !important here,
+       otherwise it overrides the inline opacity GSAP needs to set */
     padding:90px 22px;
     min-height:auto;
     text-shadow:none;
   }
   .content-block + .content-block{border-top:1px solid var(--line);}
+  .service-item{opacity:1;}
   .results-grid,.methode-grid,.testi-grid,.services-grid{grid-template-columns:1fr;}
   .footer-top{grid-template-columns:1fr;gap:30px;}
 }
@@ -1018,14 +1019,20 @@ function initDesktopVideoScene(){
   const stage = document.getElementById('stage-viewport');
   const hud = document.getElementById('hud-progress');
 
-  // Total vertical scroll length for the whole pinned scene.
-  // 600vh = 6 viewports of scroll feels right for ~10-20s of video.
-  const SCROLL_LENGTH = '+=600%';
+  // Shorter scroll = fewer per-frame currentTime calls = smoother scrubbing.
+  // 400% (4 viewports) is comfortable for a ~10-20s clip.
+  const SCROLL_LENGTH = '+=400%';
 
-  // Force load + first paint of video
+  // Force load + first paint, then pause so only scroll drives playback.
   video.load();
-  video.play().catch(() => { /* autoplay may be blocked; OK */ });
-  video.pause();
+  video.muted = true;
+  video.playsInline = true;
+  const playPromise = video.play();
+  if (playPromise && playPromise.then) {
+    playPromise.then(() => video.pause()).catch(() => {});
+  } else {
+    video.pause();
+  }
 
   const blocks = Array.from(document.querySelectorAll('.content-block')).map(el => {
     const [s, e] = el.dataset.range.split(',').map(v => parseFloat(v) / 100);
@@ -1098,28 +1105,47 @@ function initDesktopVideoScene(){
   pillars.forEach((p, i) => { p.style.opacity = i === 0 ? 1 : 0; });
   gsap.to(hud, { opacity: 1, duration: .6, delay: .3 });
 
+  /* === Decouple video updates from scroll updates ===
+     onUpdate fires up to 60×/s. video.currentTime triggers a decoder seek
+     which on H.264 video can be slow. We:
+      a) only update currentTime if it moved by more than 1/30 s
+      b) skip if the previous seek is still pending (video.seeking)
+  */
+  let targetTime = 0;
+  let lastApplied = -1;
+  const canFastSeek = typeof video.fastSeek === 'function';
+  function maybeUpdateVideo(){
+    if (!video.duration || isNaN(video.duration)) return;
+    if (video.seeking) return;
+    if (Math.abs(targetTime - lastApplied) < 0.033) return;
+    const t = Math.min(Math.max(targetTime, 0), video.duration - 0.05);
+    // fastSeek snaps to the nearest keyframe → far cheaper than exact seek,
+    // and absolutely fine for a backdrop video where pixel-exact frames don't matter.
+    if (canFastSeek) video.fastSeek(t);
+    else video.currentTime = t;
+    lastApplied = targetTime;
+  }
+  // Drive the (cheap) video update on the rAF tick rather than per scroll event
+  gsap.ticker.add(maybeUpdateVideo);
+
   // The MASTER ScrollTrigger — pins the stage, scrubs video + opacities
-  const masterST = ScrollTrigger.create({
+  ScrollTrigger.create({
     id: 'main-scene',
     trigger: stage,
     start: 'top top',
     end: SCROLL_LENGTH,
     pin: true,
     pinSpacing: true,
-    scrub: 1,
+    scrub: 1.5,
     anticipatePin: 1,
     invalidateOnRefresh: true,
     onUpdate: self => {
       const p = self.progress;
 
-      // 1) Video scrub
-      if (video.duration && !isNaN(video.duration)) {
-        const t = p * video.duration;
-        // Clamp to avoid overshoot
-        video.currentTime = Math.min(Math.max(t, 0), video.duration - 0.01);
-      }
+      // 1) Just stash the target time — actual seek happens in rAF tick
+      if (video.duration) targetTime = p * video.duration;
 
-      // 2) Block opacities
+      // 2) Block opacities (cheap, every frame is fine)
       blocks.forEach(b => { b.el.style.opacity = blockOpacity(p, b); });
 
       // 3) Service pillars sequential reveal
@@ -1133,7 +1159,7 @@ function initDesktopVideoScene(){
     }
   });
 
-  // Safety: refresh after video metadata is known
+  // Refresh once video metadata is known (so duration is non-NaN)
   if (video.readyState >= 1) {
     ScrollTrigger.refresh();
   } else {
@@ -1145,25 +1171,35 @@ function initDesktopVideoScene(){
    MOBILE — simple stacked sections with fade-ins
    ============================================================ */
 function initMobileSections(){
-  /* On mobile the CSS makes .content-block static and visible.
-     We just add a soft fade-in on enter for each block. */
+  /* Clear any inline opacity that might persist from a desktop->mobile
+     resize transition. After this, gsap.from() can freely animate. */
+  document.querySelectorAll('.content-block, .service-item').forEach(el => {
+    el.style.removeProperty('opacity');
+    el.style.removeProperty('transform');
+  });
+
   document.querySelectorAll('.content-block').forEach(el => {
     gsap.from(el, {
       y: 30, opacity: 0, duration: .7, ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+      scrollTrigger: { trigger: el, start: 'top 90%', once: true }
     });
   });
 
-  /* Show all service pillars stacked + animate */
   document.querySelectorAll('.service-item').forEach((el, i) => {
-    el.style.opacity = '';  // remove inline opacity if any
     gsap.from(el, {
-      y: 30, opacity: 0, duration: .6, delay: i * .08, ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+      y: 24, opacity: 0, duration: .6, delay: i * .08, ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 92%', once: true }
     });
   });
 
-  /* Counters: trigger when results block enters viewport */
+  document.querySelectorAll('.methode-step, .result-item, .testi-item').forEach((el, i) => {
+    gsap.from(el, {
+      y: 20, opacity: 0, duration: .55, delay: (i % 4) * .06, ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 92%', once: true }
+    });
+  });
+
+  /* Counters fire when results block enters viewport */
   const resultsBlock = document.querySelector('.block-results');
   if (resultsBlock) {
     ScrollTrigger.create({
@@ -1183,7 +1219,7 @@ function initMobileSections(){
     });
   }
 
-  /* Mobile menu jump-to-section via anchor href works natively */
+  /* Native anchor scrolling on mobile — close the menu when a link is clicked */
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', () => {
       document.getElementById('mobile-menu')?.classList.remove('is-open');
