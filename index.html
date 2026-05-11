@@ -16,14 +16,12 @@
 <!-- Favicons -->
 <link rel="icon" type="image/png" href="logo.png" />
 <link rel="apple-touch-icon" href="logo.png" />
-
-<!-- Preload the logo so it's instant in the preloader -->
 <link rel="preload" as="image" href="logo.png" fetchpriority="high" />
 
 <!-- Preconnect / Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
 <!-- Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -50,22 +48,22 @@
   --purple:#7c5cfc;
   --magenta:#d63384;
   --pink:#e8548e;
+  --green:#4ade80;
   --grad: linear-gradient(135deg, #4d7cff 0%, #7c5cfc 40%, #d63384 100%);
   --grad-text: linear-gradient(90deg, #4d7cff 0%, #9b6dff 50%, #e8548e 100%);
   --grad-soft: linear-gradient(135deg, rgba(77,124,255,.14) 0%, rgba(124,92,252,.10) 50%, rgba(214,51,132,.14) 100%);
-  --glass: rgba(255,255,255,.025);
-  --glass-strong: rgba(255,255,255,.045);
+  --glass: rgba(10,14,26,.55);
+  --glass-strong: rgba(10,14,26,.72);
   --r-sm:10px;
   --r-md:18px;
   --r-lg:28px;
   --r-xl:40px;
-  --shadow-glow: 0 0 60px rgba(124,92,252,.35);
-  --container: 1340px;
+  --container:1340px;
 }
 
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{background:var(--bg-1);color:var(--text);}
-html{scroll-behavior:auto;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
 body{
   font-family:'DM Sans',system-ui,sans-serif;
   font-weight:400;
@@ -90,7 +88,6 @@ html.lenis,html.lenis body{height:auto;}
    TYPO
    ============================================================ */
 .display{font-family:'Syne',sans-serif;font-weight:700;letter-spacing:-.02em;line-height:.96;}
-.display-sm{font-family:'Syne',sans-serif;font-weight:600;letter-spacing:-.01em;line-height:1.05;}
 .eyebrow{
   font-family:'DM Sans',sans-serif;
   font-size:11px;
@@ -109,7 +106,7 @@ html.lenis,html.lenis body{height:auto;}
 .italic{font-style:italic;font-family:'Syne',sans-serif;font-weight:500;}
 
 /* ============================================================
-   GLOBAL FX (cursor, noise, orbs, progress)
+   CURSOR + NOISE + SCROLL PROGRESS
    ============================================================ */
 .cursor{
   position:fixed;top:0;left:0;
@@ -120,7 +117,7 @@ html.lenis,html.lenis body{height:auto;}
   pointer-events:none;
   z-index:9999;
   transform:translate(-50%,-50%);
-  transition:width .3s cubic-bezier(.2,.8,.2,1), height .3s cubic-bezier(.2,.8,.2,1), background-color .25s ease, border-color .25s ease;
+  transition:width .3s cubic-bezier(.2,.8,.2,1), height .3s cubic-bezier(.2,.8,.2,1);
   will-change:transform,width,height;
 }
 .cursor-glow{
@@ -130,40 +127,20 @@ html.lenis,html.lenis body{height:auto;}
   background:radial-gradient(circle,rgba(124,92,252,.22) 0%,rgba(214,51,132,.06) 40%,transparent 70%);
   filter:blur(46px);
   pointer-events:none;
-  z-index:1;
+  z-index:3;
   transform:translate(-50%,-50%);
   mix-blend-mode:screen;
   will-change:transform;
 }
-.cursor.is-hover{
-  width:48px;height:48px;
-  background:transparent;
-  border:1px solid rgba(255,255,255,.85);
-  mix-blend-mode:difference;
-}
-
+.cursor.is-hover{width:48px;height:48px;background:transparent;border:1px solid rgba(255,255,255,.9);}
 .noise{
   position:fixed;inset:0;
   pointer-events:none;
   z-index:9998;
-  opacity:.04;
+  opacity:.035;
   mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
-
-.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
-.orb{
-  position:absolute;
-  border-radius:50%;
-  filter:blur(120px);
-  opacity:.55;
-  will-change:transform;
-}
-.orb-1{width:520px;height:520px;background:#4d7cff;top:-120px;left:-160px;}
-.orb-2{width:620px;height:620px;background:#7c5cfc;top:30%;right:-200px;}
-.orb-3{width:480px;height:480px;background:#d63384;bottom:-160px;left:30%;opacity:.45;}
-.orb-4{width:380px;height:380px;background:#4d7cff;bottom:10%;right:10%;opacity:.35;}
-
 .scroll-progress{
   position:fixed;top:0;left:0;right:0;
   height:2px;
@@ -175,7 +152,7 @@ html.lenis,html.lenis body{height:auto;}
 }
 
 /* ============================================================
-   PRELOADER — CINEMATIC SEQUENCE
+   PRELOADER
    ============================================================ */
 .preloader{
   position:fixed;inset:0;
@@ -206,11 +183,7 @@ html.lenis,html.lenis body{height:auto;}
   filter:drop-shadow(0 0 0 rgba(124,92,252,0));
   will-change:transform,opacity,filter;
 }
-.preloader-logo img{
-  width:100%;
-  height:auto;
-  display:block;
-}
+.preloader-logo img{width:100%;height:auto;display:block;}
 .preloader-counter{
   position:absolute;
   bottom:48px;
@@ -236,11 +209,133 @@ html.lenis,html.lenis body{height:auto;}
 }
 .preloader-line{
   position:absolute;
-  left:50%;top:50%;
+  left:50%;top:62%;
   transform:translate(-50%,-50%);
   width:0;height:1px;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
   z-index:1;
+}
+
+/* ============================================================
+   CIRCUIT BACKGROUND — fixed canvas, camera-controlled
+   ============================================================ */
+.circuit-bg{
+  position:fixed;inset:0;
+  z-index:0;
+  pointer-events:none;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 50%, rgba(13,18,36,1) 0%, rgba(7,10,20,1) 60%, #050810 100%);
+}
+.circuit-bg svg{
+  position:absolute;
+  top:0;left:0;
+  width:4000px;height:3000px;
+  transform-origin:0 0;
+  will-change:transform;
+}
+/* Trace base + decorative */
+.tr{
+  fill:none;
+  stroke:rgba(77,124,255,.18);
+  stroke-width:1.6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.tr-main{
+  fill:none;
+  stroke:rgba(124,92,252,.55);
+  stroke-width:2.6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  filter:drop-shadow(0 0 4px rgba(124,92,252,.35));
+}
+.tr-flow{
+  stroke-dasharray:14 28;
+  animation:flowDash 5s linear infinite;
+}
+@keyframes flowDash{ to { stroke-dashoffset:-420; } }
+
+/* Energy pulse along main traces */
+.tr-pulse{
+  fill:none;
+  stroke:url(#grad-trace);
+  stroke-width:3;
+  stroke-linecap:round;
+  stroke-dasharray:80 999;
+  stroke-dashoffset:0;
+  filter:drop-shadow(0 0 8px rgba(214,51,132,.7));
+  opacity:.85;
+}
+
+/* Node visual: chip frame + halo + core */
+.node-g .chip{
+  fill:#0b1020;
+  stroke:rgba(124,92,252,.45);
+  stroke-width:1.4;
+}
+.node-g .chip-inner{
+  fill:rgba(124,92,252,.04);
+  stroke:rgba(255,255,255,.05);
+  stroke-width:1;
+}
+.node-g .pin{
+  stroke:rgba(124,92,252,.55);
+  stroke-width:1.5;
+  stroke-linecap:round;
+}
+.node-g .core{
+  fill:url(#grad-core);
+  filter:drop-shadow(0 0 14px rgba(214,51,132,.85));
+}
+.node-g .halo{
+  fill:none;
+  stroke:rgba(214,51,132,.5);
+  stroke-width:1.4;
+  opacity:.55;
+}
+.node-g .halo-2{
+  fill:none;
+  stroke:rgba(124,92,252,.35);
+  stroke-width:1;
+  opacity:.4;
+  stroke-dasharray:3 5;
+  animation:nodeSpin 22s linear infinite;
+}
+@keyframes nodeSpin{ to { transform:rotate(360deg); transform-box:fill-box; transform-origin:center; } }
+.node-g .num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:18px;
+  fill:rgba(255,255,255,.75);
+  font-weight:600;
+  text-anchor:middle;
+  dominant-baseline:central;
+}
+
+/* Decorative components */
+.comp-ic{
+  fill:#0d1226;
+  stroke:rgba(124,92,252,.32);
+  stroke-width:1.2;
+}
+.comp-ic-pin{
+  stroke:rgba(124,92,252,.4);
+  stroke-width:1;
+}
+.comp-cap{
+  fill:rgba(214,51,132,.06);
+  stroke:rgba(214,51,132,.35);
+  stroke-width:1;
+}
+.comp-res{
+  fill:rgba(77,124,255,.06);
+  stroke:rgba(77,124,255,.35);
+  stroke-width:1;
+}
+.via{
+  fill:#0b1020;
+  stroke:rgba(124,92,252,.5);
+  stroke-width:1;
 }
 
 /* ============================================================
@@ -272,11 +367,8 @@ html.lenis,html.lenis body{height:auto;}
   filter:drop-shadow(0 2px 14px rgba(124,92,252,.25));
 }
 .nav-logo img{
-  width:100%;
-  height:100%;
+  width:100%;height:100%;
   display:block;
-  /* Underlying image is 2:1 (wordmark + tagline). We crop bottom to keep
-     only the NEEXUS wordmark — container aspect 3.4:1 + cover from top. */
   object-fit:cover;
   object-position:top center;
 }
@@ -285,11 +377,7 @@ html.lenis,html.lenis body{height:auto;}
   filter:drop-shadow(0 4px 22px rgba(124,92,252,.55));
 }
 .nav.is-scrolled .nav-logo{height:32px;}
-.nav-links{
-  display:flex;
-  gap:34px;
-  align-items:center;
-}
+.nav-links{display:flex;gap:32px;align-items:center;}
 .nav-links a{
   font-size:13px;
   letter-spacing:.02em;
@@ -297,6 +385,7 @@ html.lenis,html.lenis body{height:auto;}
   position:relative;
   padding:6px 0;
   transition:color .25s;
+  font-family:'JetBrains Mono',monospace;
 }
 .nav-links a::after{
   content:'';
@@ -309,30 +398,19 @@ html.lenis,html.lenis body{height:auto;}
 }
 .nav-links a:hover{color:var(--text);}
 .nav-links a:hover::after{transform:scaleX(1);}
-
 .nav-cta{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  font-size:13px;
-  font-weight:500;
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:500;
   padding:11px 20px;
   border-radius:100px;
   border:1px solid var(--line-strong);
-  background:rgba(255,255,255,.02);
+  background:rgba(10,14,26,.55);
   backdrop-filter:blur(12px);
   transition:transform .35s, border-color .35s, background-color .35s;
 }
-.nav-cta:hover{
-  border-color:rgba(255,255,255,.25);
-  background:rgba(255,255,255,.05);
-}
-.nav-cta .arrow{
-  display:inline-block;
-  transition:transform .35s;
-}
+.nav-cta:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.05);}
+.nav-cta .arrow{display:inline-block;transition:transform .35s;}
 .nav-cta:hover .arrow{transform:translateX(4px);}
-
 .nav-burger{
   display:none;
   width:40px;height:40px;
@@ -342,12 +420,8 @@ html.lenis,html.lenis body{height:auto;}
   align-items:center;justify-content:center;
   flex-direction:column;gap:4px;
 }
-.nav-burger span{
-  display:block;width:16px;height:1px;background:#fff;
-  transition:transform .3s, opacity .3s;
-}
+.nav-burger span{display:block;width:16px;height:1px;background:#fff;transition:transform .3s, opacity .3s;}
 
-/* Mobile menu overlay */
 .mobile-menu{
   position:fixed;inset:0;
   background:rgba(7,10,20,.96);
@@ -362,48 +436,134 @@ html.lenis,html.lenis body{height:auto;}
 .mobile-menu.is-open{transform:translateY(0);}
 .mobile-menu a{
   font-family:'Syne',sans-serif;
-  font-size:38px;
-  font-weight:600;
-  letter-spacing:-.02em;
+  font-size:34px;font-weight:600;letter-spacing:-.02em;
   padding:18px 0;
   border-bottom:1px solid var(--line);
 }
 
 /* ============================================================
-   LAYOUT HELPERS
+   HUD — fixed UI showing the current node + total
    ============================================================ */
-.section{
-  position:relative;
-  padding:140px 36px;
-  z-index:2;
-}
-.container{
-  max-width:var(--container);
-  margin:0 auto;
-  position:relative;
-}
-.section-eyebrow{
-  display:inline-flex;
+.hud{
+  position:fixed;
+  left:36px;bottom:36px;
+  z-index:50;
+  display:flex;
   align-items:center;
-  gap:10px;
-  margin-bottom:28px;
-}
-.section-eyebrow .num{
+  gap:14px;
+  padding:10px 16px;
+  background:var(--glass-strong);
+  border:1px solid var(--line);
+  backdrop-filter:blur(14px);
+  border-radius:100px;
   font-family:'JetBrains Mono',monospace;
   font-size:11px;
-  color:var(--text-mute);
-  letter-spacing:.05em;
-}
-.section-eyebrow .label{
-  font-size:11px;
+  letter-spacing:.1em;
   text-transform:uppercase;
+  color:var(--text-dim);
+  pointer-events:none;
+  opacity:0;
+}
+.hud .dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--magenta);
+  box-shadow:0 0 12px var(--magenta);
+  animation:hudPulse 1.8s infinite ease-in-out;
+}
+@keyframes hudPulse{ 0%,100%{opacity:.5;transform:scale(.8);} 50%{opacity:1;transform:scale(1);} }
+.hud .label{color:var(--text);font-weight:600;letter-spacing:.05em;}
+.hud .total{color:var(--text-mute);}
+
+.hud-right{
+  position:fixed;
+  right:36px;bottom:36px;
+  z-index:50;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
   letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--text-mute);
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+  pointer-events:none;
+  opacity:0;
+}
+
+/* ============================================================
+   SECTIONS COMMON
+   ============================================================ */
+main{position:relative;z-index:5;}
+.node-section{
+  position:relative;
+  min-height:100vh;
+  padding:130px 36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:5;
+}
+.node-section.is-first{padding-top:0;}
+.node-content{
+  width:100%;
+  max-width:var(--container);
+  position:relative;
+  z-index:5;
+}
+.node-card{
+  position:relative;
+  background:var(--glass);
+  border:1px solid var(--line);
+  backdrop-filter:blur(22px) saturate(140%);
+  -webkit-backdrop-filter:blur(22px) saturate(140%);
+  border-radius:var(--r-lg);
+  padding:60px;
+  overflow:hidden;
+}
+.node-card::before{
+  content:'';
+  position:absolute;inset:-1px;
+  border-radius:inherit;
+  background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.5) 25%,transparent 50%,rgba(214,51,132,.5) 75%,transparent 100%);
+  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  padding:1px;
+  opacity:.6;
+  animation:rotateBorder 8s linear infinite;
+  pointer-events:none;
+}
+@property --rot{syntax:'<angle>';initial-value:0deg;inherits:false;}
+@keyframes rotateBorder{ to { --rot:360deg; } }
+
+.section-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:32px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
   color:var(--text-dim);
 }
-.section-eyebrow .line{
-  width:48px;height:1px;
-  background:var(--line-strong);
+.section-tag .node-id{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 12px;
+  border:1px solid var(--line-strong);
+  border-radius:100px;
+  background:rgba(124,92,252,.08);
 }
+.section-tag .node-id::before{
+  content:'';
+  width:6px;height:6px;border-radius:50%;
+  background:var(--magenta);
+  box-shadow:0 0 10px var(--magenta);
+}
+.section-tag .line{width:48px;height:1px;background:var(--line-strong);}
+.section-tag .label{color:var(--text);}
+
 .section-title{
   font-family:'Syne',sans-serif;
   font-weight:600;
@@ -411,39 +571,37 @@ html.lenis,html.lenis body{height:auto;}
   line-height:1;
   letter-spacing:-.025em;
   max-width:18ch;
+  margin-bottom:28px;
 }
+.section-sub{
+  color:var(--text-dim);
+  font-size:clamp(15px,1.1vw,18px);
+  line-height:1.6;
+  max-width:54ch;
+  margin-bottom:40px;
+}
+.section-sub b{color:var(--text);font-weight:500;}
 
 /* ============================================================
-   HERO (PINNED)
+   HERO (NODE 01)
    ============================================================ */
 .hero{
-  position:relative;
   min-height:100vh;
   padding:0 36px;
-  overflow:hidden;
-  z-index:2;
-}
-.hero-grid-bg{
-  position:absolute;inset:0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
-  background-size:80px 80px;
-  mask-image:radial-gradient(ellipse 75% 65% at 50% 45%,#000 25%,transparent 85%);
-  -webkit-mask-image:radial-gradient(ellipse 75% 65% at 50% 45%,#000 25%,transparent 85%);
-  pointer-events:none;
-  opacity:.95;
+  display:flex;
+  align-items:center;
+  position:relative;
 }
 .hero-inner{
+  width:100%;
   max-width:var(--container);
   margin:0 auto;
-  height:100vh;
+  position:relative;
+  text-align:center;
   display:flex;
   flex-direction:column;
-  justify-content:center;
-  position:relative;
-  padding-top:80px;
-  will-change:transform,opacity;
+  align-items:center;
+  padding-top:60px;
 }
 .hero-badge{
   display:inline-flex;
@@ -451,13 +609,14 @@ html.lenis,html.lenis body{height:auto;}
   gap:10px;
   padding:8px 16px 8px 12px;
   border:1px solid var(--line-strong);
-  background:rgba(255,255,255,.025);
+  background:rgba(10,14,26,.7);
   backdrop-filter:blur(10px);
   border-radius:100px;
   font-size:12px;
   letter-spacing:.05em;
   width:fit-content;
   margin-bottom:36px;
+  font-family:'JetBrains Mono',monospace;
 }
 .hero-badge .pulse-dot{
   width:8px;height:8px;border-radius:50%;
@@ -474,7 +633,7 @@ html.lenis,html.lenis body{height:auto;}
 }
 @keyframes pulse{
   0%{transform:scale(1);opacity:.8;}
-  100%{transform:scale(2.2);opacity:0;}
+  100%{transform:scale(2.4);opacity:0;}
 }
 .hero-title{
   font-family:'Syne',sans-serif;
@@ -484,12 +643,9 @@ html.lenis,html.lenis body{height:auto;}
   letter-spacing:-.035em;
   margin-bottom:32px;
   perspective:1200px;
+  max-width:18ch;
 }
-.hero-title .line{
-  display:block;
-  overflow:hidden;
-  perspective:1200px;
-}
+.hero-title .line{display:block;overflow:hidden;perspective:1200px;}
 .hero-title .line-2{
   background:var(--grad-text);
   -webkit-background-clip:text;
@@ -506,26 +662,16 @@ html.lenis,html.lenis body{height:auto;}
   color:var(--text-dim);
   max-width:54ch;
   line-height:1.55;
-  margin-bottom:48px;
-  font-weight:400;
+  margin-bottom:44px;
 }
 .hero-sub b{color:var(--text);font-weight:500;}
-
-.cta-row{
-  display:flex;
-  gap:16px;
-  flex-wrap:wrap;
-  margin-bottom:80px;
-}
+.cta-row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:68px;}
 .btn{
   display:inline-flex;
-  align-items:center;
-  gap:12px;
+  align-items:center;gap:12px;
   padding:18px 28px;
   border-radius:100px;
-  font-size:14px;
-  font-weight:500;
-  letter-spacing:.01em;
+  font-size:14px;font-weight:500;letter-spacing:.01em;
   position:relative;
   transition:transform .4s cubic-bezier(.2,.8,.2,1);
   will-change:transform;
@@ -533,7 +679,7 @@ html.lenis,html.lenis body{height:auto;}
 .btn-primary{
   background:var(--grad);
   color:#fff;
-  box-shadow:0 12px 40px rgba(124,92,252,.35);
+  box-shadow:0 12px 40px rgba(124,92,252,.45);
 }
 .btn-primary::before{
   content:'';
@@ -542,14 +688,13 @@ html.lenis,html.lenis body{height:auto;}
   background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 50%);
   pointer-events:none;
 }
-.btn-primary:hover{
-  box-shadow:0 18px 50px rgba(124,92,252,.55);
-}
+.btn-primary:hover{box-shadow:0 18px 50px rgba(124,92,252,.65);}
 .btn-ghost{
-  background:rgba(255,255,255,.025);
+  background:rgba(10,14,26,.65);
   color:var(--text);
   border:1px solid var(--line-strong);
   position:relative;
+  backdrop-filter:blur(10px);
 }
 .btn-ghost::before{
   content:'';
@@ -571,19 +716,19 @@ html.lenis,html.lenis body{height:auto;}
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:48px;
-  max-width:760px;
+  max-width:780px;
+  width:100%;
   border-top:1px solid var(--line);
-  padding-top:40px;
+  padding-top:36px;
 }
+.hero-stat{text-align:center;}
 .hero-stat .num{
   font-family:'Syne',sans-serif;
-  font-weight:600;
-  font-size:clamp(28px,3vw,42px);
+  font-weight:700;
+  font-size:clamp(28px,3.4vw,46px);
   line-height:1;
   background:var(--grad-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
   margin-bottom:8px;
   letter-spacing:-.02em;
 }
@@ -594,77 +739,25 @@ html.lenis,html.lenis body{height:auto;}
   line-height:1.4;
 }
 
-.hero-scroll-hint{
-  position:absolute;
-  bottom:40px;right:36px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  font-size:11px;
-  letter-spacing:.22em;
-  text-transform:uppercase;
-  color:var(--text-mute);
-  writing-mode:vertical-rl;
-  transform:rotate(180deg);
-}
-.hero-scroll-hint .bar{
-  width:1px;height:48px;
-  background:linear-gradient(to bottom,var(--text-mute),transparent);
-  animation:scrollLine 2s ease-in-out infinite;
-}
-@keyframes scrollLine{
-  0%,100%{transform:scaleY(.4);transform-origin:top;}
-  50%{transform:scaleY(1);transform-origin:top;}
-}
-
-/* Hero floating side numbers */
-.hero-side{
-  position:absolute;
-  top:50%;
-  right:-10px;
-  transform:translateY(-50%) rotate(-90deg);
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px;
-  letter-spacing:.4em;
-  color:var(--text-mute);
-  text-transform:uppercase;
-}
-
 /* ============================================================
-   PROBLEMS
+   PAIN POINTS (NODE 02)
    ============================================================ */
-.problems{
-  background:var(--bg-1);
-}
-.problems-head{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:80px;
-  align-items:end;
-  margin-bottom:80px;
-}
-.problems-intro{
-  font-size:16px;
-  color:var(--text-dim);
-  max-width:42ch;
-  line-height:1.65;
-}
-.problems-grid{
+.pain-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:24px;
+  gap:18px;
+  margin-top:42px;
 }
-.problem-card{
+.pain-card{
   position:relative;
-  padding:40px;
-  border-radius:var(--r-lg);
-  background:var(--glass);
+  padding:32px 30px;
+  border-radius:var(--r-md);
+  background:rgba(255,255,255,.03);
   border:1px solid var(--line);
-  backdrop-filter:blur(10px);
   overflow:hidden;
-  transition:transform .5s cubic-bezier(.2,.8,.2,1),background-color .35s, border-color .35s;
+  transition:transform .5s cubic-bezier(.2,.8,.2,1),background-color .35s;
 }
-.problem-card::before{
+.pain-card::before{
   content:'';
   position:absolute;inset:-1px;
   border-radius:inherit;
@@ -672,160 +765,88 @@ html.lenis,html.lenis body{height:auto;}
   -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
   -webkit-mask-composite:xor;
   mask-composite:exclude;
-  padding:1px;
-  opacity:0;
+  padding:1px;opacity:0;
   transition:opacity .5s;
   animation:rotateBorder 6s linear infinite;
 }
-@property --rot{syntax:'<angle>';initial-value:0deg;inherits:false;}
-@keyframes rotateBorder{to{--rot:360deg;}}
-.problem-card:hover{transform:translateY(-4px);background:var(--glass-strong);}
-.problem-card:hover::before{opacity:1;}
-.problem-card .icon{
-  width:54px;height:54px;
-  border-radius:14px;
+.pain-card:hover{transform:translateY(-4px);background:rgba(255,255,255,.05);}
+.pain-card:hover::before{opacity:1;}
+.pain-card .icon{
+  width:48px;height:48px;
+  border-radius:12px;
   background:var(--grad-soft);
   border:1px solid var(--line);
   display:grid;place-items:center;
-  margin-bottom:28px;
-  font-size:24px;
+  margin-bottom:22px;
+  font-size:22px;
 }
-.problem-card h3{
+.pain-card h3{
   font-family:'Syne',sans-serif;
-  font-weight:600;
-  font-size:24px;
+  font-weight:600;font-size:22px;
   letter-spacing:-.01em;
-  margin-bottom:14px;
+  margin-bottom:12px;
 }
-.problem-card p{
-  color:var(--text-dim);
-  font-size:15px;
-  line-height:1.6;
-}
-.problem-card .tag{
+.pain-card p{color:var(--text-dim);font-size:14.5px;line-height:1.6;}
+.pain-card .tag{
   position:absolute;
-  top:24px;right:28px;
+  top:22px;right:24px;
   font-family:'JetBrains Mono',monospace;
-  font-size:10px;
-  letter-spacing:.1em;
-  color:var(--text-mute);
+  font-size:10px;letter-spacing:.1em;color:var(--text-mute);
 }
 
 /* ============================================================
-   SERVICES (HORIZONTAL SCROLL)
+   SERVICES NODES (03 / 04 / 05)
    ============================================================ */
-.services-wrap{
-  position:relative;
-  background:var(--bg-0);
-  padding:140px 0 0;
-  overflow:hidden;
-}
-.services-head{
-  padding:0 36px;
-  max-width:var(--container);
-  margin:0 auto 80px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:80px;
-  align-items:end;
-}
-.services-head p{
-  color:var(--text-dim);
-  max-width:42ch;
-  font-size:16px;
-  line-height:1.65;
-}
-.horizontal-container{
-  position:relative;
-  height:100vh;
-  width:100%;
-  overflow:hidden;
-}
-.horizontal-track{
-  display:flex;
-  height:100%;
-  will-change:transform;
-}
-.service-panel{
-  flex:0 0 100vw;
-  height:100%;
+.service-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:60px;
-  padding:60px 36px;
   align-items:center;
-  position:relative;
-}
-.service-panel .panel-num{
-  position:absolute;
-  top:60px;left:36px;
-  font-family:'JetBrains Mono',monospace;
-  font-size:13px;
-  letter-spacing:.2em;
-  color:var(--text-mute);
-}
-.service-content{
-  max-width:var(--container);
-  margin:0 auto;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:80px;
-  align-items:center;
-  width:100%;
 }
 .service-text .pillar-num{
   font-family:'JetBrains Mono',monospace;
-  font-size:12px;
+  font-size:11px;
   color:var(--magenta);
-  letter-spacing:.2em;
-  margin-bottom:20px;
-  display:block;
+  letter-spacing:.22em;
+  margin-bottom:18px;
+  display:inline-block;
+  padding:6px 12px;
+  border:1px solid rgba(214,51,132,.3);
+  border-radius:100px;
+  background:rgba(214,51,132,.06);
 }
 .service-text h3{
   font-family:'Syne',sans-serif;
   font-weight:700;
-  font-size:clamp(32px,4.4vw,64px);
+  font-size:clamp(32px,4.2vw,60px);
   line-height:1;
   letter-spacing:-.025em;
-  margin-bottom:24px;
+  margin-bottom:20px;
 }
 .service-text .lead{
-  font-size:16px;
-  color:var(--text-dim);
-  line-height:1.65;
-  margin-bottom:32px;
-  max-width:46ch;
+  font-size:16px;color:var(--text-dim);
+  line-height:1.65;margin-bottom:28px;max-width:42ch;
 }
-.service-text ul{
-  list-style:none;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
+.service-text ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
 .service-text li{
-  display:flex;
-  gap:14px;
+  display:flex;gap:14px;
   align-items:flex-start;
-  font-size:15px;
-  color:var(--text);
-  padding:14px 0;
+  font-size:14.5px;color:var(--text);
+  padding:12px 0;
   border-bottom:1px solid var(--line);
 }
 .service-text li::before{
   content:'';
   flex:0 0 6px;
-  width:6px;height:6px;
-  border-radius:50%;
+  width:6px;height:6px;border-radius:50%;
   background:var(--grad);
-  margin-top:8px;
+  margin-top:7px;
   box-shadow:0 0 10px rgba(124,92,252,.6);
 }
-
-/* Service visuals */
 .service-visual{
   position:relative;
-  height:520px;
-  border-radius:var(--r-lg);
+  height:480px;
+  border-radius:var(--r-md);
   background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
   border:1px solid var(--line);
   overflow:hidden;
@@ -834,56 +855,43 @@ html.lenis,html.lenis body{height:auto;}
 .service-visual::before{
   content:'';
   position:absolute;inset:0;
-  background:radial-gradient(circle at 20% 0%,rgba(77,124,255,.18),transparent 60%),
-             radial-gradient(circle at 100% 100%,rgba(214,51,132,.18),transparent 60%);
+  background:
+    radial-gradient(circle at 20% 0%,rgba(77,124,255,.18),transparent 60%),
+    radial-gradient(circle at 100% 100%,rgba(214,51,132,.18),transparent 60%);
   pointer-events:none;
 }
 
-/* Visual 01: Chat */
-.chat-visual{padding:24px;}
+/* Chat visual */
+.chat-visual{padding:22px;}
 .chat-header{
   display:flex;align-items:center;gap:10px;
-  padding-bottom:18px;
+  padding-bottom:16px;
   border-bottom:1px solid var(--line);
-  margin-bottom:24px;
+  margin-bottom:20px;
 }
 .chat-header .av{
   width:36px;height:36px;border-radius:50%;
   background:var(--grad);
   display:grid;place-items:center;
-  font-family:'Syne',sans-serif;
-  font-weight:700;
-  font-size:14px;
-  color:#fff;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#fff;
 }
 .chat-header .meta{flex:1;}
 .chat-header .meta .name{font-size:13px;font-weight:500;}
-.chat-header .meta .status{font-size:11px;color:#4ade80;display:flex;align-items:center;gap:6px;margin-top:2px;}
-.chat-header .meta .status::before{content:'';width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80;}
+.chat-header .meta .status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px;margin-top:2px;}
+.chat-header .meta .status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
 .chat-header .ch-btn{
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;
-  color:var(--text-mute);
-  padding:4px 8px;
-  border:1px solid var(--line);
-  border-radius:6px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-mute);
+  padding:4px 8px;border:1px solid var(--line);border-radius:6px;
 }
-.chat-msgs{display:flex;flex-direction:column;gap:12px;padding:0 4px;}
+.chat-msgs{display:flex;flex-direction:column;gap:10px;padding:0 4px;}
 .msg{
   max-width:78%;
-  padding:12px 16px;
+  padding:10px 14px;
   border-radius:18px;
-  font-size:13.5px;
-  line-height:1.45;
-  opacity:0;
-  transform:translateY(12px);
+  font-size:13px;line-height:1.4;
+  opacity:0;transform:translateY(12px);
 }
-.msg.user{
-  align-self:flex-end;
-  background:rgba(255,255,255,.06);
-  border:1px solid var(--line);
-  border-bottom-right-radius:6px;
-}
+.msg.user{align-self:flex-end;background:rgba(255,255,255,.06);border:1px solid var(--line);border-bottom-right-radius:6px;}
 .msg.ai{
   align-self:flex-start;
   background:var(--grad-soft);
@@ -892,471 +900,160 @@ html.lenis,html.lenis body{height:auto;}
 }
 .msg .meta{font-size:10px;color:var(--text-mute);margin-top:4px;font-family:'JetBrains Mono',monospace;}
 .typing{
-  align-self:flex-start;
-  display:flex;align-items:center;gap:4px;
-  padding:12px 16px;
-  background:var(--glass);
-  border:1px solid var(--line);
-  border-radius:18px;
-  border-bottom-left-radius:6px;
-  opacity:0;
+  align-self:flex-start;display:flex;align-items:center;gap:4px;
+  padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid var(--line);
+  border-radius:18px;border-bottom-left-radius:6px;opacity:0;
 }
-.typing span{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--text-dim);
-  animation:typingDot 1.2s ease-in-out infinite;
-}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--text-dim);animation:typingDot 1.2s ease-in-out infinite;}
 .typing span:nth-child(2){animation-delay:.15s;}
 .typing span:nth-child(3){animation-delay:.3s;}
-@keyframes typingDot{
-  0%,60%,100%{opacity:.3;transform:translateY(0);}
-  30%{opacity:1;transform:translateY(-3px);}
-}
+@keyframes typingDot{0%,60%,100%{opacity:.3;transform:translateY(0);}30%{opacity:1;transform:translateY(-3px);}}
 
-/* Visual 02: Workflow */
-.workflow-visual{padding:30px;display:grid;place-items:center;}
-.workflow-svg{width:100%;height:100%;max-width:460px;}
-.workflow-svg .node{
-  fill:rgba(10,14,26,.9);
-  stroke:rgba(255,255,255,.18);
-  stroke-width:1;
-}
-.workflow-svg .node-label{
-  font-family:'JetBrains Mono',monospace;
-  font-size:9px;
-  fill:var(--text);
-  text-anchor:middle;
-  dominant-baseline:central;
-  font-weight:500;
-}
-.workflow-svg .node-icon{
-  font-family:'JetBrains Mono',monospace;
-  font-size:14px;
-  fill:#fff;
-  text-anchor:middle;
-  dominant-baseline:central;
-}
-.workflow-svg .conn{
-  fill:none;
-  stroke:rgba(124,92,252,.35);
-  stroke-width:1.2;
-  stroke-dasharray:2 4;
-}
-.workflow-svg .conn-flow{
-  fill:none;
-  stroke:url(#flow-grad);
-  stroke-width:2;
-  stroke-linecap:round;
-}
-.workflow-svg .pulse{
-  fill:url(#flow-grad);
-}
+/* Workflow visual */
+.workflow-visual{padding:28px;display:grid;place-items:center;}
+.workflow-svg{width:100%;height:100%;max-width:420px;}
+.workflow-svg .node-w{fill:rgba(10,14,26,.9);stroke:rgba(255,255,255,.18);stroke-width:1;}
+.workflow-svg .nlabel{font-family:'JetBrains Mono',monospace;font-size:9px;fill:var(--text);text-anchor:middle;dominant-baseline:central;font-weight:500;}
+.workflow-svg .nicon{font-family:'JetBrains Mono',monospace;font-size:14px;fill:#fff;text-anchor:middle;dominant-baseline:central;}
+.workflow-svg .conn-flow{fill:none;stroke:url(#flow-grad);stroke-width:2;stroke-linecap:round;}
+.workflow-svg .pulse{fill:url(#flow-grad);}
 
-/* Visual 03: Code */
-.code-visual{
-  padding:24px;
-  font-family:'JetBrains Mono',monospace;
-}
-.code-window-bar{
-  display:flex;align-items:center;gap:8px;
-  padding-bottom:14px;
-  border-bottom:1px solid var(--line);
-  margin-bottom:18px;
-}
-.code-window-bar .dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.15);}
-.code-window-bar .file{
-  margin-left:14px;
-  font-size:11px;
-  color:var(--text-dim);
-}
-.code-content{
-  font-size:12.5px;
-  line-height:1.85;
-  color:var(--text);
-}
-.code-content .ln{display:flex;gap:18px;opacity:0;}
-.code-content .num{
-  color:var(--text-mute);
-  width:20px;text-align:right;
-  user-select:none;
-}
+/* Code visual */
+.code-visual{padding:22px;font-family:'JetBrains Mono',monospace;}
+.code-window-bar{display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:16px;}
+.code-window-bar .ddot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.15);}
+.code-window-bar .file{margin-left:14px;font-size:11px;color:var(--text-dim);}
+.code-content{font-size:12.5px;line-height:1.8;color:var(--text);}
+.code-content .ln{display:flex;gap:16px;opacity:0;}
+.code-content .lnum{color:var(--text-mute);width:20px;text-align:right;user-select:none;}
 .code-content .kw{color:#c084fc;}
 .code-content .fn{color:#60a5fa;}
 .code-content .str{color:#86efac;}
 .code-content .com{color:var(--text-mute);font-style:italic;}
 .code-content .pr{color:#fbbf24;}
 .code-content .typing-cursor{
-  display:inline-block;
-  width:6px;height:14px;
+  display:inline-block;width:6px;height:14px;
   background:var(--grad);
   animation:blink 1s infinite;
-  margin-left:2px;
-  vertical-align:middle;
+  margin-left:2px;vertical-align:middle;
 }
 @keyframes blink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
-
-.code-preview{
-  margin-top:20px;
-  padding:18px;
-  border-radius:12px;
-  background:var(--bg-2);
-  border:1px solid var(--line);
-}
-.code-preview .pv-bar{
-  height:4px;
-  background:var(--grad);
-  border-radius:100px;
-  margin-bottom:14px;
-  width:0;
-}
-.code-preview .pv-block{
-  height:8px;
-  background:rgba(255,255,255,.08);
-  border-radius:4px;
-  margin-bottom:8px;
-  opacity:0;
-}
+.code-preview{margin-top:18px;padding:16px;border-radius:10px;background:rgba(15,20,36,.8);border:1px solid var(--line);}
+.code-preview .pv-bar{height:4px;background:var(--grad);border-radius:100px;margin-bottom:12px;width:0;}
+.code-preview .pv-block{height:8px;background:rgba(255,255,255,.08);border-radius:4px;margin-bottom:8px;opacity:0;}
 .code-preview .pv-block.w-3{width:60%;}
 .code-preview .pv-block.w-2{width:40%;}
 .code-preview .pv-block.w-1{width:80%;}
 
-/* Service progress dots */
-.services-dots{
-  position:absolute;
-  bottom:40px;left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:14px;
-  z-index:5;
-}
-.services-dots .dot{
-  width:24px;height:2px;
-  background:var(--line-strong);
-  border-radius:100px;
-  position:relative;
-  overflow:hidden;
-}
-.services-dots .dot::after{
-  content:'';
-  position:absolute;inset:0;
-  background:var(--grad);
-  transform:scaleX(0);
-  transform-origin:0;
-  transition:transform .4s ease;
-}
-.services-dots .dot.is-active::after{transform:scaleX(1);}
-
 /* ============================================================
-   METHODE
+   METHODE (NODE 06)
    ============================================================ */
-.methode{
-  position:relative;
-  background:var(--bg-1);
-}
 .methode-inner{
   display:grid;
-  grid-template-columns:1fr 1.2fr;
-  gap:100px;
-  align-items:start;
+  grid-template-columns:1fr;
+  gap:40px;
 }
-.methode-sticky{
-  position:sticky;
-  top:120px;
-}
-.methode-sticky h2{
-  font-family:'Syne',sans-serif;
-  font-weight:600;
-  font-size:clamp(36px,5vw,72px);
-  letter-spacing:-.025em;
-  line-height:1;
-  margin-bottom:32px;
-}
-.methode-sticky p{
-  color:var(--text-dim);
-  font-size:16px;
-  max-width:38ch;
-  line-height:1.65;
-  margin-bottom:48px;
-}
-.methode-progress{
-  position:relative;
-  width:100%;
-  max-width:280px;
-  height:4px;
-  background:var(--line);
-  border-radius:100px;
-  overflow:hidden;
-}
-.methode-progress .fill{
-  position:absolute;inset:0;
-  background:var(--grad);
-  transform-origin:0;
-  transform:scaleX(0);
-}
-.methode-progress-label{
-  display:flex;
-  justify-content:space-between;
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px;
-  color:var(--text-mute);
-  letter-spacing:.05em;
-  margin-top:10px;
-  max-width:280px;
-}
-
 .methode-steps{
-  display:flex;
-  flex-direction:column;
-  gap:80px;
-}
-.methode-step{
-  position:relative;
-  padding:40px;
-  border-radius:var(--r-lg);
-  background:var(--glass);
-  border:1px solid var(--line);
-  backdrop-filter:blur(10px);
-}
-.methode-step .step-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:28px;
-  padding-bottom:24px;
-  border-bottom:1px solid var(--line);
-}
-.methode-step .step-num{
-  font-family:'Syne',sans-serif;
-  font-weight:700;
-  font-size:clamp(48px,7vw,96px);
-  line-height:1;
-  background:var(--grad-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  letter-spacing:-.04em;
-}
-.methode-step .step-tag{
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px;
-  color:var(--text-mute);
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  padding:6px 12px;
-  border:1px solid var(--line);
-  border-radius:100px;
-}
-.methode-step h3{
-  font-family:'Syne',sans-serif;
-  font-weight:600;
-  font-size:28px;
-  letter-spacing:-.01em;
-  margin-bottom:14px;
-}
-.methode-step p{
-  color:var(--text-dim);
-  font-size:15px;
-  line-height:1.6;
-}
-.methode-step .step-deliverables{
-  margin-top:24px;
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.methode-step .step-deliverables span{
-  font-size:11px;
-  color:var(--text-dim);
-  padding:6px 12px;
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--line);
-  border-radius:100px;
-}
-
-/* ============================================================
-   RESULTATS (PINNED + HUGE SCRUBBED COUNTERS)
-   ============================================================ */
-.results{
-  position:relative;
-  background:var(--bg-0);
-  overflow:hidden;
-  padding:0;
-}
-.results-pin{
-  position:relative;
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  padding:120px 36px;
-}
-.results::before{
-  content:'';
-  position:absolute;inset:0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
-  background-size:60px 60px;
-  mask-image:radial-gradient(ellipse 80% 50% at 50% 50%,#000 30%,transparent 90%);
-  -webkit-mask-image:radial-gradient(ellipse 80% 50% at 50% 50%,#000 30%,transparent 90%);
-  pointer-events:none;
-}
-.results-inner{
-  width:100%;
-  max-width:var(--container);
-  margin:0 auto;
-  position:relative;
-  z-index:2;
-}
-.results-text{
-  text-align:center;
-  margin-bottom:80px;
-}
-.results-text h2{
-  font-family:'Syne',sans-serif;
-  font-weight:600;
-  font-size:clamp(36px,5vw,72px);
-  line-height:1;
-  letter-spacing:-.025em;
-  margin-bottom:24px;
-  max-width:20ch;
-  margin-inline:auto;
-}
-.results-text p{
-  color:var(--text-dim);
-  font-size:16px;
-  max-width:54ch;
-  line-height:1.65;
-  margin-inline:auto;
-}
-.results-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:20px;
+  margin-top:42px;
+}
+.methode-step{
+  position:relative;
+  padding:32px 26px;
+  border-radius:var(--r-md);
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--line);
+}
+.methode-step::after{
+  content:'';
+  position:absolute;
+  right:-22px;top:50%;
+  width:22px;height:1px;
+  background:linear-gradient(90deg,rgba(124,92,252,.6),transparent);
+}
+.methode-step:last-child::after{display:none;}
+.methode-step .step-num{
+  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:48px;
+  line-height:1;
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  letter-spacing:-.04em;margin-bottom:16px;
+}
+.methode-step .step-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--text-mute);
+  letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:12px;
+}
+.methode-step h3{font-family:'Syne',sans-serif;font-weight:600;font-size:20px;letter-spacing:-.01em;margin-bottom:10px;}
+.methode-step p{color:var(--text-dim);font-size:13.5px;line-height:1.55;}
+
+/* ============================================================
+   RESULTATS (NODE 07)
+   ============================================================ */
+.results-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+  margin-top:42px;
 }
 .result-card{
   position:relative;
-  padding:48px 28px 36px;
-  border-radius:var(--r-lg);
-  background:var(--glass);
+  padding:42px 24px 32px;
+  border-radius:var(--r-md);
+  background:rgba(255,255,255,.03);
   border:1px solid var(--line);
-  backdrop-filter:blur(14px);
-  overflow:hidden;
   text-align:center;
-  transition:transform .55s cubic-bezier(.2,.8,.2,1), border-color .35s;
-}
-.result-card::before{
-  content:'';
-  position:absolute;inset:-1px;
-  border-radius:inherit;
-  background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.55) 25%,transparent 50%,rgba(214,51,132,.55) 75%,transparent 100%);
-  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-  padding:1px;
-  opacity:0;
-  transition:opacity .5s;
-  animation:rotateBorder 6s linear infinite;
-  pointer-events:none;
+  overflow:hidden;
 }
 .result-card::after{
   content:'';
   position:absolute;
   top:50%;left:50%;
-  width:90%;
-  aspect-ratio:1;
+  width:90%;aspect-ratio:1;
   transform:translate(-50%,-55%);
-  background:radial-gradient(circle at center,rgba(124,92,252,.35),rgba(214,51,132,.18) 35%,transparent 65%);
-  filter:blur(40px);
+  background:radial-gradient(circle at center,rgba(124,92,252,.32),rgba(214,51,132,.16) 35%,transparent 65%);
+  filter:blur(36px);
   opacity:.55;
   pointer-events:none;
   z-index:0;
 }
-.result-card:hover{transform:translateY(-6px);}
-.result-card:hover::before{opacity:1;}
 .result-card .num{
   font-family:'Syne',sans-serif;
   font-weight:700;
-  font-size:clamp(4rem,8vw,10rem);
+  font-size:clamp(3.5rem,7vw,7rem);
   line-height:.9;
   letter-spacing:-.05em;
   background:var(--grad-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  margin-bottom:18px;
-  display:flex;
-  align-items:baseline;
-  justify-content:center;
-  position:relative;
-  z-index:1;
-  filter:drop-shadow(0 0 28px rgba(124,92,252,.45));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:14px;
+  display:flex;align-items:baseline;justify-content:center;
+  position:relative;z-index:1;
+  filter:drop-shadow(0 0 24px rgba(124,92,252,.4));
 }
-.result-card .num .prefix{
-  font-size:.55em;
-  margin-right:2px;
-  opacity:.9;
-}
-.result-card .unit{
-  font-size:.45em;
-  margin-left:6px;
-  opacity:.9;
-  font-weight:600;
-}
-.result-card .lbl{
-  font-size:14px;
-  color:var(--text);
-  font-weight:500;
-  margin-bottom:8px;
-  letter-spacing:.01em;
-  position:relative;
-  z-index:1;
-}
-.result-card .desc{
-  font-size:12.5px;
-  color:var(--text-mute);
-  line-height:1.55;
-  position:relative;
-  z-index:1;
-}
+.result-card .num .prefix{font-size:.55em;margin-right:2px;opacity:.9;}
+.result-card .unit{font-size:.45em;margin-left:6px;opacity:.9;font-weight:600;}
+.result-card .lbl{font-size:13px;color:var(--text);font-weight:500;margin-bottom:6px;position:relative;z-index:1;}
+.result-card .desc{font-size:12px;color:var(--text-mute);line-height:1.5;position:relative;z-index:1;}
 
 /* ============================================================
-   TEMOIGNAGES
+   TEMOIGNAGES (NODE 08)
    ============================================================ */
-.testi{
-  background:var(--bg-1);
-  position:relative;
-}
-.testi-head{
-  text-align:center;
-  margin-bottom:80px;
-}
-.testi-head h2{
-  font-family:'Syne',sans-serif;
-  font-weight:600;
-  font-size:clamp(36px,5vw,72px);
-  letter-spacing:-.025em;
-  line-height:1;
-  margin-bottom:20px;
-  max-width:18ch;
-  margin-inline:auto;
-}
-.testi-head p{
-  color:var(--text-dim);
-  max-width:48ch;
-  margin-inline:auto;
-}
 .testi-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:24px;
+  gap:18px;
+  margin-top:42px;
 }
 .testi-card{
   position:relative;
-  padding:36px;
-  border-radius:var(--r-lg);
-  background:var(--glass);
+  padding:32px;
+  border-radius:var(--r-md);
+  background:rgba(255,255,255,.03);
   border:1px solid var(--line);
-  backdrop-filter:blur(10px);
   transition:transform .55s cubic-bezier(.2,.8,.2,1),background-color .35s;
   transform-style:preserve-3d;
   perspective:1000px;
@@ -1370,160 +1067,80 @@ html.lenis,html.lenis body{height:auto;}
   -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
   -webkit-mask-composite:xor;
   mask-composite:exclude;
-  padding:1px;
-  opacity:0;
+  padding:1px;opacity:0;
   transition:opacity .5s;
   animation:rotateBorder 6s linear infinite;
-  pointer-events:none;
-  z-index:2;
+  pointer-events:none;z-index:2;
 }
-.testi-card:hover{background:var(--glass-strong);}
 .testi-card:hover::before{opacity:1;}
 .testi-card .quote-mark{
   font-family:'Syne',sans-serif;
-  font-size:64px;
-  line-height:.5;
+  font-size:56px;line-height:.5;
   background:var(--grad-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  margin-bottom:18px;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:16px;
 }
-.testi-card .quote{
-  font-size:15.5px;
-  line-height:1.6;
-  color:var(--text);
-  margin-bottom:32px;
-  min-height:120px;
-}
-.testi-card .author{
-  display:flex;align-items:center;gap:14px;
-  padding-top:24px;
-  border-top:1px solid var(--line);
-}
+.testi-card .quote{font-size:14.5px;line-height:1.6;color:var(--text);margin-bottom:26px;min-height:110px;}
+.testi-card .author{display:flex;align-items:center;gap:12px;padding-top:20px;border-top:1px solid var(--line);}
 .testi-card .av{
-  width:44px;height:44px;
-  border-radius:50%;
+  width:42px;height:42px;border-radius:50%;
   background:var(--grad);
   display:grid;place-items:center;
-  font-family:'Syne',sans-serif;
-  font-weight:700;
-  font-size:14px;
-  color:#fff;
-  flex:0 0 44px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#fff;flex:0 0 42px;
 }
-.testi-card .author-meta .name{font-size:14px;font-weight:500;}
-.testi-card .author-meta .role{font-size:12px;color:var(--text-dim);margin-top:2px;}
-.testi-card .city{
-  position:absolute;
-  top:24px;right:28px;
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;
-  letter-spacing:.1em;
-  color:var(--text-mute);
-}
+.testi-card .author-meta .name{font-size:13.5px;font-weight:500;}
+.testi-card .author-meta .role{font-size:11.5px;color:var(--text-dim);margin-top:2px;}
+.testi-card .city{position:absolute;top:22px;right:24px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--text-mute);}
 
 /* ============================================================
-   CTA FINAL
+   CTA FINAL (NODE 09)
    ============================================================ */
 .cta-final{
-  position:relative;
-  padding:180px 36px;
   text-align:center;
-  overflow:hidden;
-  background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(124,92,252,.18),rgba(214,51,132,.05) 40%,transparent 70%),var(--bg-0);
+  position:relative;
 }
-.cta-final::before{
-  content:'';
-  position:absolute;inset:0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-  background-size:80px 80px;
-  mask-image:radial-gradient(ellipse 70% 50% at 50% 50%,#000,transparent 90%);
-  -webkit-mask-image:radial-gradient(ellipse 70% 50% at 50% 50%,#000,transparent 90%);
-}
+.cta-final .node-card{padding:80px 50px;}
 .cta-final h2{
   font-family:'Syne',sans-serif;
   font-weight:700;
-  font-size:clamp(48px,8vw,128px);
+  font-size:clamp(42px,7vw,108px);
   letter-spacing:-.035em;
   line-height:.95;
-  max-width:14ch;
-  margin:0 auto 36px;
+  max-width:18ch;
+  margin:0 auto 28px;
 }
 .cta-final h2 .grad{
   background:var(--grad-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .cta-final p{
   color:var(--text-dim);
-  font-size:18px;
-  max-width:54ch;
-  margin:0 auto 56px;
+  font-size:17px;
+  max-width:52ch;
+  margin:0 auto 44px;
   line-height:1.55;
 }
-.cta-final .cta-row{
-  justify-content:center;
-  margin-bottom:0;
-}
-.cta-final .btn-primary{
-  padding:22px 36px;
-  font-size:15px;
-}
+.cta-final .cta-row{justify-content:center;margin-bottom:0;}
 
 /* ============================================================
    FOOTER
    ============================================================ */
 .footer{
   position:relative;
+  z-index:5;
   padding:80px 36px 40px;
-  background:var(--bg-0);
+  background:rgba(7,10,20,.85);
+  backdrop-filter:blur(20px);
   border-top:1px solid var(--line);
 }
-.footer-inner{
-  max-width:var(--container);
-  margin:0 auto;
-}
-.footer-top{
-  display:grid;
-  grid-template-columns:1.5fr 1fr 1fr 1fr;
-  gap:60px;
-  margin-bottom:80px;
-}
-.footer-brand .logo{
-  display:block;
-  margin-bottom:24px;
-  max-width:240px;
-}
-.footer-brand .logo img{
-  width:100%;
-  height:auto;
-  display:block;
-  filter:drop-shadow(0 0 18px rgba(124,92,252,.25));
-}
-.footer-brand p{
-  color:var(--text-dim);
-  font-size:14px;
-  line-height:1.6;
-  max-width:34ch;
-}
-.footer-col h4{
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:.22em;
-  color:var(--text-mute);
-  margin-bottom:20px;
-  font-weight:500;
-}
+.footer-inner{max-width:var(--container);margin:0 auto;}
+.footer-top{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:60px;margin-bottom:60px;}
+.footer-brand .logo{display:block;margin-bottom:24px;max-width:220px;}
+.footer-brand .logo img{width:100%;height:auto;display:block;filter:drop-shadow(0 0 18px rgba(124,92,252,.25));}
+.footer-brand p{color:var(--text-dim);font-size:14px;line-height:1.6;max-width:34ch;}
+.footer-col h4{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:var(--text-mute);margin-bottom:20px;font-weight:500;font-family:'JetBrains Mono',monospace;}
 .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:14px;}
-.footer-col a{
-  font-size:14px;
-  color:var(--text-dim);
-  transition:color .25s;
-}
+.footer-col a{font-size:14px;color:var(--text-dim);transition:color .25s;}
 .footer-col a:hover{color:var(--text);}
 .footer-bottom{
   padding-top:32px;
@@ -1538,84 +1155,44 @@ html.lenis,html.lenis body{height:auto;}
 }
 .footer-socials{display:flex;gap:14px;}
 .footer-socials a{
-  width:38px;height:38px;
-  border-radius:50%;
+  width:38px;height:38px;border-radius:50%;
   border:1px solid var(--line);
   display:grid;place-items:center;
   transition:border-color .35s,background-color .35s,transform .35s;
 }
-.footer-socials a:hover{
-  border-color:rgba(255,255,255,.3);
-  background:rgba(255,255,255,.04);
-  transform:translateY(-2px);
-}
+.footer-socials a:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.04);transform:translateY(-2px);}
 .footer-socials svg{width:14px;height:14px;}
-
-.footer-mega{
-  font-family:'Syne',sans-serif;
-  font-weight:800;
-  font-size:clamp(80px,18vw,260px);
-  line-height:.85;
-  letter-spacing:-.05em;
-  margin-top:40px;
-  background:linear-gradient(180deg,rgba(255,255,255,.06) 0%,transparent 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  text-align:center;
-  user-select:none;
-  white-space:nowrap;
-  overflow:hidden;
-}
 
 /* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width:1024px){
-  .problems-head,.services-head,.methode-inner,.footer-top{
-    grid-template-columns:1fr;
-    gap:40px;
+  .pain-grid,.service-grid,.methode-steps,.results-grid,.testi-grid,.footer-top{
+    grid-template-columns:1fr;gap:18px;
   }
-  .problems-grid{grid-template-columns:1fr;}
   .results-grid{grid-template-columns:repeat(2,1fr);}
-  .testi-grid{grid-template-columns:1fr;}
-  .service-content{grid-template-columns:1fr;}
+  .methode-steps{grid-template-columns:repeat(2,1fr);}
+  .methode-step::after{display:none;}
   .service-visual{height:380px;}
-  .methode-sticky{position:relative;top:0;}
-  .methode-steps{gap:24px;}
-  .results-pin{min-height:auto;padding:100px 36px;}
-  .result-card .num{font-size:clamp(3.5rem,9vw,5rem);}
+  .node-card{padding:40px;}
 }
 @media (max-width:768px){
   body{cursor:auto;}
   .cursor,.cursor-glow{display:none;}
   .nav{padding:18px 22px;}
   .nav.is-scrolled{padding:12px 22px;}
-  .nav-links{display:none;}
-  .nav-cta{display:none;}
+  .nav-links,.nav-cta{display:none;}
   .nav-burger{display:flex;}
   .mobile-menu{display:flex;}
-  .section{padding:90px 22px;}
+  .node-section{padding:90px 22px;min-height:auto;}
   .hero{padding:0 22px;}
-  .hero-stats{
-    grid-template-columns:1fr;
-    gap:24px;
-    padding-top:32px;
-  }
-  .cta-final{padding:120px 22px;}
-  .hero-side,.hero-scroll-hint{display:none;}
-  .horizontal-container{height:auto;}
-  .horizontal-track{flex-direction:column;}
-  .service-panel{flex:0 0 auto;height:auto;padding:60px 22px;}
-  .services-dots{display:none;}
+  .hero-stats{grid-template-columns:1fr;gap:24px;}
+  .results-grid,.methode-steps{grid-template-columns:1fr;}
+  .testi-grid{grid-template-columns:1fr;}
   .footer-top{grid-template-columns:1fr;}
-  .footer-mega{font-size:80px;}
-  .results-grid{grid-template-columns:1fr;}
-  .results-pin{padding:80px 22px;}
-  .result-card{padding:36px 24px 28px;}
-  .preloader-counter,.preloader-tag{bottom:24px;}
-  .preloader-counter{left:22px;}
-  .preloader-tag{right:22px;}
+  .node-card{padding:32px 26px;border-radius:var(--r-md);}
+  .cta-final .node-card{padding:60px 28px;}
+  .hud,.hud-right{display:none;}
 }
 </style>
 </head>
@@ -1631,12 +1208,304 @@ html.lenis,html.lenis body{height:auto;}
 <div class="cursor-glow" id="cursor-glow"></div>
 <div class="cursor" id="cursor"></div>
 
-<!-- Background orbs -->
-<div class="orbs" aria-hidden="true">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-  <div class="orb orb-4"></div>
+<!-- ============================================================
+     CIRCUIT BACKGROUND — fixed canvas, camera-pannable
+     ============================================================ -->
+<div class="circuit-bg" id="circuit-bg" aria-hidden="true">
+  <svg id="circuit-svg" viewBox="0 0 4000 3000" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <!-- Grid pattern -->
+      <pattern id="grid-pattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+        <circle cx="40" cy="40" r="1" fill="rgba(124,92,252,.13)"/>
+      </pattern>
+      <!-- Trace gradient -->
+      <linearGradient id="grad-trace" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4d7cff"/>
+        <stop offset="50%" stop-color="#7c5cfc"/>
+        <stop offset="100%" stop-color="#d63384"/>
+      </linearGradient>
+      <!-- Core radial -->
+      <radialGradient id="grad-core" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity=".95"/>
+        <stop offset="35%" stop-color="#e8548e" stop-opacity=".95"/>
+        <stop offset="100%" stop-color="#7c5cfc" stop-opacity=".4"/>
+      </radialGradient>
+      <!-- Soft halo radial -->
+      <radialGradient id="grad-halo" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(214,51,132,.4)"/>
+        <stop offset="60%" stop-color="rgba(124,92,252,.18)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <!-- Glow filter -->
+      <filter id="glow-soft" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="6" result="b"/>
+        <feMerge>
+          <feMergeNode in="b"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!-- Grid background -->
+    <rect width="4000" height="3000" fill="url(#grid-pattern)"/>
+
+    <!-- Large background chip rectangles (depth layers) -->
+    <g opacity=".5">
+      <rect x="200"  y="200"  width="600" height="400" rx="14" class="comp-ic"/>
+      <rect x="240"  y="240"  width="520" height="320" rx="8"  class="comp-ic" opacity=".6"/>
+      <rect x="2800" y="180"  width="900" height="500" rx="14" class="comp-ic"/>
+      <rect x="2840" y="220"  width="820" height="420" rx="8"  class="comp-ic" opacity=".6"/>
+      <rect x="180"  y="2400" width="700" height="450" rx="14" class="comp-ic"/>
+      <rect x="2900" y="2400" width="900" height="450" rx="14" class="comp-ic"/>
+      <rect x="1500" y="2700" width="1000" height="220" rx="14" class="comp-ic"/>
+    </g>
+
+    <!-- Decorative secondary traces (background depth) -->
+    <g class="trace-deco">
+      <path class="tr" d="M0,1500 H400 V1200 H600 V1000"/>
+      <path class="tr" d="M4000,1500 H3700 V1200 H3400 V1000"/>
+      <path class="tr" d="M2000,3000 V2700 H1800"/>
+      <path class="tr" d="M2200,3000 V2700 H2400"/>
+      <path class="tr" d="M0,800  H300  V1100 H500"/>
+      <path class="tr" d="M4000,800 H3700 V1100 H3500"/>
+      <path class="tr" d="M1000,200 V400 H800 V600"/>
+      <path class="tr" d="M3000,200 V400 H3200 V600"/>
+      <path class="tr" d="M1700,1500 H2000 V1700 H2300 V1500"/>
+      <path class="tr" d="M1700,1100 H2300"/>
+      <path class="tr" d="M900,1800 H1100 V2000 H1300"/>
+      <path class="tr" d="M3100,1800 H2900 V2000 H2700"/>
+      <!-- Sub-circuit lines -->
+      <path class="tr" d="M2000,150 V300 H1700 V450"/>
+      <path class="tr" d="M2000,150 V300 H2300 V450"/>
+    </g>
+
+    <!-- Small decorative components: resistors, capacitors, ICs -->
+    <g class="comps">
+      <!-- Resistors (rectangles) -->
+      <rect class="comp-res" x="700"  y="1100" width="60" height="22" rx="3"/>
+      <rect class="comp-res" x="3300" y="1100" width="60" height="22" rx="3"/>
+      <rect class="comp-res" x="1900" y="2000" width="60" height="22" rx="3"/>
+      <rect class="comp-res" x="2100" y="2000" width="60" height="22" rx="3"/>
+      <rect class="comp-res" x="600"  y="400"  width="60" height="22" rx="3"/>
+      <rect class="comp-res" x="3340" y="400"  width="60" height="22" rx="3"/>
+      <rect class="comp-res" x="1000" y="2400" width="60" height="22" rx="3"/>
+      <rect class="comp-res" x="3000" y="2400" width="60" height="22" rx="3"/>
+
+      <!-- Capacitors (circles) -->
+      <circle class="comp-cap" cx="500"  cy="1700" r="14"/>
+      <circle class="comp-cap" cx="3500" cy="1700" r="14"/>
+      <circle class="comp-cap" cx="2000" cy="900"  r="14"/>
+      <circle class="comp-cap" cx="2000" cy="2100" r="14"/>
+      <circle class="comp-cap" cx="1300" cy="800"  r="14"/>
+      <circle class="comp-cap" cx="2700" cy="800"  r="14"/>
+      <circle class="comp-cap" cx="900"  cy="1800" r="14"/>
+      <circle class="comp-cap" cx="3100" cy="1800" r="14"/>
+
+      <!-- Vias (small dots) -->
+      <circle class="via" cx="2700" cy="500"  r="5"/>
+      <circle class="via" cx="3500" cy="1200" r="5"/>
+      <circle class="via" cx="3500" cy="1800" r="5"/>
+      <circle class="via" cx="2800" cy="2500" r="5"/>
+      <circle class="via" cx="1200" cy="2500" r="5"/>
+      <circle class="via" cx="500"  cy="1800" r="5"/>
+      <circle class="via" cx="500"  cy="1200" r="5"/>
+      <circle class="via" cx="1200" cy="1500" r="5"/>
+      <circle class="via" cx="1700" cy="1500" r="5"/>
+      <circle class="via" cx="2300" cy="1500" r="5"/>
+
+      <!-- Decorative ICs with pins -->
+      <g transform="translate(700,1500)">
+        <rect class="comp-ic" x="-60" y="-30" width="120" height="60" rx="4"/>
+        <g class="comp-ic-pin">
+          <line x1="-60" y1="-15" x2="-70" y2="-15"/>
+          <line x1="-60" y1="0"   x2="-70" y2="0"/>
+          <line x1="-60" y1="15"  x2="-70" y2="15"/>
+          <line x1="60"  y1="-15" x2="70"  y2="-15"/>
+          <line x1="60"  y1="0"   x2="70"  y2="0"/>
+          <line x1="60"  y1="15"  x2="70"  y2="15"/>
+        </g>
+        <text x="0" y="0" class="nlabel" fill="rgba(255,255,255,.4)" style="font-size:10px;">NX-1A</text>
+      </g>
+      <g transform="translate(3300,1500)">
+        <rect class="comp-ic" x="-60" y="-30" width="120" height="60" rx="4"/>
+        <g class="comp-ic-pin">
+          <line x1="-60" y1="-15" x2="-70" y2="-15"/>
+          <line x1="-60" y1="0"   x2="-70" y2="0"/>
+          <line x1="-60" y1="15"  x2="-70" y2="15"/>
+          <line x1="60"  y1="-15" x2="70"  y2="-15"/>
+          <line x1="60"  y1="0"   x2="70"  y2="0"/>
+          <line x1="60"  y1="15"  x2="70"  y2="15"/>
+        </g>
+        <text x="0" y="0" class="nlabel" fill="rgba(255,255,255,.4)" style="font-size:10px;">NX-2B</text>
+      </g>
+      <g transform="translate(2000,2150)">
+        <rect class="comp-ic" x="-80" y="-22" width="160" height="44" rx="4"/>
+        <text x="0" y="0" class="nlabel" fill="rgba(255,255,255,.4)" style="font-size:10px;">SDS-PROC-9</text>
+      </g>
+    </g>
+
+    <!-- MAIN TRACES connecting the 9 nodes (PCB right-angle bends) -->
+    <g class="trace-main-group">
+      <path class="tr-main tr-flow" id="trace-1-2" d="M2000,500 H2700 V800 H3200"/>
+      <path class="tr-main tr-flow" id="trace-2-3" d="M3200,800 H3500 V1500"/>
+      <path class="tr-main tr-flow" id="trace-3-4" d="M3500,1500 V2200 H3200"/>
+      <path class="tr-main tr-flow" id="trace-4-5" d="M3200,2200 H2800 V2500 H2400"/>
+      <path class="tr-main tr-flow" id="trace-5-6" d="M2400,2500 H1600"/>
+      <path class="tr-main tr-flow" id="trace-6-7" d="M1600,2500 H1200 V2200 H800"/>
+      <path class="tr-main tr-flow" id="trace-7-8" d="M800,2200 V1500 H500"/>
+      <path class="tr-main tr-flow" id="trace-8-9" d="M500,1500 H2000"/>
+    </g>
+
+    <!-- ACTIVE traces (energy pulse along — animated by JS) -->
+    <g class="trace-pulse-group">
+      <path class="tr-pulse" id="pulse-1-2" d="M2000,500 H2700 V800 H3200"/>
+      <path class="tr-pulse" id="pulse-2-3" d="M3200,800 H3500 V1500"/>
+      <path class="tr-pulse" id="pulse-3-4" d="M3500,1500 V2200 H3200"/>
+      <path class="tr-pulse" id="pulse-4-5" d="M3200,2200 H2800 V2500 H2400"/>
+      <path class="tr-pulse" id="pulse-5-6" d="M2400,2500 H1600"/>
+      <path class="tr-pulse" id="pulse-6-7" d="M1600,2500 H1200 V2200 H800"/>
+      <path class="tr-pulse" id="pulse-7-8" d="M800,2200 V1500 H500"/>
+      <path class="tr-pulse" id="pulse-8-9" d="M500,1500 H2000"/>
+    </g>
+
+    <!-- NODES (9 chips at trace endpoints) -->
+    <g class="nodes-group">
+      <!-- Reusable node template applied to each: -->
+      <g class="node-g" id="node-1" transform="translate(2000,500)">
+        <circle r="160" fill="url(#grad-halo)" opacity=".75"/>
+        <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
+        <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
+        <g class="pin">
+          <line x1="-86" y1="-32" x2="-100" y2="-32"/>
+          <line x1="-86" y1="-10" x2="-100" y2="-10"/>
+          <line x1="-86" y1="12"  x2="-100" y2="12"/>
+          <line x1="-86" y1="34"  x2="-100" y2="34"/>
+          <line x1="86"  y1="-32" x2="100"  y2="-32"/>
+          <line x1="86"  y1="-10" x2="100"  y2="-10"/>
+          <line x1="86"  y1="12"  x2="100"  y2="12"/>
+          <line x1="86"  y1="34"  x2="100"  y2="34"/>
+        </g>
+        <circle class="halo" r="56"/>
+        <circle class="halo-2" r="78"/>
+        <circle class="core" r="16"/>
+        <text class="num" x="0" y="-78">N01</text>
+      </g>
+      <g class="node-g" id="node-2" transform="translate(3200,800)">
+        <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
+        <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
+        <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
+        <g class="pin">
+          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
+          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
+          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
+          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
+        </g>
+        <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
+        <circle class="core" r="16"/>
+        <text class="num" x="0" y="-78">N02</text>
+      </g>
+      <g class="node-g" id="node-3" transform="translate(3500,1500)">
+        <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
+        <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
+        <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
+        <g class="pin">
+          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
+          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
+          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
+          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
+        </g>
+        <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
+        <circle class="core" r="16"/>
+        <text class="num" x="0" y="-78">N03</text>
+      </g>
+      <g class="node-g" id="node-4" transform="translate(3200,2200)">
+        <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
+        <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
+        <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
+        <g class="pin">
+          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
+          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
+          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
+          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
+        </g>
+        <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
+        <circle class="core" r="16"/>
+        <text class="num" x="0" y="-78">N04</text>
+      </g>
+      <g class="node-g" id="node-5" transform="translate(2400,2500)">
+        <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
+        <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
+        <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
+        <g class="pin">
+          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
+          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
+          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
+          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
+        </g>
+        <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
+        <circle class="core" r="16"/>
+        <text class="num" x="0" y="-78">N05</text>
+      </g>
+      <g class="node-g" id="node-6" transform="translate(1600,2500)">
+        <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
+        <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
+        <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
+        <g class="pin">
+          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
+          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
+          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
+          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
+        </g>
+        <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
+        <circle class="core" r="16"/>
+        <text class="num" x="0" y="-78">N06</text>
+      </g>
+      <g class="node-g" id="node-7" transform="translate(800,2200)">
+        <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
+        <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
+        <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
+        <g class="pin">
+          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
+          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
+          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
+          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
+        </g>
+        <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
+        <circle class="core" r="16"/>
+        <text class="num" x="0" y="-78">N07</text>
+      </g>
+      <g class="node-g" id="node-8" transform="translate(500,1500)">
+        <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
+        <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
+        <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
+        <g class="pin">
+          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
+          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
+          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
+          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
+        </g>
+        <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
+        <circle class="core" r="16"/>
+        <text class="num" x="0" y="-78">N08</text>
+      </g>
+      <g class="node-g" id="node-9" transform="translate(2000,1500)">
+        <circle r="220" fill="url(#grad-halo)" opacity=".85"/>
+        <rect class="chip" x="-110" y="-72" width="220" height="144" rx="8"/>
+        <rect class="chip-inner" x="-94" y="-56" width="188" height="112" rx="4"/>
+        <g class="pin">
+          <line x1="-110" y1="-44" x2="-126" y2="-44"/><line x1="-110" y1="-22" x2="-126" y2="-22"/>
+          <line x1="-110" y1="0"   x2="-126" y2="0"/><line x1="-110" y1="22"   x2="-126" y2="22"/>
+          <line x1="-110" y1="44"  x2="-126" y2="44"/>
+          <line x1="110" y1="-44" x2="126" y2="-44"/><line x1="110" y1="-22" x2="126" y2="-22"/>
+          <line x1="110" y1="0"   x2="126" y2="0"/><line x1="110" y1="22"   x2="126" y2="22"/>
+          <line x1="110" y1="44"  x2="126" y2="44"/>
+        </g>
+        <circle class="halo" r="72"/><circle class="halo-2" r="98"/>
+        <circle class="core" r="22"/>
+        <text class="num" x="0" y="-94">CORE</text>
+      </g>
+    </g>
+  </svg>
 </div>
 
 <!-- Preloader -->
@@ -1646,7 +1515,7 @@ html.lenis,html.lenis body{height:auto;}
     <img src="logo.png" alt="NEEXUS — Smart Digital Solution Agency" fetchpriority="high" decoding="sync" />
   </div>
   <div class="preloader-counter" id="preloader-counter">000</div>
-  <div class="preloader-tag" id="preloader-tag">Loading</div>
+  <div class="preloader-tag" id="preloader-tag">Booting</div>
 </div>
 
 <!-- Navigation -->
@@ -1655,12 +1524,12 @@ html.lenis,html.lenis body{height:auto;}
     <img src="logo.png" alt="NEEXUS" fetchpriority="high" />
   </a>
   <div class="nav-links">
-    <a href="#services" data-cursor>Services</a>
-    <a href="#methode" data-cursor>Méthode</a>
-    <a href="#resultats" data-cursor>Résultats</a>
-    <a href="#temoignages" data-cursor>Témoignages</a>
+    <a href="#node-section-3" data-cursor>Services</a>
+    <a href="#node-section-6" data-cursor>Méthode</a>
+    <a href="#node-section-7" data-cursor>Résultats</a>
+    <a href="#node-section-8" data-cursor>Témoignages</a>
   </div>
-  <a href="#cta" class="nav-cta" data-cursor data-magnetic>
+  <a href="#node-section-9" class="nav-cta" data-cursor data-magnetic>
     Audit gratuit <span class="arrow">→</span>
   </a>
   <button class="nav-burger" id="nav-burger" aria-label="Menu">
@@ -1670,154 +1539,128 @@ html.lenis,html.lenis body{height:auto;}
 
 <!-- Mobile menu -->
 <div class="mobile-menu" id="mobile-menu">
-  <a href="#services">Services</a>
-  <a href="#methode">Méthode</a>
-  <a href="#resultats">Résultats</a>
-  <a href="#temoignages">Témoignages</a>
-  <a href="#cta" class="gradient-text">Audit gratuit →</a>
+  <a href="#node-section-3">Services</a>
+  <a href="#node-section-6">Méthode</a>
+  <a href="#node-section-7">Résultats</a>
+  <a href="#node-section-8">Témoignages</a>
+  <a href="#node-section-9" class="gradient-text">Audit gratuit →</a>
 </div>
 
-<!-- ============================================================
-     HERO
-     ============================================================ -->
-<section class="hero" id="hero">
-  <div class="hero-grid-bg"></div>
-  <div class="hero-side">N° 001 — SDS LLC</div>
-  <div class="hero-inner">
-    <div class="hero-badge" data-hero-fade>
-      <span class="pulse-dot"></span>
-      Smart Digital Solution Agency
-    </div>
-
-    <h1 class="hero-title">
-      <span class="line"><span class="line-inner" data-hero-line>Vos concurrents</span></span>
-      <span class="line"><span class="line-inner" data-hero-line>automatisent.</span></span>
-      <span class="line line-2"><span class="line-inner italic" data-hero-line>Vous faites encore</span></span>
-      <span class="line line-2"><span class="line-inner italic" data-hero-line>tout à la main ?</span></span>
-    </h1>
-
-    <p class="hero-sub" data-hero-fade>
-      On automatise ce qui vous freine pour que vous puissiez vous concentrer sur
-      <b>ce qui fait vraiment grandir votre business</b>. IA, workflows, présence digitale —
-      les outils des grandes entreprises, pour la vôtre.
-    </p>
-
-    <div class="cta-row" data-hero-fade>
-      <a href="#cta" class="btn btn-primary" data-cursor data-magnetic>
-        Réserver mon audit gratuit
-        <span class="arrow">→</span>
-      </a>
-      <a href="#services" class="btn btn-ghost" data-cursor data-magnetic>
-        Découvrir nos solutions
-        <span class="arrow">↓</span>
-      </a>
-    </div>
-
-    <div class="hero-stats" data-hero-fade>
-      <div class="hero-stat">
-        <div class="num"><span class="counter" data-target="150">0</span>+</div>
-        <div class="lbl">Automatisations<br/>déployées</div>
-      </div>
-      <div class="hero-stat">
-        <div class="num"><span class="counter" data-target="98">0</span>%</div>
-        <div class="lbl">Satisfaction<br/>client</div>
-      </div>
-      <div class="hero-stat">
-        <div class="num"><span class="counter" data-target="10">0</span>x</div>
-        <div class="lbl">ROI moyen<br/>constaté</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="hero-scroll-hint" data-hero-fade>
-    <div class="bar"></div>
-    Scroll
-  </div>
-</section>
+<!-- HUD (current node indicator) -->
+<div class="hud" id="hud">
+  <span class="dot"></span>
+  <span><span class="label" id="hud-label">N01</span> · <span id="hud-name">Hero</span></span>
+  <span class="total">/ 09 nodes</span>
+</div>
+<div class="hud-right" id="hud-right">SDS · CIRCUIT · LIVE</div>
 
 <!-- ============================================================
-     PROBLEMS
+     SECTIONS — 9 NODES
      ============================================================ -->
-<section class="section problems" id="problems">
-  <div class="container">
-    <div class="problems-head">
-      <div>
-        <div class="section-eyebrow">
-          <span class="num">01</span>
-          <span class="line"></span>
-          <span class="label">Pain Points</span>
-        </div>
-        <h2 class="section-title" data-split>
-          Si vous reconnaissez ces situations, on peut vous aider.
-        </h2>
+<main>
+
+  <!-- ===== NODE 01 · HERO ===== -->
+  <section class="node-section hero is-first" id="node-section-1" data-node="1" data-node-name="Hero">
+    <div class="hero-inner">
+      <div class="hero-badge" data-hero-fade>
+        <span class="pulse-dot"></span>
+        <span>NX-CIRCUIT v4 · INITIALIZED</span>
       </div>
-      <p class="problems-intro" data-fade>
-        Ces frictions coûtent en moyenne <b style="color:var(--text);">28h par semaine</b>
-        à une PME. Le pire : la plupart des dirigeants ne réalisent même pas qu'elles existent.
+      <h1 class="hero-title">
+        <span class="line"><span class="line-inner" data-hero-line>Vos concurrents</span></span>
+        <span class="line"><span class="line-inner" data-hero-line>automatisent.</span></span>
+        <span class="line line-2"><span class="line-inner italic" data-hero-line>Vous faites encore</span></span>
+        <span class="line line-2"><span class="line-inner italic" data-hero-line>tout à la main ?</span></span>
+      </h1>
+      <p class="hero-sub" data-hero-fade>
+        On automatise ce qui vous freine pour que vous puissiez vous concentrer sur
+        <b>ce qui fait vraiment grandir votre business</b>. IA, workflows, présence digitale —
+        les outils des grandes entreprises, pour la vôtre.
       </p>
-    </div>
-
-    <div class="problems-grid">
-      <article class="problem-card" data-card>
-        <div class="tag">P-01</div>
-        <div class="icon">🔄</div>
-        <h3>Tâches répétitives</h3>
-        <p>Votre équipe passe <b style="color:var(--text);">60% de son temps</b> sur des tâches qui ne génèrent aucun chiffre d'affaires. Saisie manuelle, copier-coller entre outils, relances, devis…</p>
-      </article>
-      <article class="problem-card" data-card>
-        <div class="tag">P-02</div>
-        <div class="icon">📞</div>
-        <h3>Clients perdus</h3>
-        <p>Un prospect qui attend <b style="color:var(--text);">5 minutes sans réponse</b> a 80% de chances de partir chez le concurrent. Les leads qualifiés s'évaporent pendant la pause déjeuner.</p>
-      </article>
-      <article class="problem-card" data-card>
-        <div class="tag">P-03</div>
-        <div class="icon">🔧</div>
-        <h3>Outils déconnectés</h3>
-        <p>CRM, facturation, emails, planning, comptabilité — vos outils ne se parlent pas. Résultat : double saisie, erreurs, et une vue partielle de votre business.</p>
-      </article>
-      <article class="problem-card" data-card>
-        <div class="tag">P-04</div>
-        <div class="icon">⏰</div>
-        <h3>Pas le temps</h3>
-        <p>Trop occupé à faire tourner le quotidien pour penser à demain. La transformation digitale reste un projet "qu'on lancera bientôt"… depuis trois ans.</p>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================================
-     SERVICES (Horizontal Scroll)
-     ============================================================ -->
-<div class="services-wrap" id="services">
-  <div class="services-head">
-    <div>
-      <div class="section-eyebrow">
-        <span class="num">02</span>
-        <span class="line"></span>
-        <span class="label">Services</span>
+      <div class="cta-row" data-hero-fade>
+        <a href="#node-section-9" class="btn btn-primary" data-cursor data-magnetic>
+          Réserver mon audit gratuit
+          <span class="arrow">→</span>
+        </a>
+        <a href="#node-section-3" class="btn btn-ghost" data-cursor data-magnetic>
+          Explorer le circuit
+          <span class="arrow">↓</span>
+        </a>
       </div>
-      <h2 class="section-title" data-split>
-        Trois piliers pour digitaliser votre entreprise.
-      </h2>
+      <div class="hero-stats" data-hero-fade>
+        <div class="hero-stat">
+          <div class="num"><span class="counter" data-target="150">0</span>+</div>
+          <div class="lbl">Automatisations<br/>déployées</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num"><span class="counter" data-target="98">0</span>%</div>
+          <div class="lbl">Satisfaction<br/>client</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num"><span class="counter" data-target="10">0</span>x</div>
+          <div class="lbl">ROI moyen<br/>constaté</div>
+        </div>
+      </div>
     </div>
-    <p data-fade>
-      On ne fait pas tout. On fait <b style="color:var(--text);">trois choses, mais on les fait
-      mieux que les autres</b>. Chaque pilier est conçu pour générer un ROI mesurable
-      dès les premières semaines.
-    </p>
-  </div>
+  </section>
 
-  <div class="horizontal-container" id="horizontal-container">
-    <div class="horizontal-track" id="horizontal-track">
+  <!-- ===== NODE 02 · PAIN POINTS ===== -->
+  <section class="node-section" id="node-section-2" data-node="2" data-node-name="Pain Points">
+    <div class="node-content">
+      <div class="node-card" data-tilt>
+        <div class="section-tag">
+          <span class="node-id">N02</span>
+          <span class="line"></span>
+          <span class="label">Diagnostic · Pain Points</span>
+        </div>
+        <h2 class="section-title" data-split>Si vous reconnaissez ces situations, on peut vous aider.</h2>
+        <p class="section-sub" data-fade>
+          Ces frictions coûtent en moyenne <b>28h par semaine</b> à une PME.
+          Le pire : la plupart des dirigeants ne réalisent même pas qu'elles existent.
+        </p>
+        <div class="pain-grid">
+          <article class="pain-card" data-card>
+            <div class="tag">P-01</div>
+            <div class="icon">🔄</div>
+            <h3>Tâches répétitives</h3>
+            <p>Votre équipe passe <b>60% de son temps</b> sur des tâches qui ne génèrent aucun CA. Saisie, copier-coller entre outils, relances, devis…</p>
+          </article>
+          <article class="pain-card" data-card>
+            <div class="tag">P-02</div>
+            <div class="icon">📞</div>
+            <h3>Clients perdus</h3>
+            <p>Un prospect qui attend <b>5 minutes sans réponse</b> a 80% de chances de partir chez le concurrent. Les leads s'évaporent.</p>
+          </article>
+          <article class="pain-card" data-card>
+            <div class="tag">P-03</div>
+            <div class="icon">🔧</div>
+            <h3>Outils déconnectés</h3>
+            <p>CRM, facturation, emails, planning — vos outils ne se parlent pas. Résultat : double saisie, erreurs, vue partielle.</p>
+          </article>
+          <article class="pain-card" data-card>
+            <div class="tag">P-04</div>
+            <div class="icon">⏰</div>
+            <h3>Pas le temps</h3>
+            <p>Trop occupé à faire tourner le quotidien pour penser à demain. La transfo digitale reste un projet "qu'on lancera bientôt"… depuis 3 ans.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <!-- Pilier 01 -->
-      <section class="service-panel">
-        <div class="panel-num">01 / 03 — IA</div>
-        <div class="service-content">
+  <!-- ===== NODE 03 · IA & AGENTS ===== -->
+  <section class="node-section" id="node-section-3" data-node="3" data-node-name="IA & Agents">
+    <div class="node-content">
+      <div class="node-card">
+        <div class="section-tag">
+          <span class="node-id">N03</span>
+          <span class="line"></span>
+          <span class="label">Pilier · IA &amp; Agents Intelligents</span>
+        </div>
+        <div class="service-grid">
           <div class="service-text">
             <span class="pillar-num">PILIER 01</span>
-            <h3>IA &amp; Agents<br/><span class="italic gradient-text">Intelligents</span></h3>
+            <h3>IA &amp; Agents <span class="italic gradient-text">Intelligents</span></h3>
             <p class="lead">Des agents conversationnels qui répondent, qualifient, vendent et planifient — 24h/24, dans toutes les langues, sans pause café.</p>
             <ul>
               <li>Chatbots intelligents multi-canaux (site, WhatsApp, Instagram)</li>
@@ -1835,102 +1678,109 @@ html.lenis,html.lenis body{height:auto;}
               </div>
               <div class="ch-btn">AI ↗</div>
             </div>
-            <div class="chat-msgs" id="chat-msgs">
+            <div class="chat-msgs">
               <div class="msg user" data-msg>Bonjour, je voudrais réserver une table pour 4 ce vendredi soir.</div>
               <div class="msg ai" data-msg>
-                Bonsoir ! Avec plaisir 🌿 Pour vendredi 22h ou 20h, j'ai des disponibilités. Vous préférez quel créneau ?
+                Bonsoir ! Avec plaisir 🌿 Pour vendredi, j'ai 20h ou 22h. Vous préférez ?
                 <div class="meta">Répondu en 0.4s</div>
               </div>
               <div class="msg user" data-msg>20h c'est parfait.</div>
               <div class="msg ai" data-msg>
-                Réservé ! Je viens d'envoyer la confirmation à votre numéro. Voulez-vous une table en terrasse ?
+                Réservé ! Confirmation envoyée par SMS. Table en terrasse ?
                 <div class="meta">CRM mis à jour automatiquement</div>
               </div>
               <div class="typing" data-msg><span></span><span></span><span></span></div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </div>
+  </section>
 
-      <!-- Pilier 02 -->
-      <section class="service-panel">
-        <div class="panel-num">02 / 03 — Workflows</div>
-        <div class="service-content">
+  <!-- ===== NODE 04 · AUTOMATISATION ===== -->
+  <section class="node-section" id="node-section-4" data-node="4" data-node-name="Automatisation">
+    <div class="node-content">
+      <div class="node-card">
+        <div class="section-tag">
+          <span class="node-id">N04</span>
+          <span class="line"></span>
+          <span class="label">Pilier · Automatisation &amp; Workflows</span>
+        </div>
+        <div class="service-grid">
           <div class="service-text">
             <span class="pillar-num">PILIER 02</span>
             <h3>Automatisation &amp; <span class="italic gradient-text">Workflows</span></h3>
             <p class="lead">On connecte vos outils existants pour qu'ils travaillent ensemble. Plus de double saisie, plus d'oublis — juste des données qui circulent toutes seules.</p>
             <ul>
               <li>Automatisations Make / n8n sur mesure</li>
-              <li>Applications internes métier (no-code & code)</li>
+              <li>Applications internes métier (no-code &amp; code)</li>
               <li>Connexion CRM, ERP, facturation, agenda, comptabilité</li>
               <li>Workflows intelligents qui éliminent les tâches manuelles</li>
             </ul>
           </div>
           <div class="service-visual workflow-visual" data-visual="workflow">
-            <svg class="workflow-svg" viewBox="0 0 460 460" id="workflow-svg">
+            <svg class="workflow-svg" viewBox="0 0 460 460">
               <defs>
                 <linearGradient id="flow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stop-color="#4d7cff"/>
                   <stop offset="50%" stop-color="#7c5cfc"/>
                   <stop offset="100%" stop-color="#d63384"/>
                 </linearGradient>
-                <radialGradient id="node-grad">
-                  <stop offset="0%" stop-color="rgba(124,92,252,.2)"/>
+                <radialGradient id="node-w-grad">
+                  <stop offset="0%" stop-color="rgba(124,92,252,.25)"/>
                   <stop offset="100%" stop-color="rgba(10,14,26,.95)"/>
                 </radialGradient>
               </defs>
-              <!-- Connections (drawn first so they appear behind nodes) -->
               <path class="conn-flow" d="M90,80 Q230,80 230,200" data-flow/>
               <path class="conn-flow" d="M370,80 Q230,80 230,200" data-flow/>
               <path class="conn-flow" d="M230,260 Q230,340 110,380" data-flow/>
               <path class="conn-flow" d="M230,260 Q230,340 350,380" data-flow/>
-
-              <!-- Source nodes -->
-              <g data-node>
-                <circle class="node" cx="90" cy="80" r="34" fill="url(#node-grad)"/>
-                <text class="node-icon" x="90" y="80">@</text>
-                <text class="node-label" x="90" y="130">Email</text>
+              <g data-node-w>
+                <circle class="node-w" cx="90" cy="80" r="34" fill="url(#node-w-grad)"/>
+                <text class="nicon" x="90" y="80">@</text>
+                <text class="nlabel" x="90" y="130">Email</text>
               </g>
-              <g data-node>
-                <circle class="node" cx="370" cy="80" r="34" fill="url(#node-grad)"/>
-                <text class="node-icon" x="370" y="80">📅</text>
-                <text class="node-label" x="370" y="130">Calendar</text>
+              <g data-node-w>
+                <circle class="node-w" cx="370" cy="80" r="34" fill="url(#node-w-grad)"/>
+                <text class="nicon" x="370" y="80">📅</text>
+                <text class="nlabel" x="370" y="130">Calendar</text>
               </g>
-
-              <!-- Center processing -->
-              <g data-node>
-                <circle class="node" cx="230" cy="230" r="44" fill="url(#node-grad)" stroke="url(#flow-grad)" stroke-width="1.5"/>
-                <text class="node-icon" x="230" y="226" style="font-size:16px;">⚡</text>
-                <text class="node-label" x="230" y="248" style="font-size:8px;">PROCESS</text>
+              <g data-node-w>
+                <circle class="node-w" cx="230" cy="230" r="44" fill="url(#node-w-grad)" stroke="url(#flow-grad)" stroke-width="1.5"/>
+                <text class="nicon" x="230" y="226" style="font-size:16px;">⚡</text>
+                <text class="nlabel" x="230" y="248" style="font-size:8px;">PROCESS</text>
               </g>
-
-              <!-- Output nodes -->
-              <g data-node>
-                <circle class="node" cx="110" cy="380" r="34" fill="url(#node-grad)"/>
-                <text class="node-icon" x="110" y="380">📊</text>
-                <text class="node-label" x="110" y="430">CRM</text>
+              <g data-node-w>
+                <circle class="node-w" cx="110" cy="380" r="34" fill="url(#node-w-grad)"/>
+                <text class="nicon" x="110" y="380">📊</text>
+                <text class="nlabel" x="110" y="430">CRM</text>
               </g>
-              <g data-node>
-                <circle class="node" cx="350" cy="380" r="34" fill="url(#node-grad)"/>
-                <text class="node-icon" x="350" y="380">💬</text>
-                <text class="node-label" x="350" y="430">Slack</text>
+              <g data-node-w>
+                <circle class="node-w" cx="350" cy="380" r="34" fill="url(#node-w-grad)"/>
+                <text class="nicon" x="350" y="380">💬</text>
+                <text class="nlabel" x="350" y="430">Slack</text>
               </g>
-
-              <!-- Pulses -->
-              <circle class="pulse" r="3.5" data-pulse="1"><animateMotion dur="3s" repeatCount="indefinite" path="M90,80 Q230,80 230,200"/></circle>
-              <circle class="pulse" r="3.5" data-pulse="2"><animateMotion dur="3.5s" repeatCount="indefinite" begin="0.8s" path="M370,80 Q230,80 230,200"/></circle>
-              <circle class="pulse" r="3.5" data-pulse="3"><animateMotion dur="3s" repeatCount="indefinite" begin="1.4s" path="M230,260 Q230,340 110,380"/></circle>
-              <circle class="pulse" r="3.5" data-pulse="4"><animateMotion dur="3s" repeatCount="indefinite" begin="2s" path="M230,260 Q230,340 350,380"/></circle>
+              <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" path="M90,80 Q230,80 230,200"/></circle>
+              <circle class="pulse" r="3.5"><animateMotion dur="3.5s" repeatCount="indefinite" begin="0.8s" path="M370,80 Q230,80 230,200"/></circle>
+              <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" begin="1.4s" path="M230,260 Q230,340 110,380"/></circle>
+              <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" begin="2s" path="M230,260 Q230,340 350,380"/></circle>
             </svg>
           </div>
         </div>
-      </section>
+      </div>
+    </div>
+  </section>
 
-      <!-- Pilier 03 -->
-      <section class="service-panel">
-        <div class="panel-num">03 / 03 — Présence</div>
-        <div class="service-content">
+  <!-- ===== NODE 05 · PRÉSENCE DIGITALE ===== -->
+  <section class="node-section" id="node-section-5" data-node="5" data-node-name="Présence Digitale">
+    <div class="node-content">
+      <div class="node-card">
+        <div class="section-tag">
+          <span class="node-id">N05</span>
+          <span class="line"></span>
+          <span class="label">Pilier · Présence Digitale</span>
+        </div>
+        <div class="service-grid">
           <div class="service-text">
             <span class="pillar-num">PILIER 03</span>
             <h3>Présence <span class="italic gradient-text">Digitale</span></h3>
@@ -1944,15 +1794,15 @@ html.lenis,html.lenis body{height:auto;}
           </div>
           <div class="service-visual code-visual" data-visual="code">
             <div class="code-window-bar">
-              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              <div class="ddot"></div><div class="ddot"></div><div class="ddot"></div>
               <div class="file">~/neexus/<span style="color:var(--text);">site-client.html</span></div>
             </div>
-            <div class="code-content" id="code-content">
-              <div class="ln" data-line><span class="num">01</span><span><span class="kw">&lt;section</span> <span class="pr">class</span>=<span class="str">"hero"</span><span class="kw">&gt;</span></span></div>
-              <div class="ln" data-line><span class="num">02</span><span>&nbsp;&nbsp;<span class="kw">&lt;h1&gt;</span>Bienvenue chez <span class="str">{{client}}</span><span class="kw">&lt;/h1&gt;</span></span></div>
-              <div class="ln" data-line><span class="num">03</span><span>&nbsp;&nbsp;<span class="com">// Génération SEO automatique</span></span></div>
-              <div class="ln" data-line><span class="num">04</span><span>&nbsp;&nbsp;<span class="kw">&lt;p&gt;</span><span class="fn">{{tagline}}</span><span class="kw">&lt;/p&gt;</span></span></div>
-              <div class="ln" data-line><span class="num">05</span><span><span class="kw">&lt;/section&gt;</span><span class="typing-cursor"></span></span></div>
+            <div class="code-content">
+              <div class="ln" data-line><span class="lnum">01</span><span><span class="kw">&lt;section</span> <span class="pr">class</span>=<span class="str">"hero"</span><span class="kw">&gt;</span></span></div>
+              <div class="ln" data-line><span class="lnum">02</span><span>&nbsp;&nbsp;<span class="kw">&lt;h1&gt;</span>Bienvenue chez <span class="str">{{client}}</span><span class="kw">&lt;/h1&gt;</span></span></div>
+              <div class="ln" data-line><span class="lnum">03</span><span>&nbsp;&nbsp;<span class="com">// Génération SEO automatique</span></span></div>
+              <div class="ln" data-line><span class="lnum">04</span><span>&nbsp;&nbsp;<span class="kw">&lt;p&gt;</span><span class="fn">{{tagline}}</span><span class="kw">&lt;/p&gt;</span></span></div>
+              <div class="ln" data-line><span class="lnum">05</span><span><span class="kw">&lt;/section&gt;</span><span class="typing-cursor"></span></span></div>
             </div>
             <div class="code-preview">
               <div class="pv-bar" id="pv-bar"></div>
@@ -1963,228 +1813,176 @@ html.lenis,html.lenis body{height:auto;}
             </div>
           </div>
         </div>
-      </section>
-
-    </div>
-    <div class="services-dots" id="services-dots">
-      <div class="dot is-active"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     METHODE
-     ============================================================ -->
-<section class="section methode" id="methode">
-  <div class="container">
-    <div class="methode-inner">
-      <div class="methode-sticky">
-        <div class="section-eyebrow">
-          <span class="num">03</span>
-          <span class="line"></span>
-          <span class="label">Méthode</span>
-        </div>
-        <h2 data-split>Notre méthode en 4 étapes.</h2>
-        <p>Une approche éprouvée, transparente, sans surprise. De l'audit gratuit au déploiement, vous savez toujours où vous en êtes.</p>
-        <div class="methode-progress">
-          <div class="fill" id="methode-fill"></div>
-        </div>
-        <div class="methode-progress-label">
-          <span>00</span>
-          <span id="methode-step-label">/04</span>
-        </div>
       </div>
+    </div>
+  </section>
 
-      <div class="methode-steps" id="methode-steps">
-        <article class="methode-step" data-step>
-          <div class="step-head">
+  <!-- ===== NODE 06 · MÉTHODE ===== -->
+  <section class="node-section" id="node-section-6" data-node="6" data-node-name="Méthode">
+    <div class="node-content">
+      <div class="node-card">
+        <div class="section-tag">
+          <span class="node-id">N06</span>
+          <span class="line"></span>
+          <span class="label">Méthode · 4 étapes</span>
+        </div>
+        <h2 class="section-title" data-split>Notre méthode en 4 étapes.</h2>
+        <p class="section-sub" data-fade>
+          Une approche éprouvée, transparente, sans surprise. De l'audit gratuit au déploiement, vous savez toujours où vous en êtes.
+        </p>
+        <div class="methode-steps">
+          <article class="methode-step" data-step>
             <div class="step-num">01</div>
             <div class="step-tag">Semaine 1 · Gratuit</div>
-          </div>
-          <h3>Audit gratuit</h3>
-          <p>On analyse vos process actuels, on identifie les goulots d'étranglement, et on chiffre les <b style="color:var(--text);">3 quick-wins</b> qui auront le plus d'impact sur votre business.</p>
-          <div class="step-deliverables">
-            <span>Cartographie process</span>
-            <span>Calcul ROI</span>
-            <span>Roadmap 90j</span>
-          </div>
-        </article>
-
-        <article class="methode-step" data-step>
-          <div class="step-head">
+            <h3>Audit gratuit</h3>
+            <p>On analyse vos process et on chiffre les <b style="color:var(--text);">3 quick-wins</b> à plus fort impact.</p>
+          </article>
+          <article class="methode-step" data-step>
             <div class="step-num">02</div>
             <div class="step-tag">Semaine 2-3</div>
-          </div>
-          <h3>Stratégie</h3>
-          <p>On conçoit la solution sur mesure. Architecture, choix techniques, planning précis — vous validez chaque étape avant qu'on touche à quoi que ce soit.</p>
-          <div class="step-deliverables">
-            <span>Architecture</span>
-            <span>Maquettes</span>
-            <span>Specs techniques</span>
-          </div>
-        </article>
-
-        <article class="methode-step" data-step>
-          <div class="step-head">
+            <h3>Stratégie</h3>
+            <p>Architecture, choix techniques, planning précis. Vous validez chaque étape.</p>
+          </article>
+          <article class="methode-step" data-step>
             <div class="step-num">03</div>
             <div class="step-tag">Semaine 4-8</div>
-          </div>
-          <h3>Déploiement</h3>
-          <p>On construit, on intègre, on teste, on forme vos équipes. <b style="color:var(--text);">Zéro perturbation</b> de votre activité — la bascule se fait quand vous êtes prêt.</p>
-          <div class="step-deliverables">
-            <span>Build & tests</span>
-            <span>Formation équipes</span>
-            <span>Mise en prod</span>
-          </div>
-        </article>
-
-        <article class="methode-step" data-step>
-          <div class="step-head">
+            <h3>Déploiement</h3>
+            <p>On construit, on intègre, on forme. <b style="color:var(--text);">Zéro perturbation</b> de votre activité.</p>
+          </article>
+          <article class="methode-step" data-step>
             <div class="step-num">04</div>
             <div class="step-tag">En continu</div>
-          </div>
-          <h3>Optimisation</h3>
-          <p>On mesure, on ajuste, on scale. Vos workflows évoluent avec votre business. Maintenance, support, et nouvelles itérations basées sur les données réelles.</p>
-          <div class="step-deliverables">
-            <span>Monitoring</span>
-            <span>A/B testing</span>
-            <span>Évolutions</span>
-          </div>
-        </article>
+            <h3>Optimisation</h3>
+            <p>On mesure, on ajuste, on scale. Vos workflows évoluent avec votre business.</p>
+          </article>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ============================================================
-     RESULTATS (PINNED + SCRUBBED)
-     ============================================================ -->
-<section class="results" id="resultats">
-  <div class="results-pin" id="results-pin">
-    <div class="results-inner">
-      <div class="results-text">
-        <div class="section-eyebrow" style="justify-content:center;">
-          <span class="num">04</span>
+  <!-- ===== NODE 07 · RÉSULTATS ===== -->
+  <section class="node-section" id="node-section-7" data-node="7" data-node-name="Résultats">
+    <div class="node-content">
+      <div class="node-card">
+        <div class="section-tag">
+          <span class="node-id">N07</span>
           <span class="line"></span>
-          <span class="label">Résultats</span>
+          <span class="label">Output · Résultats Mesurés</span>
         </div>
-        <h2>Des chiffres, <span class="gradient-text italic">pas des promesses.</span></h2>
-        <p>Voici ce que nos clients constatent en moyenne dans les <b style="color:var(--text);">90 jours</b> qui suivent le déploiement. Mesurés, vérifiés, reproductibles.</p>
-      </div>
-
-      <div class="results-grid">
-        <div class="result-card" data-card data-result>
-          <div class="num"><span class="big-counter" data-target="47">0</span><span class="unit">h</span></div>
-          <div class="lbl">Économisées par mois</div>
-          <div class="desc">en moyenne, et par collaborateur impliqué dans les workflows automatisés</div>
-        </div>
-        <div class="result-card" data-card data-result>
-          <div class="num"><span class="big-counter" data-target="3">0</span><span class="unit">x</span></div>
-          <div class="lbl">Plus de leads qualifiés</div>
-          <div class="desc">grâce à la qualification automatique et au temps de réponse immédiat</div>
-        </div>
-        <div class="result-card" data-card data-result>
-          <div class="num"><span class="big-counter" data-target="98">0</span><span class="unit">%</span></div>
-          <div class="lbl">Satisfaction client</div>
-          <div class="desc">mesurée sur les 12 derniers mois, sur l'ensemble des projets livrés</div>
-        </div>
-        <div class="result-card" data-card data-result>
-          <div class="num"><span class="prefix">&lt;</span><span class="big-counter" data-target="24">0</span><span class="unit">h</span></div>
-          <div class="lbl">Temps de réponse moyen</div>
-          <div class="desc">aux demandes entrantes — chatbot, email, formulaire, WhatsApp</div>
+        <h2 class="section-title" data-split>Des chiffres, <span class="gradient-text italic">pas des promesses.</span></h2>
+        <p class="section-sub" data-fade>
+          Voici ce que nos clients constatent en moyenne dans les <b>90 jours</b> qui suivent le déploiement. Mesurés, vérifiés, reproductibles.
+        </p>
+        <div class="results-grid">
+          <div class="result-card" data-card data-result>
+            <div class="num"><span class="big-counter" data-target="47">0</span><span class="unit">h</span></div>
+            <div class="lbl">Économisées par mois</div>
+            <div class="desc">par collaborateur impliqué dans les workflows automatisés</div>
+          </div>
+          <div class="result-card" data-card data-result>
+            <div class="num"><span class="big-counter" data-target="3">0</span><span class="unit">x</span></div>
+            <div class="lbl">Plus de leads qualifiés</div>
+            <div class="desc">grâce à la qualification automatique et au temps de réponse immédiat</div>
+          </div>
+          <div class="result-card" data-card data-result>
+            <div class="num"><span class="big-counter" data-target="98">0</span><span class="unit">%</span></div>
+            <div class="lbl">Satisfaction client</div>
+            <div class="desc">mesurée sur les 12 derniers mois, sur l'ensemble des projets</div>
+          </div>
+          <div class="result-card" data-card data-result>
+            <div class="num"><span class="prefix">&lt;</span><span class="big-counter" data-target="24">0</span><span class="unit">h</span></div>
+            <div class="lbl">Temps de réponse moyen</div>
+            <div class="desc">aux demandes — chatbot, email, formulaire, WhatsApp</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ============================================================
-     TEMOIGNAGES
-     ============================================================ -->
-<section class="section testi" id="temoignages">
-  <div class="container">
-    <div class="testi-head">
-      <div class="section-eyebrow" style="justify-content:center;">
-        <span class="num">05</span>
-        <span class="line"></span>
-        <span class="label">Témoignages</span>
+  <!-- ===== NODE 08 · TÉMOIGNAGES ===== -->
+  <section class="node-section" id="node-section-8" data-node="8" data-node-name="Témoignages">
+    <div class="node-content">
+      <div class="node-card">
+        <div class="section-tag">
+          <span class="node-id">N08</span>
+          <span class="line"></span>
+          <span class="label">Voix Clients · Témoignages</span>
+        </div>
+        <h2 class="section-title" data-split>Ce qu'ils en disent.</h2>
+        <p class="section-sub" data-fade>Trois clients, trois secteurs, trois pays. Une seule conviction : on ne perd plus son temps sur ce qu'une machine peut faire.</p>
+        <div class="testi-grid">
+          <article class="testi-card" data-tilt data-card>
+            <div class="city">GE · CH</div>
+            <div class="quote-mark">"</div>
+            <p class="quote">NEEXUS a automatisé nos réservations et notre SAV. On a récupéré 20h par semaine. Mon équipe s'est remise à sourire — ça vaut tous les ROI du monde.</p>
+            <div class="author">
+              <div class="av">MD</div>
+              <div class="author-meta">
+                <div class="name">Marc Dubois</div>
+                <div class="role">CEO · Restaurant Le Comptoir</div>
+              </div>
+            </div>
+          </article>
+          <article class="testi-card" data-tilt data-card>
+            <div class="city">LY · FR</div>
+            <div class="quote-mark">"</div>
+            <p class="quote">Leur chatbot gère 70% de nos demandes de premier contact. Mon équipe peut enfin se concentrer sur les dossiers — ceux qui paient nos factures.</p>
+            <div class="author">
+              <div class="av">SM</div>
+              <div class="author-meta">
+                <div class="name">Sophie Martin</div>
+                <div class="role">Directrice · Cabinet Martin &amp; Associés</div>
+              </div>
+            </div>
+          </article>
+          <article class="testi-card" data-tilt data-card>
+            <div class="city">ZH · CH</div>
+            <div class="quote-mark">"</div>
+            <p class="quote">Le ROI a été visible dès le premier mois. Les automatisations Make ont changé notre façon de travailler. Sincèrement, on aurait dû le faire 3 ans plus tôt.</p>
+            <div class="author">
+              <div class="av">TK</div>
+              <div class="author-meta">
+                <div class="name">Thomas Keller</div>
+                <div class="role">Fondateur · TK Immobilier</div>
+              </div>
+            </div>
+          </article>
+        </div>
       </div>
-      <h2 data-split>Ce qu'ils en disent.</h2>
-      <p data-fade>Trois clients, trois secteurs, trois pays. Une seule conviction : on ne perd plus son temps sur ce qu'une machine peut faire.</p>
     </div>
+  </section>
 
-    <div class="testi-grid">
-      <article class="testi-card" data-tilt data-card>
-        <div class="city">GE · CH</div>
-        <div class="quote-mark">"</div>
-        <p class="quote">NEEXUS a automatisé nos réservations et notre SAV. On a récupéré 20h par semaine. Mon équipe s'est remise à sourire — ça vaut tous les ROI du monde.</p>
-        <div class="author">
-          <div class="av">MD</div>
-          <div class="author-meta">
-            <div class="name">Marc Dubois</div>
-            <div class="role">CEO · Restaurant Le Comptoir</div>
-          </div>
+  <!-- ===== NODE 09 · CTA FINAL ===== -->
+  <section class="node-section cta-final" id="node-section-9" data-node="9" data-node-name="CTA · Audit">
+    <div class="node-content">
+      <div class="node-card">
+        <div class="section-tag" style="justify-content:center;display:flex;">
+          <span class="node-id">CORE</span>
+          <span class="line"></span>
+          <span class="label">Et maintenant ?</span>
         </div>
-      </article>
-
-      <article class="testi-card" data-tilt data-card>
-        <div class="city">LY · FR</div>
-        <div class="quote-mark">"</div>
-        <p class="quote">Leur chatbot gère 70% de nos demandes de premier contact. Mon équipe peut enfin se concentrer sur les dossiers — ceux qui paient nos factures.</p>
-        <div class="author">
-          <div class="av">SM</div>
-          <div class="author-meta">
-            <div class="name">Sophie Martin</div>
-            <div class="role">Directrice · Cabinet Martin &amp; Associés</div>
-          </div>
+        <h2 data-split-cta>
+          Prêt à automatiser <span class="grad italic">votre croissance</span> ?
+        </h2>
+        <p data-fade>
+          On identifie ensemble les <b style="color:var(--text);">3 quick-wins</b> qui auront le plus
+          d'impact sur votre business. 30 minutes, en visio, gratuit, sans engagement.
+        </p>
+        <div class="cta-row" data-fade>
+          <a href="mailto:contact@neexusds.com" class="btn btn-primary" data-cursor data-magnetic>
+            Réserver mon audit gratuit
+            <span class="arrow">→</span>
+          </a>
+          <a href="#node-section-8" class="btn btn-ghost" data-cursor data-magnetic>
+            Voir un cas client
+            <span class="arrow">↗</span>
+          </a>
         </div>
-      </article>
-
-      <article class="testi-card" data-tilt data-card>
-        <div class="city">ZH · CH</div>
-        <div class="quote-mark">"</div>
-        <p class="quote">Le ROI a été visible dès le premier mois. Les automatisations Make ont changé notre façon de travailler. Sincèrement, on aurait dû le faire trois ans plus tôt.</p>
-        <div class="author">
-          <div class="av">TK</div>
-          <div class="author-meta">
-            <div class="name">Thomas Keller</div>
-            <div class="role">Fondateur · TK Immobilier</div>
-          </div>
-        </div>
-      </article>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ============================================================
-     CTA FINAL
-     ============================================================ -->
-<section class="cta-final" id="cta">
-  <div class="section-eyebrow" style="justify-content:center;margin-bottom:40px;">
-    <span class="num">06</span>
-    <span class="line"></span>
-    <span class="label">Et maintenant ?</span>
-  </div>
-  <h2 data-split-cta>
-    Prêt à automatiser <span class="grad italic">votre croissance</span> ?
-  </h2>
-  <p data-fade>
-    On identifie ensemble les <b style="color:var(--text);">3 quick-wins</b> qui auront le plus
-    d'impact sur votre business. 30 minutes, en visio, gratuit, sans engagement.
-  </p>
-  <div class="cta-row" data-fade>
-    <a href="mailto:contact@neexusds.com" class="btn btn-primary" data-cursor data-magnetic>
-      Réserver mon audit gratuit
-      <span class="arrow">→</span>
-    </a>
-    <a href="#temoignages" class="btn btn-ghost" data-cursor data-magnetic>
-      Voir un cas client
-      <span class="arrow">↗</span>
-    </a>
-  </div>
-</section>
+</main>
 
 <!-- ============================================================
      FOOTER
@@ -2201,18 +1999,18 @@ html.lenis,html.lenis body{height:auto;}
       <div class="footer-col">
         <h4>Services</h4>
         <ul>
-          <li><a href="#services">IA &amp; Agents</a></li>
-          <li><a href="#services">Automatisation</a></li>
-          <li><a href="#services">Présence digitale</a></li>
-          <li><a href="#methode">Notre méthode</a></li>
+          <li><a href="#node-section-3">IA &amp; Agents</a></li>
+          <li><a href="#node-section-4">Automatisation</a></li>
+          <li><a href="#node-section-5">Présence digitale</a></li>
+          <li><a href="#node-section-6">Notre méthode</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Agence</h4>
         <ul>
-          <li><a href="#resultats">Résultats</a></li>
-          <li><a href="#temoignages">Témoignages</a></li>
-          <li><a href="#cta">Audit gratuit</a></li>
+          <li><a href="#node-section-7">Résultats</a></li>
+          <li><a href="#node-section-8">Témoignages</a></li>
+          <li><a href="#node-section-9">Audit gratuit</a></li>
           <li><a href="mailto:contact@neexusds.com">Contact</a></li>
         </ul>
       </div>
@@ -2225,9 +2023,6 @@ html.lenis,html.lenis body{height:auto;}
         </ul>
       </div>
     </div>
-
-    <div class="footer-mega">NEEXUS</div>
-
     <div class="footer-bottom">
       <div>© 2026 SDS Smart Digital Solution LLC — Tous droits réservés</div>
       <div class="footer-socials">
@@ -2251,17 +2046,27 @@ html.lenis,html.lenis body{height:auto;}
 <script>
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-/* -------------- Reduced motion guard -------------- */
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
 /* ============================================================
-   PRELOADER — CINEMATIC 3s SEQUENCE
-   1) Black screen
-   2) Logo PNG fades in with scale-up + drop-shadow glow pulse
-   3) Counter ticks 0 → 100 while accent line draws
-   4) Logo gently lifts up and dissolves
-   5) Curtain clip-path retracts top-down, revealing the hero
+   NODE LAYOUT — coordinates in SVG viewBox (4000 x 3000)
+   ============================================================ */
+const NODES = [
+  { id: 1, x: 2000, y: 500,  scale: 1.0, name: 'Hero' },
+  { id: 2, x: 3200, y: 800,  scale: 1.0, name: 'Pain Points' },
+  { id: 3, x: 3500, y: 1500, scale: 1.0, name: 'IA & Agents' },
+  { id: 4, x: 3200, y: 2200, scale: 1.0, name: 'Automatisation' },
+  { id: 5, x: 2400, y: 2500, scale: 1.0, name: 'Présence Digitale' },
+  { id: 6, x: 1600, y: 2500, scale: 1.0, name: 'Méthode' },
+  { id: 7, x: 800,  y: 2200, scale: 1.0, name: 'Résultats' },
+  { id: 8, x: 500,  y: 1500, scale: 1.0, name: 'Témoignages' },
+  { id: 9, x: 2000, y: 1500, scale: 1.15, name: 'CORE · CTA' },
+];
+const INTRO_VIEW = { x: 2000, y: 1500, scale: 0.42 };
+
+/* ============================================================
+   PRELOADER
    ============================================================ */
 const preloader = document.getElementById('preloader');
 const preloaderLogo = document.getElementById('preloader-logo');
@@ -2269,8 +2074,12 @@ const preloaderCounter = document.getElementById('preloader-counter');
 const preloaderTag = document.getElementById('preloader-tag');
 const preloaderLine = document.getElementById('preloader-line');
 
-// Nav slides in only when curtain opens
 gsap.set('.nav', { yPercent: -100, opacity: 0 });
+gsap.set('.hud', { opacity: 0 });
+gsap.set('.hud-right', { opacity: 0 });
+
+// Initialize circuit camera AT THE INTRO VIEW so it's not flashing wrong on first paint
+gsap.set('#circuit-svg', cameraFor(INTRO_VIEW));
 
 const counterObj = { val: 0 };
 const tlPre = gsap.timeline({
@@ -2279,109 +2088,91 @@ const tlPre = gsap.timeline({
 });
 
 tlPre
-  // 1) Accent line draws under the logo
   .to(preloaderLine, { width: '38vw', duration: .8, ease: 'expo.out' }, 0)
-  // 2) Logo reveals: scale + opacity rise
-  .to(preloaderLogo, {
-    opacity: 1,
-    scale: 1,
-    duration: 1.1,
-    ease: 'expo.out'
-  }, .1)
-  // 3) Glow pulse via drop-shadow filter (yoyo)
+  .to(preloaderLogo, { opacity: 1, scale: 1, duration: 1.1, ease: 'expo.out' }, .1)
   .to(preloaderLogo, {
     filter: 'drop-shadow(0 0 40px rgba(124,92,252,.85)) drop-shadow(0 0 80px rgba(214,51,132,.5))',
-    duration: .55,
-    ease: 'sine.inOut',
-    yoyo: true,
-    repeat: 1
+    duration: .55, ease: 'sine.inOut', yoyo: true, repeat: 1
   }, .8)
   .call(() => preloader.classList.add('is-glowing'), null, .8)
-  // 4) Counter runs in parallel
-  .fromTo(counterObj,
-    { val: 0 },
-    {
-      val: 100,
-      duration: 1.7,
-      ease: 'power2.inOut',
-      onUpdate: () => {
-        preloaderCounter.textContent = String(Math.round(counterObj.val)).padStart(3, '0');
-      }
-    },
-    .25
-  )
+  .fromTo(counterObj, { val: 0 }, {
+    val: 100, duration: 1.7, ease: 'power2.inOut',
+    onUpdate: () => { preloaderCounter.textContent = String(Math.round(counterObj.val)).padStart(3, '0'); }
+  }, .25)
   .to(preloaderCounter, { opacity: 1, duration: .4 }, .25)
   .to(preloaderTag, { opacity: 1, duration: .4 }, .8)
-  // 5) Lift + dissolve the logo (it "departs" upward toward the nav)
   .to([preloaderCounter, preloaderTag, preloaderLine], { opacity: 0, duration: .35 }, 2.05)
   .to(preloaderLogo, {
-    y: -80,
-    scale: .92,
-    opacity: 0,
+    y: -80, scale: .92, opacity: 0,
     filter: 'drop-shadow(0 0 0 rgba(124,92,252,0)) blur(2px)',
-    duration: .7,
-    ease: 'power3.in'
+    duration: .7, ease: 'power3.in'
   }, 2.1)
-  // 6) Curtain reveal: preloader clip-paths from the top downward,
-  //    progressively revealing the hero that sits beneath it.
-  .to(preloader, {
-    clipPath: 'inset(100% 0 0 0)',
-    duration: .95,
-    ease: 'expo.inOut'
-  }, 2.5)
-  // Navbar slides in alongside
+  .to(preloader, { clipPath: 'inset(100% 0 0 0)', duration: .95, ease: 'expo.inOut' }, 2.5)
   .to('.nav', { yPercent: 0, opacity: 1, duration: .9, ease: 'expo.out' }, 2.6)
+  .to(['.hud', '.hud-right'], { opacity: 1, duration: .6 }, 2.8)
   .set(preloader, { display: 'none' });
 
 /* ============================================================
-   INIT SITE (after preloader)
+   CAMERA UTILITY — compute transform to center a given SVG point
+   ============================================================ */
+function cameraFor({ x, y, scale }) {
+  return {
+    x: window.innerWidth / 2 - x * scale,
+    y: window.innerHeight / 2 - y * scale,
+    scale,
+  };
+}
+function applyCameraTransform(el, { x, y, scale }) {
+  gsap.set(el, { x, y, scale });
+}
+
+/* ============================================================
+   INIT — runs after preloader completes
    ============================================================ */
 function initSite(){
   initLenis();
   initCursor();
   initNav();
-  initHeroLoad();
-  initParallax();
-  initOrbsParallax();
   initScrollProgress();
-  initProblems();
-  initServices();
-  initMethode();
-  initResults();
-  initTesti();
-  initCtaFinal();
+  initCamera();
+  initHero();
   initSplitTitles();
   initFades();
+  initCards();
+  initSteps();
+  initResults();
+  initTesti();
+  initSplitCta();
+  initServiceVisuals();
   initMagnetic();
   initTilt();
-  initFooterMega();
+  initHud();
   ScrollTrigger.refresh();
 }
 
 /* ============================================================
-   LENIS SMOOTH SCROLL
+   LENIS SMOOTH SCROLL — synced with GSAP ticker
    ============================================================ */
 let lenis;
 function initLenis(){
   if (reducedMotion) return;
   lenis = new Lenis({
     duration: 1.15,
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
     wheelMultiplier: 1,
     touchMultiplier: 1.5,
   });
   lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+  gsap.ticker.add(time => { lenis.raf(time * 1000); });
   gsap.ticker.lagSmoothing(0);
 
-  // Smooth anchor scrolling
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
       const id = a.getAttribute('href');
       if (id.length > 1 && document.querySelector(id)) {
         e.preventDefault();
-        lenis.scrollTo(id, { offset: -40, duration: 1.4 });
+        lenis.scrollTo(id, { offset: -40, duration: 1.6 });
         document.getElementById('mobile-menu')?.classList.remove('is-open');
       }
     });
@@ -2389,10 +2180,7 @@ function initLenis(){
 }
 
 /* ============================================================
-   CUSTOM CURSOR + GLOW
-   12px white dot, mix-blend: difference
-   Radial glow follows with lerp 0.08 (slow trailing depth)
-   Hovering interactive elements → cursor scales to 48px
+   CUSTOM CURSOR
    ============================================================ */
 function initCursor(){
   if (isMobile) {
@@ -2403,208 +2191,147 @@ function initCursor(){
   }
   const cursor = document.getElementById('cursor');
   const glow = document.getElementById('cursor-glow');
-
   let mx = window.innerWidth/2, my = window.innerHeight/2;
   let cx = mx, cy = my, gx = mx, gy = my;
 
-  window.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-  }, { passive: true });
+  window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
 
   gsap.ticker.add(() => {
-    // Dot: tight follow (0.45 lerp) for crisp pointer feel
     cx += (mx - cx) * 0.45;
     cy += (my - cy) * 0.45;
-    // Glow: slow trailing 0.08 lerp for cinematic depth
     gx += (mx - gx) * 0.08;
     gy += (my - gy) * 0.08;
     cursor.style.transform = `translate3d(${cx}px,${cy}px,0) translate(-50%,-50%)`;
     glow.style.transform   = `translate3d(${gx}px,${gy}px,0) translate(-50%,-50%)`;
   });
 
-  // Hover state on all interactive elements
-  const hoverables = document.querySelectorAll('[data-cursor], a, button, .problem-card, .testi-card, .result-card, .methode-step');
-  hoverables.forEach(el => {
+  document.querySelectorAll('[data-cursor], a, button, .pain-card, .testi-card, .result-card, .methode-step, .node-card').forEach(el => {
     el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
     el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
   });
 }
 
 /* ============================================================
-   NAV
+   NAV — scroll background blur
    ============================================================ */
 function initNav(){
   const nav = document.getElementById('nav');
   ScrollTrigger.create({
-    start: 'top -50',
-    end: 99999,
-    onUpdate: self => {
-      nav.classList.toggle('is-scrolled', self.scroll() > 50);
-    }
+    start: 'top -50', end: 99999,
+    onUpdate: self => nav.classList.toggle('is-scrolled', self.scroll() > 50)
   });
-
   const burger = document.getElementById('nav-burger');
   const mobileMenu = document.getElementById('mobile-menu');
-  burger?.addEventListener('click', () => {
-    mobileMenu.classList.toggle('is-open');
-  });
+  burger?.addEventListener('click', () => mobileMenu.classList.toggle('is-open'));
   mobileMenu?.querySelectorAll('a').forEach(a => {
     a.addEventListener('click', () => mobileMenu.classList.remove('is-open'));
   });
 }
 
 /* ============================================================
-   SCROLL PROGRESS
+   SCROLL PROGRESS BAR
    ============================================================ */
 function initScrollProgress(){
-  const bar = document.getElementById('scroll-progress');
-  gsap.to(bar, {
-    scaleX: 1,
-    ease: 'none',
+  gsap.to('#scroll-progress', {
+    scaleX: 1, ease: 'none',
     scrollTrigger: { start: 0, end: 'max', scrub: 0 }
   });
 }
 
 /* ============================================================
-   HERO — PINNED CINEMATIC SCROLL (4 PHASES, ~150vh)
-   Phase 1 (0–25%): title chars   rotateX(-90)→0  y(100)→0
-   Phase 2 (25–50%): subtitle fade-in + CTAs slide-up
-   Phase 3 (50–75%): stats count from 0 → target
-   Phase 4 (75–100%): hero scale(0.95) + opacity fade
+   CAMERA SYSTEM — pan/zoom the circuit SVG to follow scroll
+   Master scrub timeline. Each node tween is placed at the
+   scroll progress matching its section center.
    ============================================================ */
-function initHeroLoad(){
-  // Split title chars (kept hidden initially, scroll reveals them)
-  const lines = document.querySelectorAll('[data-hero-line]');
-  lines.forEach(line => new SplitType(line, { types: 'chars' }));
+let cameraTl;
+function initCamera(){
+  const svg = document.getElementById('circuit-svg');
 
-  // Initial states: badge visible right away (curtain reveal already showed it).
-  // The rest is hidden, waiting to be scroll-revealed.
-  gsap.set('.hero-badge', { opacity: 1, y: 0 });
-  gsap.set('[data-hero-line] .char', { rotateX: -90, y: 100, opacity: 0 });
-  gsap.set('.hero-sub',     { opacity: 0, y: 36 });
-  gsap.set('.cta-row .btn', { opacity: 0, y: 36 });
-  gsap.set('.hero-stat',    { opacity: 0, y: 24 });
+  if (isMobile || reducedMotion) {
+    // On mobile: lock camera to intro view, static
+    applyCameraTransform(svg, cameraFor({ x: 2000, y: 1500, scale: .55 }));
+    return;
+  }
 
-  // Reset all counter displays to 0 so scrub feels "live"
+  // Initial state — applied immediately
+  applyCameraTransform(svg, cameraFor(INTRO_VIEW));
+
+  const sections = gsap.utils.toArray('.node-section');
+
+  // Each section owns exactly its own scroll range (top top → bottom top).
+  // The camera transitions from the previous node (or INTRO_VIEW for the
+  // first section) to this section's node while the user scrolls through it.
+  // Non-overlapping windows + immediateRender:false (except section 0)
+  // prevents the "competing fromTo" race that would otherwise snap the camera.
+  sections.forEach((section, i) => {
+    const fromView = i === 0 ? INTRO_VIEW : NODES[i - 1];
+    const toView = NODES[i];
+    gsap.fromTo(svg,
+      cameraFor(fromView),
+      {
+        ...cameraFor(toView),
+        ease: 'none',
+        immediateRender: i === 0,
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.4,
+          invalidateOnRefresh: true,
+        }
+      }
+    );
+  });
+
+  // Refresh on resize so cameraFor() can re-center on the new viewport
+  let resizeT;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(() => ScrollTrigger.refresh(), 200);
+  });
+}
+
+/* ============================================================
+   HERO — content reveal sequence (one-time on initSite)
+   ============================================================ */
+function initHero(){
+  // Split title chars
+  document.querySelectorAll('[data-hero-line]').forEach(line => {
+    new SplitType(line, { types: 'chars' });
+  });
+
+  // Counter setup
   const heroCounters = document.querySelectorAll('.hero-stat .counter');
   const counterStates = Array.from(heroCounters).map(el => ({
     el, target: +el.dataset.target, v: 0
   }));
   counterStates.forEach(c => c.el.textContent = '0');
 
-  if (isMobile || reducedMotion) {
-    // On mobile, do a quick non-scrubbed entry timeline
-    const tl = gsap.timeline({ delay: .2 });
-    tl.to('[data-hero-line] .char', {
-        rotateX: 0, y: 0, opacity: 1,
-        stagger: .015, duration: .9, ease: 'power4.out'
-      })
-      .to('.hero-sub',     { opacity: 1, y: 0, duration: .7, ease: 'power3.out' }, '-=.5')
-      .to('.cta-row .btn', { opacity: 1, y: 0, stagger: .08, duration: .6, ease: 'power3.out' }, '-=.4')
-      .to('.hero-stat',    { opacity: 1, y: 0, stagger: .1,  duration: .6, ease: 'power3.out' }, '-=.3');
+  const tl = gsap.timeline({ delay: .15 });
+  tl.from('.hero-badge', { y: 20, opacity: 0, duration: .8, ease: 'power3.out' })
+    .from('[data-hero-line] .char', {
+      rotateX: -90, y: 90, opacity: 0,
+      stagger: { each: .015, from: 'start' },
+      duration: 1, ease: 'power3.out'
+    }, '-=.4')
+    .from('.hero-sub', { y: 24, opacity: 0, duration: .8, ease: 'power3.out' }, '-=.5')
+    .from('.cta-row .btn', { y: 24, opacity: 0, stagger: .08, duration: .7, ease: 'back.out(1.4)' }, '-=.5')
+    .from('.hero-stat', { y: 24, opacity: 0, stagger: .1, duration: .7, ease: 'power3.out' }, '-=.4');
 
-    counterStates.forEach((c, i) => {
-      gsap.to(c, { v: c.target, duration: 1.6, delay: 1 + i * .1, ease: 'power2.out',
-        onUpdate: () => c.el.textContent = Math.round(c.v) });
+  counterStates.forEach((c, i) => {
+    gsap.to(c, {
+      v: c.target, duration: 2, delay: 1.4 + i * .1, ease: 'power2.out',
+      onUpdate: () => c.el.textContent = Math.round(c.v)
     });
-    return;
-  }
-
-  // Master pinned timeline — scrub-controlled over 150vh
-  const heroTl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.hero',
-      start: 'top top',
-      end: '+=150%',
-      pin: true,
-      pinSpacing: true,
-      scrub: 1,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-    }
-  });
-
-  // ---------- PHASE 1 (0 → 0.25) — Title chars unfold in 3D ----------
-  heroTl
-    .to('[data-hero-line] .char', {
-      rotateX: 0, y: 0, opacity: 1,
-      stagger: { each: .012, from: 'start' },
-      duration: 1,
-      ease: 'power3.out'
-    }, 0)
-
-  // ---------- PHASE 2 (0.25 → 0.5) — Subtitle + CTAs ----------
-    .to('.hero-sub',     { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 1.1)
-    .to('.cta-row .btn', { opacity: 1, y: 0, stagger: .08, duration: .6, ease: 'back.out(1.4)' }, 1.25)
-
-  // ---------- PHASE 3 (0.5 → 0.75) — Stats counters scrub up ----------
-    .to('.hero-stat', { opacity: 1, y: 0, stagger: .12, duration: .7, ease: 'power3.out' }, 2)
-    .to(counterStates, {
-      v: i => counterStates[i].target,
-      ease: 'none',
-      duration: 1,
-      onUpdate: function(){
-        counterStates.forEach(c => c.el.textContent = Math.round(c.v));
-      }
-    }, 2.1)
-
-  // ---------- PHASE 4 (0.75 → 1) — Hero scales out / next section incoming ----------
-    .to('.hero-inner', {
-      scale: .95,
-      opacity: 0,
-      filter: 'blur(2px)',
-      ease: 'power2.in',
-      duration: 1
-    }, 3.1)
-    .to('.hero-grid-bg', {
-      opacity: 0,
-      ease: 'power2.in',
-      duration: 1
-    }, 3.1);
-}
-
-/* ============================================================
-   HERO GRID PARALLAX (subtle, separate from pin)
-   ============================================================ */
-function initParallax(){
-  if (reducedMotion || isMobile) return;
-
-  // Subtle grid drift inside the pinned hero
-  gsap.to('.hero-grid-bg', {
-    yPercent: 18,
-    ease: 'none',
-    scrollTrigger: {
-      trigger: '.hero',
-      start: 'top top',
-      end: '+=150%',
-      scrub: 1
-    }
   });
 }
 
 /* ============================================================
-   ORBS PARALLAX — multi-speed for depth
-   scrub 0.3 (fastest snap), 0.6 (mid), 1.2 (slow drift)
-   ============================================================ */
-function initOrbsParallax(){
-  if (reducedMotion) return;
-  gsap.to('.orb-1', { y: -260, x: 80,  ease: 'none',
-    scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 0.3 } });
-  gsap.to('.orb-2', { y: -520, x: -60, ease: 'none',
-    scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 0.6 } });
-  gsap.to('.orb-3', { y: -380, x: 40,  ease: 'none',
-    scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 1.2 } });
-  gsap.to('.orb-4', { y: -220, x: -30, ease: 'none',
-    scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 0.9 } });
-}
-
-/* ============================================================
-   SPLIT TITLES (section titles)
+   SPLIT TITLES — section titles + cta
    ============================================================ */
 function initSplitTitles(){
   document.querySelectorAll('[data-split]').forEach(el => {
-    const split = new SplitType(el, { types: 'lines, words', tagName: 'span' });
-    // Wrap each word for overflow
+    new SplitType(el, { types: 'lines, words', tagName: 'span' });
     el.querySelectorAll('.word').forEach(w => {
       w.style.display = 'inline-block';
       w.style.overflow = 'hidden';
@@ -2614,19 +2341,15 @@ function initSplitTitles(){
       w.innerHTML = '';
       w.appendChild(inner);
     });
-
     gsap.from(el.querySelectorAll('.word > span'), {
-      yPercent: 110,
-      stagger: .04,
-      duration: 1,
-      ease: 'power4.out',
+      yPercent: 110, stagger: .04, duration: 1, ease: 'power4.out',
       scrollTrigger: { trigger: el, start: 'top 85%' }
     });
   });
-
-  // Special CTA title
+}
+function initSplitCta(){
   document.querySelectorAll('[data-split-cta]').forEach(el => {
-    const split = new SplitType(el, { types: 'words' });
+    new SplitType(el, { types: 'words' });
     el.querySelectorAll('.word').forEach(w => {
       w.style.display = 'inline-block';
       w.style.overflow = 'hidden';
@@ -2637,11 +2360,7 @@ function initSplitTitles(){
       w.appendChild(inner);
     });
     gsap.from(el.querySelectorAll('.word > span'), {
-      yPercent: 110,
-      rotate: 6,
-      stagger: .06,
-      duration: 1.2,
-      ease: 'power4.out',
+      yPercent: 110, rotate: 6, stagger: .06, duration: 1.2, ease: 'power4.out',
       scrollTrigger: { trigger: el, start: 'top 80%' }
     });
   });
@@ -2653,105 +2372,89 @@ function initSplitTitles(){
 function initFades(){
   document.querySelectorAll('[data-fade]').forEach(el => {
     gsap.from(el, {
-      y: 24,
-      opacity: 0,
-      duration: 1,
-      ease: 'power3.out',
+      y: 24, opacity: 0, duration: 1, ease: 'power3.out',
       scrollTrigger: { trigger: el, start: 'top 88%' }
     });
   });
 }
 
 /* ============================================================
-   PROBLEMS CARDS
+   CARDS — pain + service grids with clip-path reveal
    ============================================================ */
-function initProblems(){
-  gsap.utils.toArray('.problems .problem-card').forEach((card, i) => {
+function initCards(){
+  gsap.utils.toArray('[data-card]').forEach((card, i) => {
     gsap.from(card, {
-      y: 60,
-      opacity: 0,
+      y: 50, opacity: 0,
       clipPath: 'inset(100% 0 0 0)',
-      duration: 1.1,
-      delay: i * .08,
+      duration: 1, delay: (i % 4) * .08,
       ease: 'power4.out',
-      scrollTrigger: { trigger: card, start: 'top 85%' }
+      scrollTrigger: { trigger: card, start: 'top 88%' }
     });
   });
 }
 
 /* ============================================================
-   SERVICES (HORIZONTAL SCROLL)
+   METHODE STEPS — clip-path reveal with back-out ease
    ============================================================ */
-function initServices(){
-  if (isMobile) {
-    // On mobile, services panels stack vertically — animate in on scroll
-    gsap.utils.toArray('.service-panel').forEach((p, i) => {
-      gsap.from(p, {
-        opacity: 0, y: 40,
-        scrollTrigger: { trigger: p, start: 'top 80%' }
-      });
-      animateServiceVisual(p.querySelector('[data-visual]'), p);
+function initSteps(){
+  gsap.utils.toArray('[data-step]').forEach((step, i) => {
+    gsap.from(step, {
+      y: 60, opacity: 0,
+      clipPath: 'inset(0 0 100% 0)',
+      duration: 1.1, delay: i * .1,
+      ease: 'power4.out',
+      scrollTrigger: { trigger: step, start: 'top 85%' }
     });
-    return;
-  }
-
-  const container = document.getElementById('horizontal-container');
-  const track = document.getElementById('horizontal-track');
-  const panels = gsap.utils.toArray('.service-panel');
-  const dots = gsap.utils.toArray('#services-dots .dot');
-
-  const totalScroll = () => track.scrollWidth - window.innerWidth;
-
-  const horizontalTween = gsap.to(track, {
-    x: () => -totalScroll(),
-    ease: 'none',
-    scrollTrigger: {
-      trigger: container,
-      start: 'top top',
-      end: () => '+=' + totalScroll(),
-      pin: true,
-      scrub: 1,
-      invalidateOnRefresh: true,
-      anticipatePin: 1,
-      onUpdate: self => {
-        const idx = Math.min(panels.length - 1, Math.round(self.progress * (panels.length - 1)));
-        dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
-      }
-    }
-  });
-
-  // Animate each panel's visual when entering view
-  panels.forEach(panel => {
-    const visual = panel.querySelector('[data-visual]');
-    ScrollTrigger.create({
-      trigger: panel,
-      containerAnimation: horizontalTween,
-      start: 'left center',
-      end: 'right center',
-      onEnter: () => animateServiceVisual(visual, panel),
-      onEnterBack: () => animateServiceVisual(visual, panel),
-    });
-
-    // Animate text in each panel
-    const txt = panel.querySelector('.service-text');
-    if (txt) {
-      gsap.from(txt.children, {
-        y: 30, opacity: 0, stagger: .08, duration: .8, ease: 'power3.out',
-        scrollTrigger: {
-          trigger: panel,
-          containerAnimation: horizontalTween,
-          start: 'left 60%',
-        }
-      });
-    }
   });
 }
 
-function animateServiceVisual(visual, panel){
-  if (!visual || visual.dataset.played) return;
-  visual.dataset.played = 'true';
-  const type = visual.dataset.visual;
+/* ============================================================
+   RESULTATS — scrubbed counters
+   ============================================================ */
+function initResults(){
+  document.querySelectorAll('.big-counter').forEach(el => {
+    const target = +el.dataset.target;
+    const obj = { v: 0 };
+    gsap.to(obj, {
+      v: target, ease: 'none',
+      scrollTrigger: { trigger: el, start: 'top 80%', end: 'top 35%', scrub: 1 },
+      onUpdate: () => { el.textContent = Math.round(obj.v); }
+    });
+  });
+}
 
+/* ============================================================
+   TÉMOIGNAGES
+   ============================================================ */
+function initTesti(){
+  gsap.utils.toArray('.testi-card').forEach((card, i) => {
+    gsap.from(card, {
+      y: 70, opacity: 0,
+      clipPath: 'inset(0 0 100% 0)',
+      rotate: i % 2 === 0 ? -.4 : .4,
+      duration: 1.1, delay: i * .12,
+      ease: 'power4.out',
+      scrollTrigger: { trigger: '.testi-grid', start: 'top 80%' }
+    });
+  });
+}
+
+/* ============================================================
+   SERVICE VISUALS — chat / workflow / code
+   Trigger on section enter; each plays once.
+   ============================================================ */
+function initServiceVisuals(){
+  document.querySelectorAll('[data-visual]').forEach(visual => {
+    ScrollTrigger.create({
+      trigger: visual,
+      start: 'top 70%',
+      once: true,
+      onEnter: () => playVisual(visual)
+    });
+  });
+}
+function playVisual(visual){
+  const type = visual.dataset.visual;
   if (type === 'chat'){
     const msgs = visual.querySelectorAll('[data-msg]');
     gsap.to(msgs, { y: 0, opacity: 1, stagger: .35, duration: .6, ease: 'power2.out', delay: .2 });
@@ -2764,7 +2467,10 @@ function animateServiceVisual(visual, panel){
       f.style.strokeDashoffset = len;
     });
     gsap.to(flows, { strokeDashoffset: 0, duration: 1.4, stagger: .15, ease: 'power2.inOut', delay: .3 });
-    gsap.from(visual.querySelectorAll('[data-node]'), { scale: 0, transformOrigin: 'center', stagger: .08, duration: .8, ease: 'back.out(1.7)' });
+    gsap.from(visual.querySelectorAll('[data-node-w]'), {
+      scale: 0, transformOrigin: 'center',
+      stagger: .08, duration: .8, ease: 'back.out(1.7)'
+    });
   }
   if (type === 'code'){
     const lines = visual.querySelectorAll('[data-line]');
@@ -2773,139 +2479,6 @@ function animateServiceVisual(visual, panel){
     gsap.to(blocks, { opacity: 1, stagger: .15, duration: .4, delay: 1.4 });
     gsap.to('#pv-bar', { width: '100%', duration: 1.2, ease: 'power2.inOut', delay: 1.2 });
   }
-}
-
-/* ============================================================
-   METHODE — PROGRESS + STEPS (clip-path reveals)
-   ============================================================ */
-function initMethode(){
-  const steps = gsap.utils.toArray('[data-step]');
-  const fill = document.getElementById('methode-fill');
-  const stepLabel = document.querySelector('.methode-progress-label span:first-child');
-
-  // Each step reveal with clip-path + slight upward rise + back-out for character
-  steps.forEach((step, i) => {
-    gsap.from(step, {
-      y: 80, opacity: 0,
-      clipPath: 'inset(0 0 100% 0)',
-      duration: 1.2,
-      ease: 'power4.out',
-      scrollTrigger: {
-        trigger: step,
-        start: 'top 82%',
-      }
-    });
-
-    ScrollTrigger.create({
-      trigger: step,
-      start: 'top center',
-      end: 'bottom center',
-      onEnter: () => {
-        gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
-        if (stepLabel) stepLabel.textContent = String(i + 1).padStart(2, '0');
-      },
-      onEnterBack: () => {
-        gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
-        if (stepLabel) stepLabel.textContent = String(i + 1).padStart(2, '0');
-      },
-      onLeaveBack: () => {
-        if (i === 0) {
-          gsap.to(fill, { scaleX: 0, duration: .6 });
-          if (stepLabel) stepLabel.textContent = '00';
-        }
-      }
-    });
-  });
-}
-
-/* ============================================================
-   RESULTATS — PINNED, SCRUB-DRIVEN MASTER TIMELINE
-   The section locks while counters mount progressively.
-   ============================================================ */
-function initResults(){
-  const pin = document.getElementById('results-pin');
-  if (!pin) return;
-
-  const counters = gsap.utils.toArray('.big-counter');
-  const counterStates = counters.map(el => ({ el, target: +el.dataset.target, v: 0 }));
-  counters.forEach(el => el.textContent = '0');
-
-  const cards = gsap.utils.toArray('.result-card');
-
-  if (isMobile || reducedMotion){
-    // Mobile: simple staggered entry + counters at scroll trigger
-    gsap.from(cards, {
-      y: 50, opacity: 0, stagger: .1, duration: .8, ease: 'power3.out',
-      scrollTrigger: { trigger: pin, start: 'top 80%' }
-    });
-    counterStates.forEach((c, i) => {
-      gsap.to(c, {
-        v: c.target, duration: 1.6, ease: 'power2.out',
-        scrollTrigger: { trigger: pin, start: 'top 60%' },
-        onUpdate: () => c.el.textContent = Math.round(c.v)
-      });
-    });
-    return;
-  }
-
-  // Start state: cards translated down + dim
-  gsap.set(cards, { y: 70, opacity: 0, scale: .95 });
-  gsap.set('.results-text', { opacity: 0, y: 30 });
-
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: pin,
-      start: 'top top',
-      end: '+=120%',
-      pin: true,
-      scrub: 1,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-    }
-  });
-
-  tl.to('.results-text', { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 0)
-    .to(cards, {
-      y: 0, opacity: 1, scale: 1,
-      stagger: .12, duration: .9, ease: 'power3.out'
-    }, .3)
-    .to(counterStates, {
-      v: i => counterStates[i].target,
-      ease: 'none',
-      duration: 1.4,
-      onUpdate: function(){
-        counterStates.forEach(c => c.el.textContent = Math.round(c.v));
-      }
-    }, .6);
-}
-
-/* ============================================================
-   TEMOIGNAGES — STAGGER WITH CLIP-PATH + EXPRESSIVE EASE
-   ============================================================ */
-function initTesti(){
-  gsap.utils.toArray('.testi-card').forEach((card, i) => {
-    gsap.from(card, {
-      y: 70,
-      opacity: 0,
-      clipPath: 'inset(0 0 100% 0)',
-      rotate: i % 2 === 0 ? -.4 : .4,
-      duration: 1.1,
-      delay: i * .12,
-      ease: 'power4.out',
-      scrollTrigger: { trigger: '.testi-grid', start: 'top 80%' }
-    });
-  });
-}
-
-/* ============================================================
-   CTA FINAL
-   ============================================================ */
-function initCtaFinal(){
-  // Intensify orb glow as CTA section enters
-  gsap.from('.cta-final p', {
-    y: 24, opacity: 0, duration: 1,
-    scrollTrigger: { trigger: '.cta-final', start: 'top 75%' }
-  });
 }
 
 /* ============================================================
@@ -2929,7 +2502,7 @@ function initMagnetic(){
 }
 
 /* ============================================================
-   3D TILT ON TESTIMONIAL CARDS
+   3D TILT ON CARDS
    ============================================================ */
 function initTilt(){
   if (isMobile) return;
@@ -2939,11 +2512,10 @@ function initTilt(){
       const x = (e.clientX - r.left) / r.width - .5;
       const y = (e.clientY - r.top) / r.height - .5;
       gsap.to(card, {
-        rotationY: x * 8,
-        rotationX: -y * 8,
-        transformPerspective: 800,
-        duration: .5,
-        ease: 'power2.out'
+        rotationY: x * 4,
+        rotationX: -y * 4,
+        transformPerspective: 1000,
+        duration: .5, ease: 'power2.out'
       });
     });
     card.addEventListener('mouseleave', () => {
@@ -2953,28 +2525,52 @@ function initTilt(){
 }
 
 /* ============================================================
-   FOOTER MEGA TYPE PARALLAX
+   HUD — current node indicator
+   Updates as user scrolls between sections, highlights active node + trace
    ============================================================ */
-function initFooterMega(){
-  if (reducedMotion) return;
-  gsap.from('.footer-mega', {
-    yPercent: 30,
-    opacity: 0,
-    ease: 'none',
-    scrollTrigger: {
-      trigger: '.footer',
-      start: 'top 80%',
-      end: 'bottom bottom',
-      scrub: 1
-    }
+function initHud(){
+  const hudLabel = document.getElementById('hud-label');
+  const hudName = document.getElementById('hud-name');
+  const sections = gsap.utils.toArray('.node-section');
+
+  sections.forEach((section, i) => {
+    const node = NODES[i];
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top center',
+      end: 'bottom center',
+      onEnter: () => activateNode(i),
+      onEnterBack: () => activateNode(i),
+    });
   });
+
+  function activateNode(i){
+    const node = NODES[i];
+    hudLabel.textContent = 'N' + String(node.id).padStart(2, '0');
+    hudName.textContent = node.name;
+
+    // Light up the corresponding node
+    document.querySelectorAll('.node-g .core').forEach(c => c.style.filter = 'drop-shadow(0 0 8px rgba(214,51,132,.4))');
+    const activeCore = document.querySelector(`#node-${node.id} .core`);
+    if (activeCore) activeCore.style.filter = 'drop-shadow(0 0 22px rgba(214,51,132,1)) drop-shadow(0 0 40px rgba(124,92,252,.7))';
+
+    // Light up the trace leading INTO this node (from previous)
+    document.querySelectorAll('.tr-pulse').forEach(p => {
+      gsap.to(p, { opacity: .25, duration: .5 });
+    });
+    if (i > 0) {
+      const trace = document.getElementById(`pulse-${i}-${i+1}`);
+      if (trace) gsap.to(trace, { opacity: 1, duration: .5 });
+    }
+  }
+  // Initialize on N01
+  activateNode(0);
 }
 
 /* ============================================================
    REFRESH ON LOAD
    ============================================================ */
 window.addEventListener('load', () => ScrollTrigger.refresh());
-
 </script>
 </body>
 </html>
