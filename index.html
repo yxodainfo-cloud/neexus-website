@@ -16,7 +16,6 @@
 <link rel="icon" type="image/png" href="logo.png" />
 <link rel="apple-touch-icon" href="logo.png" />
 <link rel="preload" as="image" href="logo.png" fetchpriority="high" />
-<link rel="preload" as="video" href="chip-video.mp4" type="video/mp4" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,6 +25,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+<script src="https://unpkg.com/split-type@0.3.4/umd/index.min.js"></script>
 
 <style>
 /* ============================================================
@@ -35,23 +35,29 @@
   --bg-0:#070a14;
   --bg-1:#0a0e1a;
   --bg-2:#0f1424;
+  --bg-3:#131830;
   --line:rgba(255,255,255,.06);
-  --line-strong:rgba(255,255,255,.14);
+  --line-strong:rgba(255,255,255,.12);
   --text:#e8eaf0;
-  --text-dim:#9da3b8;
-  --text-mute:#6b7290;
+  --text-dim:#8b90a5;
+  --text-mute:#5b607a;
   --blue:#4d7cff;
   --purple:#7c5cfc;
   --magenta:#d63384;
   --pink:#e8548e;
+  --green:#4ade80;
   --grad: linear-gradient(135deg,#4d7cff 0%,#7c5cfc 40%,#d63384 100%);
   --grad-text: linear-gradient(90deg,#4d7cff 0%,#9b6dff 50%,#e8548e 100%);
-  --container:1280px;
-  --ts: 0 2px 24px rgba(0,0,0,.65), 0 0 60px rgba(0,0,0,.35);
+  --grad-soft: linear-gradient(135deg,rgba(77,124,255,.14) 0%,rgba(124,92,252,.10) 50%,rgba(214,51,132,.14) 100%);
+  --glass: rgba(255,255,255,.025);
+  --glass-strong: rgba(255,255,255,.045);
+  --r-md:18px;
+  --r-lg:28px;
+  --container:1340px;
 }
 
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{background:#000;color:var(--text);}
+html,body{background:var(--bg-1);color:var(--text);}
 html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
 body{
   font-family:'DM Sans',system-ui,sans-serif;
@@ -60,6 +66,8 @@ body{
   font-size:clamp(15px,1vw,17px);
   overflow-x:hidden;
 }
+body.has-cursor{cursor:none;}
+body.has-cursor button,body.has-cursor a{cursor:none;}
 img,svg{display:block;max-width:100%;}
 a{color:inherit;text-decoration:none;}
 button{font:inherit;color:inherit;background:none;border:0;}
@@ -69,16 +77,86 @@ button{font:inherit;color:inherit;background:none;border:0;}
 .lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain;}
 
 /* ============================================================
-   PRELOADER
+   TYPO
+   ============================================================ */
+.gradient-text{
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.italic{font-style:italic;font-family:'Syne',sans-serif;font-weight:500;}
+
+/* ============================================================
+   CURSOR (desktop only)
+   ============================================================ */
+.cursor,.cursor-glow{display:none;}
+body.has-cursor .cursor,
+body.has-cursor .cursor-glow{display:block;}
+.cursor{
+  position:fixed;top:0;left:0;
+  width:12px;height:12px;border-radius:50%;
+  background:#fff;mix-blend-mode:difference;
+  pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:width .3s cubic-bezier(.2,.8,.2,1),height .3s cubic-bezier(.2,.8,.2,1);
+  will-change:transform,width,height;
+}
+.cursor-glow{
+  position:fixed;top:0;left:0;
+  width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,92,252,.22) 0%,rgba(214,51,132,.06) 40%,transparent 70%);
+  filter:blur(46px);
+  pointer-events:none;z-index:1;
+  transform:translate(-50%,-50%);
+  mix-blend-mode:screen;
+  will-change:transform;
+}
+.cursor.is-hover{width:48px;height:48px;background:transparent;border:1px solid rgba(255,255,255,.9);}
+
+/* ============================================================
+   NOISE + SCROLL PROGRESS
+   ============================================================ */
+.noise{
+  position:fixed;inset:0;pointer-events:none;
+  z-index:9998;opacity:.035;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.scroll-progress{
+  position:fixed;top:0;left:0;right:0;
+  height:2px;background:var(--grad);
+  transform:scaleX(0);transform-origin:0 0;
+  z-index:9997;pointer-events:none;
+}
+
+/* ============================================================
+   GLOW ORBS — fixed background depth
+   ============================================================ */
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.orb{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(120px);
+  opacity:.55;
+  will-change:transform;
+}
+.orb-1{width:520px;height:520px;background:#4d7cff;top:-120px;left:-160px;}
+.orb-2{width:620px;height:620px;background:#7c5cfc;top:30%;right:-200px;}
+.orb-3{width:480px;height:480px;background:#d63384;bottom:-160px;left:30%;opacity:.45;}
+.orb-4{width:380px;height:380px;background:#4d7cff;bottom:10%;right:10%;opacity:.35;}
+
+/* ============================================================
+   PRELOADER — logo PNG 120px height
    ============================================================ */
 .preloader{
   position:fixed;inset:0;
   background:#000;z-index:10000;
   display:grid;place-items:center;overflow:hidden;
+  will-change:clip-path;
 }
 .preloader::before{
   content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(124,92,252,.35),transparent 60%);
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%,rgba(124,92,252,.35),transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(214,51,132,.2),transparent 70%);
   opacity:0;pointer-events:none;
 }
 .preloader.is-glowing::before{opacity:1;transition:opacity .8s ease;}
@@ -92,28 +170,36 @@ button{font:inherit;color:inherit;background:none;border:0;}
 .preloader-logo img{height:120px;width:auto;display:block;}
 .preloader-counter{
   position:absolute;bottom:48px;left:48px;z-index:2;
-  font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.04em;
-  color:var(--text-dim);opacity:0;
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;letter-spacing:.04em;color:var(--text-dim);
+  opacity:0;
 }
 .preloader-tag{
   position:absolute;bottom:48px;right:48px;z-index:2;
   font-size:11px;letter-spacing:.22em;text-transform:uppercase;
   color:var(--text-dim);opacity:0;
 }
+.preloader-line{
+  position:absolute;left:50%;top:62%;
+  transform:translate(-50%,-50%);
+  width:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+  z-index:1;
+}
 
 /* ============================================================
-   NAV
+   NAV — logo PNG 40px height
    ============================================================ */
 .nav{
   position:fixed;top:0;left:0;right:0;z-index:1000;
   padding:22px 36px;
   display:flex;align-items:center;justify-content:space-between;
-  transition:padding .35s ease,background-color .35s ease,backdrop-filter .35s ease,border-color .35s ease;
+  transition:padding .35s ease,background-color .35s ease,border-color .35s ease,backdrop-filter .35s ease;
   border-bottom:1px solid transparent;
 }
 .nav.is-scrolled{
   padding:14px 36px;
-  background:rgba(0,0,0,.55);
+  background:rgba(10,14,26,.62);
   backdrop-filter:blur(18px) saturate(140%);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
   border-bottom:1px solid var(--line);
@@ -134,7 +220,6 @@ button{font:inherit;color:inherit;background:none;border:0;}
 .nav-links a{
   font-size:13px;letter-spacing:.02em;color:var(--text-dim);
   position:relative;padding:6px 0;transition:color .25s;
-  font-family:'JetBrains Mono',monospace;
 }
 .nav-links a::after{
   content:'';position:absolute;left:0;bottom:0;
@@ -149,456 +234,799 @@ button{font:inherit;color:inherit;background:none;border:0;}
   font-size:13px;font-weight:500;
   padding:11px 20px;border-radius:100px;
   border:1px solid var(--line-strong);
-  background:rgba(0,0,0,.55);
+  background:rgba(255,255,255,.02);
   backdrop-filter:blur(12px);
   transition:transform .35s,border-color .35s,background-color .35s;
 }
-.nav-cta:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.06);}
+.nav-cta:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.05);}
 .nav-cta .arrow{display:inline-block;transition:transform .35s;}
 .nav-cta:hover .arrow{transform:translateX(4px);}
 .nav-burger{
   display:none;width:40px;height:40px;border-radius:50%;
-  border:1px solid var(--line-strong);background:rgba(0,0,0,.5);
+  border:1px solid var(--line-strong);background:rgba(255,255,255,.03);
   align-items:center;justify-content:center;flex-direction:column;gap:4px;
 }
 .nav-burger span{display:block;width:16px;height:1px;background:#fff;transition:transform .3s,opacity .3s;}
-
 .mobile-menu{
   position:fixed;inset:0;
-  background:rgba(0,0,0,.96);
-  backdrop-filter:blur(24px);
-  z-index:999;display:none;
-  flex-direction:column;padding:120px 36px 60px;
+  background:rgba(7,10,20,.96);backdrop-filter:blur(24px);
+  z-index:999;display:none;flex-direction:column;
+  padding:120px 36px 60px;
   transform:translateY(-100%);
   transition:transform .55s cubic-bezier(.7,0,.3,1);
 }
 .mobile-menu.is-open{transform:translateY(0);}
 .mobile-menu a{
-  font-family:'Syne',sans-serif;font-size:32px;font-weight:600;letter-spacing:-.02em;
-  padding:16px 0;border-bottom:1px solid var(--line);
-}
-
-/* Scroll progress */
-.scroll-progress{
-  position:fixed;top:0;left:0;right:0;height:2px;
-  background:var(--grad);
-  transform:scaleX(0);transform-origin:0 0;
-  z-index:9997;pointer-events:none;
+  font-family:'Syne',sans-serif;font-size:34px;font-weight:600;letter-spacing:-.02em;
+  padding:18px 0;border-bottom:1px solid var(--line);
 }
 
 /* ============================================================
-   SCROLL STAGE — pinned video + content overlay
+   COMMON SECTION
    ============================================================ */
-.stage-viewport{
-  position:relative;
-  width:100%;height:100vh;
-  overflow:hidden;
-  background:#000;
+.section{position:relative;padding:140px 36px;z-index:2;}
+.container{max-width:var(--container);margin:0 auto;position:relative;}
+.section-eyebrow{
+  display:inline-flex;align-items:center;gap:10px;margin-bottom:28px;
 }
-.bg-video{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  object-fit:cover;
-  z-index:0;
-  background:#000;
-  pointer-events:none;
-}
-.video-overlay{
-  position:absolute;inset:0;
-  background:rgba(10,14,26,.5);
-  z-index:1;
-  pointer-events:none;
-}
-.video-vignette{
-  position:absolute;inset:0;
-  background:radial-gradient(ellipse 70% 60% at 50% 50%,transparent 40%,rgba(0,0,0,.55) 100%);
-  z-index:1;
-  pointer-events:none;
-}
-
-/* Content overlay layer */
-.content-block{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:120px 36px;
-  text-align:center;
-  opacity:0;
-  z-index:5;
-  color:#fff;
-  text-shadow:var(--ts);
-  pointer-events:none;
-  will-change:opacity,transform;
-}
-.content-block.is-active{pointer-events:auto;}
-.content-block > *{max-width:var(--container);width:100%;margin-inline:auto;}
-
-/* === BLOCK: LOGO === */
-.block-logo .big-logo{
-  height:clamp(120px,18vh,200px);
-  width:auto;
-  margin:0 auto 32px;
-  filter:drop-shadow(0 8px 40px rgba(124,92,252,.55));
-}
-.block-logo .tagline{
+.section-eyebrow .num{
   font-family:'JetBrains Mono',monospace;
-  font-size:clamp(12px,1vw,15px);
-  letter-spacing:.3em;
-  text-transform:uppercase;
-  color:rgba(255,255,255,.85);
+  font-size:11px;color:var(--text-mute);letter-spacing:.05em;
 }
-.block-logo .pulse{
-  display:inline-block;
+.section-eyebrow .label{
+  font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:var(--text-dim);
+}
+.section-eyebrow .line{width:48px;height:1px;background:var(--line-strong);}
+.section-title{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(36px,5.4vw,80px);
+  line-height:1;letter-spacing:-.025em;max-width:18ch;
+}
+.section-sub{
+  color:var(--text-dim);font-size:clamp(15px,1.1vw,17px);
+  line-height:1.65;max-width:44ch;
+}
+.section-sub b{color:var(--text);font-weight:500;}
+
+/* ============================================================
+   HERO (pinned on desktop)
+   ============================================================ */
+.hero{
+  position:relative;
+  min-height:100vh;
+  padding:0 36px;
+  overflow:hidden;
+  z-index:2;
+}
+.hero-grid-bg{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(ellipse 75% 65% at 50% 45%,#000 25%,transparent 85%);
+  -webkit-mask-image:radial-gradient(ellipse 75% 65% at 50% 45%,#000 25%,transparent 85%);
+  pointer-events:none;
+}
+.hero-inner{
+  max-width:var(--container);
+  margin:0 auto;
+  height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;padding-top:80px;
+  will-change:transform,opacity;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:8px 16px 8px 12px;
+  border:1px solid var(--line-strong);
+  background:rgba(255,255,255,.025);
+  backdrop-filter:blur(10px);
+  border-radius:100px;
+  font-size:12px;letter-spacing:.05em;
+  width:fit-content;margin-bottom:36px;
+}
+.hero-badge .pulse-dot{
   width:8px;height:8px;border-radius:50%;
-  background:var(--magenta);
-  margin-right:14px;vertical-align:middle;
-  box-shadow:0 0 12px var(--magenta);
+  background:var(--blue);position:relative;
+  box-shadow:0 0 10px var(--blue);
+}
+.hero-badge .pulse-dot::after{
+  content:'';position:absolute;inset:-4px;
+  border-radius:50%;border:1px solid var(--blue);
   animation:pulse 2.4s infinite;
 }
-@keyframes pulse{0%{transform:scale(1);opacity:.85;}100%{transform:scale(2.4);opacity:0;}}
-
-/* === BLOCK: HERO === */
-.block-hero h1{
+@keyframes pulse{0%{transform:scale(1);opacity:.8;}100%{transform:scale(2.2);opacity:0;}}
+.hero-title{
   font-family:'Syne',sans-serif;font-weight:700;
-  font-size:clamp(40px,7vw,108px);
-  line-height:.94;letter-spacing:-.035em;
-  margin-bottom:28px;max-width:18ch;
+  font-size:clamp(48px,8.4vw,140px);
+  line-height:.92;letter-spacing:-.035em;
+  margin-bottom:32px;perspective:1200px;
 }
-.block-hero h1 .grad{
+.hero-title .line{display:block;overflow:hidden;perspective:1200px;}
+.hero-title .line-2{
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
-  font-style:italic;
 }
-.block-hero p{
+.hero-title .char{
+  display:inline-block;
+  will-change:transform,opacity;
+  transform-style:preserve-3d;
+}
+.hero-sub{
   font-size:clamp(15px,1.2vw,19px);
-  color:rgba(232,234,240,.95);
-  max-width:56ch;
-  margin:0 auto 40px;
-  line-height:1.55;
+  color:var(--text-dim);max-width:54ch;
+  line-height:1.55;margin-bottom:48px;
 }
-.block-hero p b{color:#fff;font-weight:600;}
-.cta-row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+.hero-sub b{color:var(--text);font-weight:500;}
+.cta-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:80px;}
 .btn{
   display:inline-flex;align-items:center;gap:12px;
   padding:18px 28px;border-radius:100px;
   font-size:14px;font-weight:500;letter-spacing:.01em;
   position:relative;
   transition:transform .4s cubic-bezier(.2,.8,.2,1);
-  pointer-events:auto;
-  text-shadow:none;
+  will-change:transform;
 }
 .btn-primary{
   background:var(--grad);color:#fff;
-  box-shadow:0 12px 40px rgba(124,92,252,.5);
+  box-shadow:0 12px 40px rgba(124,92,252,.35);
 }
-.btn-primary:hover{box-shadow:0 18px 50px rgba(124,92,252,.7);transform:translateY(-2px);}
+.btn-primary::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 50%);
+  pointer-events:none;
+}
+.btn-primary:hover{box-shadow:0 18px 50px rgba(124,92,252,.55);}
 .btn-ghost{
-  background:rgba(0,0,0,.5);color:#fff;
-  border:1px solid var(--line-strong);backdrop-filter:blur(10px);
+  background:rgba(255,255,255,.025);color:var(--text);
+  border:1px solid var(--line-strong);
+  position:relative;backdrop-filter:blur(10px);
 }
-.btn-ghost:hover{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.08);transform:translateY(-2px);}
+.btn-ghost::before{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;
+  background:var(--grad);
+  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  padding:1px;opacity:0;transition:opacity .35s;
+}
+.btn-ghost:hover::before{opacity:1;}
 .btn .arrow{transition:transform .35s;}
 .btn:hover .arrow{transform:translate(2px,-2px);}
-
-/* === BLOCK: SERVICES === */
-.block-services .head{
-  margin-bottom:48px;
+.hero-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:48px;max-width:760px;
+  border-top:1px solid var(--line);padding-top:40px;
 }
-.block-services h2{
+.hero-stat .num{
   font-family:'Syne',sans-serif;font-weight:600;
-  font-size:clamp(32px,5vw,68px);
-  line-height:1;letter-spacing:-.025em;
-  margin-bottom:18px;max-width:18ch;margin-inline:auto;
+  font-size:clamp(28px,3vw,42px);line-height:1;
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:8px;letter-spacing:-.02em;
 }
-.block-services h2 .grad{background:var(--grad-text);-webkit-background-clip:text;background-clip:text;color:transparent;font-style:italic;}
-.block-services .sub{color:rgba(255,255,255,.85);font-size:15px;max-width:54ch;margin:0 auto;}
-.services-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:22px;
-  margin-top:20px;
+.hero-stat .lbl{
+  font-size:12px;color:var(--text-dim);letter-spacing:.04em;line-height:1.4;
 }
-.service-item{
+.hero-scroll-hint{
+  position:absolute;bottom:40px;right:36px;
+  display:flex;align-items:center;gap:14px;
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--text-mute);
+  writing-mode:vertical-rl;transform:rotate(180deg);
+}
+.hero-scroll-hint .bar{
+  width:1px;height:48px;
+  background:linear-gradient(to bottom,var(--text-mute),transparent);
+  animation:scrollLine 2s ease-in-out infinite;
+}
+@keyframes scrollLine{0%,100%{transform:scaleY(.4);transform-origin:top;}50%{transform:scaleY(1);transform-origin:top;}}
+
+/* ============================================================
+   PROBLEMS
+   ============================================================ */
+.problems-head{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:end;margin-bottom:80px;
+}
+.problems-intro{
+  font-size:16px;color:var(--text-dim);
+  max-width:42ch;line-height:1.65;
+}
+.problems-intro b{color:var(--text);font-weight:500;}
+.problems-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:24px;
+}
+.problem-card{
   position:relative;
-  padding:32px 26px;
-  border-radius:18px;
-  background:rgba(10,14,26,.55);
-  border:1px solid var(--line-strong);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  text-align:left;
-  opacity:0;
-  text-shadow:none;
+  padding:40px;
+  border-radius:var(--r-lg);
+  background:var(--glass);
+  border:1px solid var(--line);
+  backdrop-filter:blur(10px);
+  overflow:hidden;
+  transition:transform .5s cubic-bezier(.2,.8,.2,1),background-color .35s,border-color .35s;
 }
-.service-item .pill{
-  display:inline-block;
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;letter-spacing:.2em;
-  color:var(--magenta);
-  padding:5px 11px;
-  border:1px solid rgba(214,51,132,.35);
-  border-radius:100px;
-  background:rgba(214,51,132,.08);
-  margin-bottom:18px;
+.problem-card::before{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;
+  background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.5) 25%,transparent 50%,rgba(214,51,132,.5) 75%,transparent 100%);
+  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  padding:1px;opacity:0;
+  transition:opacity .5s;
+  animation:rotateBorder 6s linear infinite;
 }
-.service-item h3{
-  font-family:'Syne',sans-serif;font-weight:600;
-  font-size:22px;letter-spacing:-.01em;
-  margin-bottom:12px;color:#fff;
-}
-.service-item p{color:rgba(232,234,240,.85);font-size:13.5px;line-height:1.55;}
-.service-item ul{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:8px;}
-.service-item li{
-  display:flex;gap:10px;align-items:flex-start;
-  font-size:12.5px;color:rgba(232,234,240,.8);line-height:1.45;
-}
-.service-item li::before{
-  content:'';flex:0 0 5px;width:5px;height:5px;border-radius:50%;
-  background:var(--grad);margin-top:6px;
-  box-shadow:0 0 8px rgba(124,92,252,.6);
-}
-
-/* === BLOCK: METHODE === */
-.block-methode h2{
-  font-family:'Syne',sans-serif;font-weight:600;
-  font-size:clamp(32px,5vw,68px);
-  line-height:1;letter-spacing:-.025em;
-  margin-bottom:18px;
-}
-.block-methode .sub{color:rgba(255,255,255,.85);max-width:54ch;margin:0 auto 48px;}
-.methode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
-.methode-step{
-  padding:28px 22px;
-  border-radius:16px;
-  background:rgba(10,14,26,.55);
-  border:1px solid var(--line-strong);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  text-align:left;
-  text-shadow:none;
-}
-.methode-step .step-num{
-  font-family:'Syne',sans-serif;font-weight:700;
-  font-size:42px;line-height:1;
-  background:var(--grad-text);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  letter-spacing:-.04em;margin-bottom:14px;
-}
-.methode-step .tag{
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;letter-spacing:.1em;
-  color:var(--text-dim);text-transform:uppercase;
-  margin-bottom:8px;
-}
-.methode-step h3{font-family:'Syne',sans-serif;font-weight:600;font-size:18px;color:#fff;margin-bottom:8px;}
-.methode-step p{font-size:13px;color:rgba(232,234,240,.78);line-height:1.5;}
-
-/* === BLOCK: RESULTS === */
-.block-results h2{
-  font-family:'Syne',sans-serif;font-weight:600;
-  font-size:clamp(32px,5vw,68px);
-  line-height:1;letter-spacing:-.025em;
-  margin-bottom:18px;
-}
-.block-results h2 .grad{background:var(--grad-text);-webkit-background-clip:text;background-clip:text;color:transparent;font-style:italic;}
-.block-results .sub{color:rgba(255,255,255,.85);max-width:54ch;margin:0 auto 48px;}
-.results-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
-.result-item{
-  padding:36px 22px 26px;
-  border-radius:16px;
-  background:rgba(10,14,26,.55);
-  border:1px solid var(--line-strong);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  text-align:center;position:relative;overflow:hidden;
-  text-shadow:none;
-}
-.result-item::after{
-  content:'';position:absolute;
-  top:50%;left:50%;width:90%;aspect-ratio:1;
-  transform:translate(-50%,-55%);
-  background:radial-gradient(circle at center,rgba(124,92,252,.32),rgba(214,51,132,.16) 40%,transparent 70%);
-  filter:blur(34px);opacity:.6;pointer-events:none;z-index:0;
-}
-.result-item .num{
-  font-family:'Syne',sans-serif;font-weight:700;
-  font-size:clamp(3rem,6vw,5.5rem);
-  line-height:.9;letter-spacing:-.05em;
-  background:var(--grad-text);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  margin-bottom:14px;
-  display:flex;align-items:baseline;justify-content:center;
-  position:relative;z-index:1;
-  filter:drop-shadow(0 0 24px rgba(124,92,252,.5));
-}
-.result-item .num .prefix{font-size:.55em;margin-right:2px;opacity:.9;}
-.result-item .unit{font-size:.45em;margin-left:5px;opacity:.9;font-weight:600;}
-.result-item .lbl{font-size:13px;color:#fff;font-weight:500;margin-bottom:6px;position:relative;z-index:1;}
-.result-item .desc{font-size:11.5px;color:rgba(232,234,240,.7);line-height:1.5;position:relative;z-index:1;}
-
-/* === BLOCK: TESTI === */
-.block-testi h2{
-  font-family:'Syne',sans-serif;font-weight:600;
-  font-size:clamp(32px,5vw,68px);
-  line-height:1;letter-spacing:-.025em;
-  margin-bottom:48px;
-}
-.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
-.testi-item{
-  padding:30px 28px;
-  border-radius:18px;
-  background:rgba(10,14,26,.55);
-  border:1px solid var(--line-strong);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  text-align:left;position:relative;
-  text-shadow:none;
-}
-.testi-item .quote-mark{
-  font-family:'Syne',sans-serif;font-size:52px;line-height:.5;
-  background:var(--grad-text);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  margin-bottom:16px;
-}
-.testi-item .quote{font-size:14px;line-height:1.6;color:#fff;margin-bottom:24px;min-height:100px;}
-.testi-item .author{display:flex;align-items:center;gap:12px;padding-top:18px;border-top:1px solid var(--line);}
-.testi-item .av{
-  width:40px;height:40px;border-radius:50%;background:var(--grad);
+@property --rot{syntax:'<angle>';initial-value:0deg;inherits:false;}
+@keyframes rotateBorder{to{--rot:360deg;}}
+.problem-card:hover{transform:translateY(-4px);background:var(--glass-strong);}
+.problem-card:hover::before{opacity:1;}
+.problem-card .icon{
+  width:54px;height:54px;border-radius:14px;
+  background:var(--grad-soft);border:1px solid var(--line);
   display:grid;place-items:center;
-  font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#fff;flex:0 0 40px;
+  margin-bottom:28px;font-size:24px;
 }
-.testi-item .name{font-size:13px;font-weight:500;color:#fff;}
-.testi-item .role{font-size:11.5px;color:var(--text-dim);margin-top:2px;}
-.testi-item .city{
-  position:absolute;top:24px;right:24px;
+.problem-card h3{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:24px;letter-spacing:-.01em;margin-bottom:14px;
+}
+.problem-card p{color:var(--text-dim);font-size:15px;line-height:1.6;}
+.problem-card .tag{
+  position:absolute;top:24px;right:28px;
   font-family:'JetBrains Mono',monospace;
   font-size:10px;letter-spacing:.1em;color:var(--text-mute);
 }
 
-/* === BLOCK: CTA === */
-.block-cta h2{
-  font-family:'Syne',sans-serif;font-weight:700;
-  font-size:clamp(42px,7vw,108px);
-  line-height:.95;letter-spacing:-.035em;
-  margin-bottom:28px;max-width:18ch;margin-inline:auto;
-}
-.block-cta h2 .grad{background:var(--grad-text);-webkit-background-clip:text;background-clip:text;color:transparent;font-style:italic;}
-.block-cta p{
-  color:rgba(255,255,255,.9);
-  font-size:17px;max-width:52ch;margin:0 auto 40px;line-height:1.55;
-}
-.block-cta p b{color:#fff;font-weight:600;}
-
 /* ============================================================
-   HUD progress indicator (desktop only)
+   SERVICES (HORIZONTAL SCROLL desktop / STACK mobile)
    ============================================================ */
-.hud-progress{
-  position:fixed;right:36px;top:50%;
-  transform:translateY(-50%);
-  z-index:50;
-  display:flex;flex-direction:column;gap:14px;
+.services-wrap{
+  position:relative;
+  background:var(--bg-0);
+  padding:140px 0 0;
+  overflow:hidden;
+}
+.services-head{
+  padding:0 36px;
+  max-width:var(--container);
+  margin:0 auto 80px;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:end;
+}
+.services-head p{
+  color:var(--text-dim);max-width:42ch;
+  font-size:16px;line-height:1.65;
+}
+.services-head p b{color:var(--text);font-weight:500;}
+.horizontal-container{
+  position:relative;
+  height:100vh;width:100%;overflow:hidden;
+}
+.horizontal-track{
+  display:flex;height:100%;
+  will-change:transform;
+}
+.service-panel{
+  flex:0 0 100vw;height:100%;
+  padding:60px 36px;
+  display:grid;align-items:center;
+  position:relative;
+}
+.service-panel .panel-num{
+  position:absolute;top:60px;left:36px;
   font-family:'JetBrains Mono',monospace;
-  font-size:10px;letter-spacing:.18em;
-  color:var(--text-dim);
-  text-transform:uppercase;
-  opacity:0;
+  font-size:13px;letter-spacing:.2em;color:var(--text-mute);
+}
+.service-content{
+  max-width:var(--container);margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;
+  align-items:center;width:100%;
+}
+.service-text .pillar-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;color:var(--magenta);
+  letter-spacing:.2em;margin-bottom:20px;display:block;
+}
+.service-text h3{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(32px,4.4vw,64px);
+  line-height:1;letter-spacing:-.025em;margin-bottom:24px;
+}
+.service-text .lead{
+  font-size:16px;color:var(--text-dim);
+  line-height:1.65;margin-bottom:32px;max-width:46ch;
+}
+.service-text ul{list-style:none;display:flex;flex-direction:column;gap:14px;}
+.service-text li{
+  display:flex;gap:14px;align-items:flex-start;
+  font-size:15px;color:var(--text);
+  padding:14px 0;border-bottom:1px solid var(--line);
+}
+.service-text li::before{
+  content:'';flex:0 0 6px;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--grad);margin-top:8px;
+  box-shadow:0 0 10px rgba(124,92,252,.6);
+}
+.service-visual{
+  position:relative;height:520px;
+  border-radius:var(--r-lg);
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+  border:1px solid var(--line);
+  overflow:hidden;backdrop-filter:blur(14px);
+}
+.service-visual::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 20% 0%,rgba(77,124,255,.18),transparent 60%),
+    radial-gradient(circle at 100% 100%,rgba(214,51,132,.18),transparent 60%);
   pointer-events:none;
 }
-.hud-progress .step{
+
+/* Chat visual */
+.chat-visual{padding:24px;}
+.chat-header{
   display:flex;align-items:center;gap:10px;
-  transition:color .35s,opacity .35s;
-  opacity:.5;
+  padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:24px;
 }
-.hud-progress .step .dot{
-  width:7px;height:7px;border-radius:50%;
-  background:rgba(255,255,255,.3);
-  transition:background .35s,box-shadow .35s,transform .35s;
+.chat-header .av{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--grad);
+  display:grid;place-items:center;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#fff;
 }
-.hud-progress .step.is-active{opacity:1;color:#fff;}
-.hud-progress .step.is-active .dot{
-  background:var(--magenta);
-  box-shadow:0 0 12px var(--magenta);
-  transform:scale(1.3);
+.chat-header .meta{flex:1;}
+.chat-header .meta .name{font-size:13px;font-weight:500;}
+.chat-header .meta .status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px;margin-top:2px;}
+.chat-header .meta .status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+.chat-header .ch-btn{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-mute);padding:4px 8px;border:1px solid var(--line);border-radius:6px;}
+.chat-msgs{display:flex;flex-direction:column;gap:12px;padding:0 4px;}
+.msg{
+  max-width:78%;padding:12px 16px;border-radius:18px;
+  font-size:13.5px;line-height:1.45;
+  opacity:0;transform:translateY(12px);
 }
+.msg.user{align-self:flex-end;background:rgba(255,255,255,.06);border:1px solid var(--line);border-bottom-right-radius:6px;}
+.msg.ai{align-self:flex-start;background:var(--grad-soft);border:1px solid rgba(124,92,252,.25);border-bottom-left-radius:6px;}
+.msg .meta{font-size:10px;color:var(--text-mute);margin-top:4px;font-family:'JetBrains Mono',monospace;}
+.typing{
+  align-self:flex-start;display:flex;align-items:center;gap:4px;
+  padding:12px 16px;background:var(--glass);border:1px solid var(--line);
+  border-radius:18px;border-bottom-left-radius:6px;opacity:0;
+}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--text-dim);animation:typingDot 1.2s ease-in-out infinite;}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes typingDot{0%,60%,100%{opacity:.3;transform:translateY(0);}30%{opacity:1;transform:translateY(-3px);}}
+
+/* Workflow visual */
+.workflow-visual{padding:30px;display:grid;place-items:center;}
+.workflow-svg{width:100%;height:100%;max-width:460px;}
+.workflow-svg .node-w{fill:rgba(10,14,26,.9);stroke:rgba(255,255,255,.18);stroke-width:1;}
+.workflow-svg .nlabel{font-family:'JetBrains Mono',monospace;font-size:9px;fill:var(--text);text-anchor:middle;dominant-baseline:central;font-weight:500;}
+.workflow-svg .nicon{font-family:'JetBrains Mono',monospace;font-size:14px;fill:#fff;text-anchor:middle;dominant-baseline:central;}
+.workflow-svg .conn-flow{fill:none;stroke:url(#flow-grad);stroke-width:2;stroke-linecap:round;}
+.workflow-svg .pulse{fill:url(#flow-grad);}
+
+/* Code visual */
+.code-visual{padding:24px;font-family:'JetBrains Mono',monospace;}
+.code-window-bar{display:flex;align-items:center;gap:8px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:18px;}
+.code-window-bar .ddot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.15);}
+.code-window-bar .file{margin-left:14px;font-size:11px;color:var(--text-dim);}
+.code-content{font-size:12.5px;line-height:1.85;color:var(--text);}
+.code-content .ln{display:flex;gap:18px;opacity:0;}
+.code-content .lnum{color:var(--text-mute);width:20px;text-align:right;user-select:none;}
+.code-content .kw{color:#c084fc;}
+.code-content .fn{color:#60a5fa;}
+.code-content .str{color:#86efac;}
+.code-content .com{color:var(--text-mute);font-style:italic;}
+.code-content .pr{color:#fbbf24;}
+.code-content .typing-cursor{display:inline-block;width:6px;height:14px;background:var(--grad);animation:blink 1s infinite;margin-left:2px;vertical-align:middle;}
+@keyframes blink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
+.code-preview{margin-top:20px;padding:18px;border-radius:12px;background:var(--bg-2);border:1px solid var(--line);}
+.code-preview .pv-bar{height:4px;background:var(--grad);border-radius:100px;margin-bottom:14px;width:0;}
+.code-preview .pv-block{height:8px;background:rgba(255,255,255,.08);border-radius:4px;margin-bottom:8px;opacity:0;}
+.code-preview .pv-block.w-3{width:60%;}
+.code-preview .pv-block.w-2{width:40%;}
+.code-preview .pv-block.w-1{width:80%;}
+
+.services-dots{
+  position:absolute;bottom:40px;left:50%;
+  transform:translateX(-50%);
+  display:flex;gap:14px;z-index:5;
+}
+.services-dots .ddot{
+  width:24px;height:2px;background:var(--line-strong);
+  border-radius:100px;position:relative;overflow:hidden;
+}
+.services-dots .ddot::after{
+  content:'';position:absolute;inset:0;background:var(--grad);
+  transform:scaleX(0);transform-origin:0;
+  transition:transform .4s ease;
+}
+.services-dots .ddot.is-active::after{transform:scaleX(1);}
+
+/* ============================================================
+   METHODE
+   ============================================================ */
+.methode-inner{
+  display:grid;grid-template-columns:1fr 1.2fr;
+  gap:100px;align-items:start;
+}
+.methode-sticky{position:sticky;top:120px;}
+.methode-sticky h2{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(36px,5vw,72px);
+  letter-spacing:-.025em;line-height:1;margin-bottom:32px;
+}
+.methode-sticky p{
+  color:var(--text-dim);font-size:16px;
+  max-width:38ch;line-height:1.65;margin-bottom:48px;
+}
+.methode-progress{
+  position:relative;width:100%;max-width:280px;
+  height:4px;background:var(--line);
+  border-radius:100px;overflow:hidden;
+}
+.methode-progress .fill{
+  position:absolute;inset:0;
+  background:var(--grad);
+  transform-origin:0;transform:scaleX(0);
+}
+.methode-progress-label{
+  display:flex;justify-content:space-between;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--text-mute);letter-spacing:.05em;
+  margin-top:10px;max-width:280px;
+}
+.methode-steps{display:flex;flex-direction:column;gap:80px;}
+.methode-step{
+  position:relative;
+  padding:40px;border-radius:var(--r-lg);
+  background:var(--glass);border:1px solid var(--line);
+  backdrop-filter:blur(10px);
+}
+.methode-step .step-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:28px;padding-bottom:24px;
+  border-bottom:1px solid var(--line);
+}
+.methode-step .step-num{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(48px,7vw,96px);line-height:1;
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  letter-spacing:-.04em;
+}
+.methode-step .step-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--text-mute);
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:6px 12px;border:1px solid var(--line);border-radius:100px;
+}
+.methode-step h3{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:28px;letter-spacing:-.01em;margin-bottom:14px;
+}
+.methode-step p{color:var(--text-dim);font-size:15px;line-height:1.6;}
+.methode-step .step-deliverables{
+  margin-top:24px;display:flex;gap:8px;flex-wrap:wrap;
+}
+.methode-step .step-deliverables span{
+  font-size:11px;color:var(--text-dim);
+  padding:6px 12px;background:rgba(255,255,255,.03);
+  border:1px solid var(--line);border-radius:100px;
+}
+
+/* ============================================================
+   RESULTATS (pinned counters)
+   ============================================================ */
+.results{
+  position:relative;
+  background:var(--bg-0);
+  overflow:hidden;
+  padding:0;
+}
+.results-pin{
+  position:relative;min-height:100vh;
+  display:flex;align-items:center;
+  padding:120px 36px;
+}
+.results::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 50% at 50% 50%,#000 30%,transparent 90%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 50% at 50% 50%,#000 30%,transparent 90%);
+  pointer-events:none;
+}
+.results-inner{
+  width:100%;max-width:var(--container);margin:0 auto;
+  position:relative;z-index:2;
+}
+.results-text{text-align:center;margin-bottom:80px;}
+.results-text h2{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(36px,5vw,72px);line-height:1;
+  letter-spacing:-.025em;margin-bottom:24px;
+  max-width:20ch;margin-inline:auto;
+}
+.results-text p{
+  color:var(--text-dim);font-size:16px;
+  max-width:54ch;line-height:1.65;margin-inline:auto;
+}
+.results-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:20px;
+}
+.result-card{
+  position:relative;
+  padding:48px 28px 36px;
+  border-radius:var(--r-lg);
+  background:var(--glass);border:1px solid var(--line);
+  backdrop-filter:blur(14px);
+  overflow:hidden;text-align:center;
+  transition:transform .55s cubic-bezier(.2,.8,.2,1);
+}
+.result-card::before{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;
+  background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.55) 25%,transparent 50%,rgba(214,51,132,.55) 75%,transparent 100%);
+  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  padding:1px;opacity:0;transition:opacity .5s;
+  animation:rotateBorder 6s linear infinite;pointer-events:none;
+}
+.result-card::after{
+  content:'';position:absolute;
+  top:50%;left:50%;width:90%;aspect-ratio:1;
+  transform:translate(-50%,-55%);
+  background:radial-gradient(circle at center,rgba(124,92,252,.35),rgba(214,51,132,.18) 35%,transparent 65%);
+  filter:blur(40px);opacity:.55;
+  pointer-events:none;z-index:0;
+}
+.result-card:hover{transform:translateY(-6px);}
+.result-card:hover::before{opacity:1;}
+.result-card .num{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(4rem,8vw,10rem);line-height:.9;
+  letter-spacing:-.05em;
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:18px;
+  display:flex;align-items:baseline;justify-content:center;
+  position:relative;z-index:1;
+  filter:drop-shadow(0 0 28px rgba(124,92,252,.45));
+}
+.result-card .num .prefix{font-size:.55em;margin-right:2px;opacity:.9;}
+.result-card .num .unit{font-size:.45em;margin-left:6px;opacity:.9;font-weight:600;}
+.result-card .lbl{
+  font-size:14px;color:var(--text);font-weight:500;
+  margin-bottom:8px;letter-spacing:.01em;
+  position:relative;z-index:1;
+}
+.result-card .desc{
+  font-size:12.5px;color:var(--text-mute);line-height:1.55;
+  position:relative;z-index:1;
+}
+
+/* ============================================================
+   TEMOIGNAGES
+   ============================================================ */
+.testi{background:var(--bg-1);position:relative;}
+.testi-head{text-align:center;margin-bottom:80px;}
+.testi-head h2{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(36px,5vw,72px);
+  letter-spacing:-.025em;line-height:1;
+  margin-bottom:20px;max-width:18ch;margin-inline:auto;
+}
+.testi-head p{color:var(--text-dim);max-width:48ch;margin-inline:auto;}
+.testi-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+}
+.testi-card{
+  position:relative;padding:36px;
+  border-radius:var(--r-lg);
+  background:var(--glass);border:1px solid var(--line);
+  backdrop-filter:blur(10px);
+  transition:transform .55s cubic-bezier(.2,.8,.2,1),background-color .35s;
+  transform-style:preserve-3d;perspective:1000px;
+  overflow:hidden;
+}
+.testi-card::before{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;
+  background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.5) 25%,transparent 50%,rgba(214,51,132,.5) 75%,transparent 100%);
+  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  padding:1px;opacity:0;transition:opacity .5s;
+  animation:rotateBorder 6s linear infinite;
+  pointer-events:none;z-index:2;
+}
+.testi-card:hover{background:var(--glass-strong);}
+.testi-card:hover::before{opacity:1;}
+.testi-card .quote-mark{
+  font-family:'Syne',sans-serif;font-size:64px;line-height:.5;
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:18px;
+}
+.testi-card .quote{font-size:15.5px;line-height:1.6;color:var(--text);margin-bottom:32px;min-height:120px;}
+.testi-card .author{display:flex;align-items:center;gap:14px;padding-top:24px;border-top:1px solid var(--line);}
+.testi-card .av{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--grad);display:grid;place-items:center;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#fff;flex:0 0 44px;
+}
+.testi-card .author-meta .name{font-size:14px;font-weight:500;}
+.testi-card .author-meta .role{font-size:12px;color:var(--text-dim);margin-top:2px;}
+.testi-card .city{
+  position:absolute;top:24px;right:28px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:.1em;color:var(--text-mute);
+}
+
+/* ============================================================
+   CTA FINAL
+   ============================================================ */
+.cta-final{
+  position:relative;
+  padding:180px 36px;text-align:center;overflow:hidden;
+  background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(124,92,252,.18),rgba(214,51,132,.05) 40%,transparent 70%),var(--bg-0);
+}
+.cta-final::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(ellipse 70% 50% at 50% 50%,#000,transparent 90%);
+  -webkit-mask-image:radial-gradient(ellipse 70% 50% at 50% 50%,#000,transparent 90%);
+}
+.cta-final h2{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(48px,8vw,128px);
+  letter-spacing:-.035em;line-height:.95;
+  max-width:14ch;margin:0 auto 36px;
+}
+.cta-final h2 .grad{
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.cta-final p{
+  color:var(--text-dim);font-size:18px;
+  max-width:54ch;margin:0 auto 56px;line-height:1.55;
+}
+.cta-final .cta-row{justify-content:center;margin-bottom:0;}
+.cta-final .btn-primary{padding:22px 36px;font-size:15px;}
 
 /* ============================================================
    FOOTER
    ============================================================ */
 .footer{
-  position:relative;z-index:5;
-  padding:60px 36px 30px;
-  background:#070a14;
+  position:relative;
+  padding:80px 36px 40px;
+  background:var(--bg-0);
   border-top:1px solid var(--line);
 }
 .footer-inner{max-width:var(--container);margin:0 auto;}
-.footer-top{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:50px;margin-bottom:50px;}
-.footer-brand .logo{display:block;margin-bottom:20px;max-width:200px;}
+.footer-top{
+  display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;
+  gap:60px;margin-bottom:80px;
+}
+.footer-brand .logo{display:block;margin-bottom:24px;max-width:240px;}
 .footer-brand .logo img{width:100%;height:auto;display:block;filter:drop-shadow(0 0 18px rgba(124,92,252,.25));}
-.footer-brand p{color:var(--text-dim);font-size:13.5px;line-height:1.6;max-width:34ch;}
-.footer-col h4{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:var(--text-mute);margin-bottom:18px;font-weight:500;font-family:'JetBrains Mono',monospace;}
-.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:12px;}
-.footer-col a{font-size:13.5px;color:var(--text-dim);transition:color .25s;}
+.footer-brand p{color:var(--text-dim);font-size:14px;line-height:1.6;max-width:34ch;}
+.footer-col h4{
+  font-size:11px;text-transform:uppercase;letter-spacing:.22em;
+  color:var(--text-mute);margin-bottom:20px;font-weight:500;
+}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:14px;}
+.footer-col a{font-size:14px;color:var(--text-dim);transition:color .25s;}
 .footer-col a:hover{color:var(--text);}
 .footer-bottom{
-  padding-top:28px;border-top:1px solid var(--line);
+  padding-top:32px;border-top:1px solid var(--line);
   display:flex;justify-content:space-between;align-items:center;
-  flex-wrap:wrap;gap:18px;font-size:12px;color:var(--text-mute);
+  flex-wrap:wrap;gap:20px;font-size:12px;color:var(--text-mute);
 }
-.footer-socials{display:flex;gap:12px;}
+.footer-socials{display:flex;gap:14px;}
 .footer-socials a{
-  width:36px;height:36px;border-radius:50%;
+  width:38px;height:38px;border-radius:50%;
   border:1px solid var(--line);
   display:grid;place-items:center;
   transition:border-color .35s,background-color .35s,transform .35s;
 }
-.footer-socials a:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.04);transform:translateY(-2px);}
-.footer-socials svg{width:13px;height:13px;}
+.footer-socials a:hover{
+  border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.04);
+  transform:translateY(-2px);
+}
+.footer-socials svg{width:14px;height:14px;}
+.footer-mega{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(80px,18vw,260px);
+  line-height:.85;letter-spacing:-.05em;
+  margin-top:40px;
+  background:linear-gradient(180deg,rgba(255,255,255,.06) 0%,transparent 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-align:center;user-select:none;
+  white-space:nowrap;overflow:hidden;
+}
 
 /* ============================================================
-   RESPONSIVE — Mobile (≤768px) gets static bg + stacked sections
+   RESPONSIVE — Tablet (≤1024) + Mobile (≤768) cut down hard
    ============================================================ */
 @media (max-width:1024px){
-  .services-grid,.methode-grid,.results-grid,.testi-grid{grid-template-columns:1fr;gap:14px;}
-  .results-grid,.methode-grid{grid-template-columns:repeat(2,1fr);}
+  .problems-head,.services-head,.methode-inner,.footer-top{
+    grid-template-columns:1fr;gap:40px;
+  }
+  .problems-grid,.results-grid{grid-template-columns:repeat(2,1fr);}
+  .testi-grid{grid-template-columns:1fr;}
+  .service-content{grid-template-columns:1fr;}
+  .service-visual{height:380px;}
+  .methode-sticky{position:relative;top:0;}
+  .methode-steps{gap:24px;}
+  .results-pin{min-height:auto;padding:100px 36px;}
 }
 @media (max-width:768px){
-  .nav{padding:16px 22px;}
+  /* === KILL EXPENSIVE EFFECTS ON MOBILE === */
+  .problem-card,.testi-card,.result-card,.methode-step,
+  .nav.is-scrolled,.nav-cta,.btn-ghost,.mobile-menu,
+  .service-visual,.hero-badge{
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  .problem-card::before,
+  .testi-card::before,
+  .result-card::before{display:none!important;}
+  .problem-card,.testi-card,.result-card{background:rgba(15,20,36,.85);}
+
+  .nav{padding:18px 22px;}
   .nav.is-scrolled{padding:12px 22px;}
   .nav-links,.nav-cta{display:none;}
   .nav-burger{display:flex;}
   .mobile-menu{display:flex;}
-
-  /* Kill the pinned video scene on mobile — show stacked content blocks */
-  .stage-viewport{
-    height:auto;overflow:visible;
-    background:
-      radial-gradient(ellipse 70% 50% at 30% 20%,rgba(77,124,255,.10),transparent 60%),
-      radial-gradient(ellipse 70% 50% at 70% 80%,rgba(214,51,132,.12),transparent 60%),
-      var(--bg-1);
-  }
-  .bg-video,.video-overlay,.video-vignette,.hud-progress{display:none!important;}
-  .content-block{
-    position:relative;inset:auto;
-    /* Override the desktop base opacity:0 (used for overlay fade-in).
-       Use a plain rule (no !important) so gsap.from() can still set
-       inline opacity:0 for its fade-in animation. */
-    opacity:1;
-    padding:90px 22px;
-    min-height:auto;
-    text-shadow:none;
-  }
-  .content-block + .content-block{border-top:1px solid var(--line);}
-  .service-item{opacity:1;}
-  .results-grid,.methode-grid,.testi-grid,.services-grid{grid-template-columns:1fr;}
-  .footer-top{grid-template-columns:1fr;gap:30px;}
+  .section{padding:90px 22px;}
+  .hero{padding:0 22px;}
+  .hero-stats{grid-template-columns:1fr;gap:24px;padding-top:32px;}
+  .cta-final{padding:120px 22px;}
+  .hero-scroll-hint{display:none;}
+  .problems-grid,.results-grid{grid-template-columns:1fr;}
+  .footer-top{grid-template-columns:1fr;}
+  .footer-mega{font-size:80px;}
+  /* SERVICES: stack vertically on mobile */
+  .horizontal-container{height:auto;width:100%;overflow:visible;}
+  .horizontal-track{flex-direction:column;height:auto;transform:none!important;}
+  .service-panel{flex:0 0 auto;width:100%;height:auto;padding:60px 22px;}
+  .service-panel .panel-num{position:relative;top:auto;left:auto;margin-bottom:18px;}
+  .services-dots{display:none;}
+  .preloader-logo,.preloader-logo img{height:80px;}
 }
 </style>
 </head>
 <body class="lenis lenis-smooth">
 
+<!-- Noise overlay -->
+<div class="noise"></div>
+
 <!-- Scroll progress -->
 <div class="scroll-progress" id="scroll-progress"></div>
 
+<!-- Cursor (desktop only — body.has-cursor class) -->
+<div class="cursor-glow" id="cursor-glow"></div>
+<div class="cursor" id="cursor"></div>
+
+<!-- Background glow orbs -->
+<div class="orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+</div>
+
 <!-- Preloader -->
 <div class="preloader" id="preloader">
+  <div class="preloader-line" id="preloader-line"></div>
   <div class="preloader-logo" id="preloader-logo" aria-label="NEEXUS">
     <img src="logo.png" alt="NEEXUS — Smart Digital Solution Agency" fetchpriority="high" decoding="sync" />
   </div>
@@ -608,16 +1036,16 @@ button{font:inherit;color:inherit;background:none;border:0;}
 
 <!-- Navigation -->
 <nav class="nav" id="nav">
-  <a href="#top" class="nav-logo" aria-label="NEEXUS — accueil" data-jump="0">
+  <a href="#" class="nav-logo" data-cursor aria-label="NEEXUS — accueil">
     <img src="logo.png" alt="NEEXUS" fetchpriority="high" />
   </a>
   <div class="nav-links">
-    <a href="#services" data-jump="0.30">Services</a>
-    <a href="#methode" data-jump="0.50">Méthode</a>
-    <a href="#resultats" data-jump="0.65">Résultats</a>
-    <a href="#temoignages" data-jump="0.80">Témoignages</a>
+    <a href="#services" data-cursor>Services</a>
+    <a href="#methode" data-cursor>Méthode</a>
+    <a href="#resultats" data-cursor>Résultats</a>
+    <a href="#temoignages" data-cursor>Témoignages</a>
   </div>
-  <a href="#cta" class="nav-cta" data-jump="0.92">
+  <a href="#cta" class="nav-cta" data-cursor data-magnetic>
     Audit gratuit <span class="arrow">→</span>
   </a>
   <button class="nav-burger" id="nav-burger" aria-label="Menu">
@@ -625,202 +1053,485 @@ button{font:inherit;color:inherit;background:none;border:0;}
   </button>
 </nav>
 
-<!-- Mobile menu -->
 <div class="mobile-menu" id="mobile-menu">
   <a href="#services">Services</a>
   <a href="#methode">Méthode</a>
   <a href="#resultats">Résultats</a>
   <a href="#temoignages">Témoignages</a>
-  <a href="#cta" style="background:var(--grad-text);-webkit-background-clip:text;background-clip:text;color:transparent;">Audit gratuit →</a>
-</div>
-
-<!-- HUD progress indicator (desktop only) -->
-<div class="hud-progress" id="hud-progress">
-  <div class="step" data-step="0"><span class="dot"></span><span>Init</span></div>
-  <div class="step" data-step="1"><span class="dot"></span><span>Hero</span></div>
-  <div class="step" data-step="2"><span class="dot"></span><span>Services</span></div>
-  <div class="step" data-step="3"><span class="dot"></span><span>Méthode</span></div>
-  <div class="step" data-step="4"><span class="dot"></span><span>Résultats</span></div>
-  <div class="step" data-step="5"><span class="dot"></span><span>Témoignages</span></div>
-  <div class="step" data-step="6"><span class="dot"></span><span>Audit</span></div>
+  <a href="#cta" class="gradient-text">Audit gratuit →</a>
 </div>
 
 <!-- ============================================================
-     SCROLL STAGE — pinned full-screen video + 7 content blocks
+     HERO
      ============================================================ -->
-<section class="stage-viewport" id="stage-viewport">
-  <video
-    id="bg-video"
-    class="bg-video"
-    muted
-    playsinline
-    preload="auto"
-    autoplay
-    poster="logo.png"
-    aria-hidden="true">
-    <source src="chip-video.mp4" type="video/mp4" />
-  </video>
-  <div class="video-overlay"></div>
-  <div class="video-vignette"></div>
-
-  <!-- 0% – 15% : LOGO + TAGLINE -->
-  <div class="content-block block-logo" data-block="0" data-range="0,15">
-    <img src="logo.png" alt="NEEXUS" class="big-logo" />
-    <div class="tagline"><span class="pulse"></span>Smart Digital Solution Agency</div>
-  </div>
-
-  <!-- 15% – 30% : HERO TITLE + CTA -->
-  <div class="content-block block-hero" data-block="1" data-range="15,30">
-    <h1>Vos concurrents automatisent.<br/><span class="grad">Vous faites encore<br/>tout à la main ?</span></h1>
-    <p>On automatise ce qui vous freine pour que vous puissiez vous concentrer sur <b>ce qui fait vraiment grandir votre business</b>. IA, workflows, présence digitale — les outils des grandes entreprises, pour la vôtre.</p>
-    <div class="cta-row">
-      <a href="#cta" class="btn btn-primary" data-jump="0.92">Réserver mon audit gratuit <span class="arrow">→</span></a>
-      <a href="#services" class="btn btn-ghost" data-jump="0.30">Découvrir nos solutions <span class="arrow">↓</span></a>
+<section class="hero" id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-inner">
+    <div class="hero-badge" data-hero-fade>
+      <span class="pulse-dot"></span>
+      Smart Digital Solution Agency
     </div>
-  </div>
-
-  <!-- 30% – 50% : 3 SERVICES (un par un) -->
-  <div class="content-block block-services" data-block="2" data-range="30,50" id="services">
-    <div class="head">
-      <h2>Trois piliers pour <span class="grad">digitaliser</span> votre entreprise.</h2>
-      <p class="sub">On ne fait pas tout. On fait <b>trois choses, mais on les fait mieux que les autres</b>.</p>
+    <h1 class="hero-title">
+      <span class="line"><span class="line-inner" data-hero-line>Vos concurrents</span></span>
+      <span class="line"><span class="line-inner" data-hero-line>automatisent.</span></span>
+      <span class="line line-2"><span class="line-inner italic" data-hero-line>Vous faites encore</span></span>
+      <span class="line line-2"><span class="line-inner italic" data-hero-line>tout à la main ?</span></span>
+    </h1>
+    <p class="hero-sub" data-hero-fade>
+      On automatise ce qui vous freine pour que vous puissiez vous concentrer sur
+      <b>ce qui fait vraiment grandir votre business</b>. IA, workflows, présence digitale —
+      les outils des grandes entreprises, pour la vôtre.
+    </p>
+    <div class="cta-row" data-hero-fade>
+      <a href="#cta" class="btn btn-primary" data-cursor data-magnetic>
+        Réserver mon audit gratuit
+        <span class="arrow">→</span>
+      </a>
+      <a href="#services" class="btn btn-ghost" data-cursor data-magnetic>
+        Découvrir nos solutions
+        <span class="arrow">↓</span>
+      </a>
     </div>
-    <div class="services-grid">
-      <article class="service-item" data-pillar="0">
-        <div class="pill">PILIER 01</div>
-        <h3>IA &amp; Agents Intelligents</h3>
-        <p>Des agents conversationnels qui répondent, qualifient, vendent et planifient — 24h/24, dans toutes les langues.</p>
-        <ul>
-          <li>Chatbots multi-canaux (site, WhatsApp, Instagram)</li>
-          <li>Secrétaire IA — appels et prise de RDV</li>
-          <li>SAV automatisé avec escalade humaine</li>
-        </ul>
-      </article>
-      <article class="service-item" data-pillar="1">
-        <div class="pill">PILIER 02</div>
-        <h3>Automatisation &amp; Workflows</h3>
-        <p>On connecte vos outils existants pour qu'ils travaillent ensemble. Plus de double saisie, plus d'oublis.</p>
-        <ul>
-          <li>Automatisations Make / n8n sur mesure</li>
-          <li>Applications internes métier</li>
-          <li>Connexion CRM, ERP, facturation, agenda</li>
-        </ul>
-      </article>
-      <article class="service-item" data-pillar="2">
-        <div class="pill">PILIER 03</div>
-        <h3>Présence Digitale</h3>
-        <p>Un site qui convertit, du contenu qui engage, une visibilité qui dure.</p>
-        <ul>
-          <li>Sites web optimisés conversion</li>
-          <li>Contenu — réseaux sociaux, blog, newsletters</li>
-          <li>SEO &amp; stratégie de visibilité</li>
-        </ul>
-      </article>
-    </div>
-  </div>
-
-  <!-- 50% – 65% : MÉTHODE 4 ÉTAPES -->
-  <div class="content-block block-methode" data-block="3" data-range="50,65" id="methode">
-    <h2>Notre méthode en <span style="background:var(--grad-text);-webkit-background-clip:text;background-clip:text;color:transparent;font-style:italic;">4 étapes</span>.</h2>
-    <p class="sub">Une approche éprouvée, transparente, sans surprise. De l'audit gratuit au déploiement, vous savez toujours où vous en êtes.</p>
-    <div class="methode-grid">
-      <article class="methode-step">
-        <div class="step-num">01</div>
-        <div class="tag">Semaine 1 · Gratuit</div>
-        <h3>Audit gratuit</h3>
-        <p>On analyse vos process et on chiffre les 3 quick-wins à plus fort impact.</p>
-      </article>
-      <article class="methode-step">
-        <div class="step-num">02</div>
-        <div class="tag">Semaine 2-3</div>
-        <h3>Stratégie</h3>
-        <p>Architecture, choix techniques, planning précis. Vous validez chaque étape.</p>
-      </article>
-      <article class="methode-step">
-        <div class="step-num">03</div>
-        <div class="tag">Semaine 4-8</div>
-        <h3>Déploiement</h3>
-        <p>On construit, on intègre, on forme. Zéro perturbation de votre activité.</p>
-      </article>
-      <article class="methode-step">
-        <div class="step-num">04</div>
-        <div class="tag">En continu</div>
-        <h3>Optimisation</h3>
-        <p>On mesure, on ajuste, on scale. Vos workflows évoluent avec votre business.</p>
-      </article>
-    </div>
-  </div>
-
-  <!-- 65% – 80% : RÉSULTATS (chiffres animés) -->
-  <div class="content-block block-results" data-block="4" data-range="65,80" id="resultats">
-    <h2>Des chiffres, <span class="grad">pas des promesses.</span></h2>
-    <p class="sub">Ce que nos clients constatent en moyenne dans les <b>90 jours</b> qui suivent le déploiement.</p>
-    <div class="results-grid">
-      <div class="result-item">
-        <div class="num"><span class="counter" data-target="47">0</span><span class="unit">h</span></div>
-        <div class="lbl">Économisées par mois</div>
-        <div class="desc">par collaborateur impliqué dans les workflows</div>
+    <div class="hero-stats" data-hero-fade>
+      <div class="hero-stat">
+        <div class="num"><span class="counter" data-target="150">0</span>+</div>
+        <div class="lbl">Automatisations<br/>déployées</div>
       </div>
-      <div class="result-item">
-        <div class="num"><span class="counter" data-target="3">0</span><span class="unit">x</span></div>
-        <div class="lbl">Plus de leads qualifiés</div>
-        <div class="desc">via qualification automatique &amp; réponse immédiate</div>
+      <div class="hero-stat">
+        <div class="num"><span class="counter" data-target="98">0</span>%</div>
+        <div class="lbl">Satisfaction<br/>client</div>
       </div>
-      <div class="result-item">
-        <div class="num"><span class="counter" data-target="98">0</span><span class="unit">%</span></div>
-        <div class="lbl">Satisfaction client</div>
-        <div class="desc">sur les 12 derniers mois, tous projets confondus</div>
-      </div>
-      <div class="result-item">
-        <div class="num"><span class="prefix">&lt;</span><span class="counter" data-target="24">0</span><span class="unit">h</span></div>
-        <div class="lbl">Temps de réponse moyen</div>
-        <div class="desc">chatbot, email, formulaire, WhatsApp</div>
+      <div class="hero-stat">
+        <div class="num"><span class="counter" data-target="10">0</span>x</div>
+        <div class="lbl">ROI moyen<br/>constaté</div>
       </div>
     </div>
   </div>
+  <div class="hero-scroll-hint">
+    <div class="bar"></div>Scroll
+  </div>
+</section>
 
-  <!-- 80% – 90% : TÉMOIGNAGES -->
-  <div class="content-block block-testi" data-block="5" data-range="80,90" id="temoignages">
-    <h2>Ce qu'ils en disent.</h2>
+<!-- ============================================================
+     PROBLEMS
+     ============================================================ -->
+<section class="section problems" id="problems">
+  <div class="container">
+    <div class="problems-head">
+      <div>
+        <div class="section-eyebrow">
+          <span class="num">01</span>
+          <span class="line"></span>
+          <span class="label">Pain Points</span>
+        </div>
+        <h2 class="section-title" data-split>Si vous reconnaissez ces situations, on peut vous aider.</h2>
+      </div>
+      <p class="problems-intro" data-fade>
+        Ces frictions coûtent en moyenne <b>28h par semaine</b> à une PME.
+        Le pire : la plupart des dirigeants ne réalisent même pas qu'elles existent.
+      </p>
+    </div>
+    <div class="problems-grid">
+      <article class="problem-card" data-card>
+        <div class="tag">P-01</div>
+        <div class="icon">🔄</div>
+        <h3>Tâches répétitives</h3>
+        <p>Votre équipe passe <b style="color:var(--text);">60% de son temps</b> sur des tâches qui ne génèrent aucun chiffre d'affaires. Saisie manuelle, copier-coller entre outils, relances, devis…</p>
+      </article>
+      <article class="problem-card" data-card>
+        <div class="tag">P-02</div>
+        <div class="icon">📞</div>
+        <h3>Clients perdus</h3>
+        <p>Un prospect qui attend <b style="color:var(--text);">5 minutes sans réponse</b> a 80% de chances de partir chez le concurrent. Les leads qualifiés s'évaporent.</p>
+      </article>
+      <article class="problem-card" data-card>
+        <div class="tag">P-03</div>
+        <div class="icon">🔧</div>
+        <h3>Outils déconnectés</h3>
+        <p>CRM, facturation, emails, planning, comptabilité — vos outils ne se parlent pas. Résultat : double saisie, erreurs, vue partielle.</p>
+      </article>
+      <article class="problem-card" data-card>
+        <div class="tag">P-04</div>
+        <div class="icon">⏰</div>
+        <h3>Pas le temps</h3>
+        <p>Trop occupé à faire tourner le quotidien pour penser à demain. La transformation digitale reste un projet "qu'on lancera bientôt"… depuis trois ans.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SERVICES (HORIZONTAL SCROLL DESKTOP / STACK MOBILE)
+     ============================================================ -->
+<div class="services-wrap" id="services">
+  <div class="services-head">
+    <div>
+      <div class="section-eyebrow">
+        <span class="num">02</span>
+        <span class="line"></span>
+        <span class="label">Services</span>
+      </div>
+      <h2 class="section-title" data-split>Trois piliers pour digitaliser votre entreprise.</h2>
+    </div>
+    <p data-fade>
+      On ne fait pas tout. On fait <b>trois choses, mais on les fait mieux que les autres</b>.
+      Chaque pilier est conçu pour générer un ROI mesurable dès les premières semaines.
+    </p>
+  </div>
+
+  <div class="horizontal-container" id="horizontal-container">
+    <div class="horizontal-track" id="horizontal-track">
+
+      <section class="service-panel">
+        <div class="panel-num">01 / 03 — IA</div>
+        <div class="service-content">
+          <div class="service-text">
+            <span class="pillar-num">PILIER 01</span>
+            <h3>IA &amp; Agents<br/><span class="italic gradient-text">Intelligents</span></h3>
+            <p class="lead">Des agents conversationnels qui répondent, qualifient, vendent et planifient — 24h/24, dans toutes les langues, sans pause café.</p>
+            <ul>
+              <li>Chatbots intelligents multi-canaux (site, WhatsApp, Instagram)</li>
+              <li>Secrétaire IA — gestion d'appels et prise de RDV automatique</li>
+              <li>SAV automatisé avec escalade intelligente vers l'humain</li>
+              <li>Répondeurs IA pour emails et messages entrants</li>
+            </ul>
+          </div>
+          <div class="service-visual chat-visual" data-visual="chat">
+            <div class="chat-header">
+              <div class="av">N</div>
+              <div class="meta">
+                <div class="name">Assistant Neexus</div>
+                <div class="status">En ligne · répond instantanément</div>
+              </div>
+              <div class="ch-btn">AI ↗</div>
+            </div>
+            <div class="chat-msgs">
+              <div class="msg user" data-msg>Bonjour, je voudrais réserver une table pour 4 ce vendredi soir.</div>
+              <div class="msg ai" data-msg>
+                Bonsoir ! Avec plaisir 🌿 Pour vendredi 22h ou 20h, j'ai des disponibilités. Vous préférez quel créneau ?
+                <div class="meta">Répondu en 0.4s</div>
+              </div>
+              <div class="msg user" data-msg>20h c'est parfait.</div>
+              <div class="msg ai" data-msg>
+                Réservé ! Je viens d'envoyer la confirmation à votre numéro. Voulez-vous une table en terrasse ?
+                <div class="meta">CRM mis à jour automatiquement</div>
+              </div>
+              <div class="typing" data-msg><span></span><span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="service-panel">
+        <div class="panel-num">02 / 03 — Workflows</div>
+        <div class="service-content">
+          <div class="service-text">
+            <span class="pillar-num">PILIER 02</span>
+            <h3>Automatisation &amp; <span class="italic gradient-text">Workflows</span></h3>
+            <p class="lead">On connecte vos outils existants pour qu'ils travaillent ensemble. Plus de double saisie, plus d'oublis — juste des données qui circulent toutes seules.</p>
+            <ul>
+              <li>Automatisations Make / n8n sur mesure</li>
+              <li>Applications internes métier (no-code &amp; code)</li>
+              <li>Connexion CRM, ERP, facturation, agenda, comptabilité</li>
+              <li>Workflows intelligents qui éliminent les tâches manuelles</li>
+            </ul>
+          </div>
+          <div class="service-visual workflow-visual" data-visual="workflow">
+            <svg class="workflow-svg" viewBox="0 0 460 460">
+              <defs>
+                <linearGradient id="flow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#4d7cff"/>
+                  <stop offset="50%" stop-color="#7c5cfc"/>
+                  <stop offset="100%" stop-color="#d63384"/>
+                </linearGradient>
+                <radialGradient id="node-w-grad">
+                  <stop offset="0%" stop-color="rgba(124,92,252,.2)"/>
+                  <stop offset="100%" stop-color="rgba(10,14,26,.95)"/>
+                </radialGradient>
+              </defs>
+              <path class="conn-flow" d="M90,80 Q230,80 230,200" data-flow/>
+              <path class="conn-flow" d="M370,80 Q230,80 230,200" data-flow/>
+              <path class="conn-flow" d="M230,260 Q230,340 110,380" data-flow/>
+              <path class="conn-flow" d="M230,260 Q230,340 350,380" data-flow/>
+              <g data-node-w>
+                <circle class="node-w" cx="90" cy="80" r="34" fill="url(#node-w-grad)"/>
+                <text class="nicon" x="90" y="80">@</text>
+                <text class="nlabel" x="90" y="130">Email</text>
+              </g>
+              <g data-node-w>
+                <circle class="node-w" cx="370" cy="80" r="34" fill="url(#node-w-grad)"/>
+                <text class="nicon" x="370" y="80">📅</text>
+                <text class="nlabel" x="370" y="130">Calendar</text>
+              </g>
+              <g data-node-w>
+                <circle class="node-w" cx="230" cy="230" r="44" fill="url(#node-w-grad)" stroke="url(#flow-grad)" stroke-width="1.5"/>
+                <text class="nicon" x="230" y="226" style="font-size:16px;">⚡</text>
+                <text class="nlabel" x="230" y="248" style="font-size:8px;">PROCESS</text>
+              </g>
+              <g data-node-w>
+                <circle class="node-w" cx="110" cy="380" r="34" fill="url(#node-w-grad)"/>
+                <text class="nicon" x="110" y="380">📊</text>
+                <text class="nlabel" x="110" y="430">CRM</text>
+              </g>
+              <g data-node-w>
+                <circle class="node-w" cx="350" cy="380" r="34" fill="url(#node-w-grad)"/>
+                <text class="nicon" x="350" y="380">💬</text>
+                <text class="nlabel" x="350" y="430">Slack</text>
+              </g>
+              <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" path="M90,80 Q230,80 230,200"/></circle>
+              <circle class="pulse" r="3.5"><animateMotion dur="3.5s" repeatCount="indefinite" begin="0.8s" path="M370,80 Q230,80 230,200"/></circle>
+              <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" begin="1.4s" path="M230,260 Q230,340 110,380"/></circle>
+              <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" begin="2s" path="M230,260 Q230,340 350,380"/></circle>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="service-panel">
+        <div class="panel-num">03 / 03 — Présence</div>
+        <div class="service-content">
+          <div class="service-text">
+            <span class="pillar-num">PILIER 03</span>
+            <h3>Présence <span class="italic gradient-text">Digitale</span></h3>
+            <p class="lead">Un site qui convertit, du contenu qui engage, une visibilité qui dure. Votre marque mérite mieux qu'un template Wordpress de 2018.</p>
+            <ul>
+              <li>Sites web modernes, performants, optimisés conversion</li>
+              <li>Création de contenu (réseaux sociaux, blog, newsletters)</li>
+              <li>SEO &amp; stratégie de visibilité organique</li>
+              <li>Identité visuelle &amp; design system cohérent</li>
+            </ul>
+          </div>
+          <div class="service-visual code-visual" data-visual="code">
+            <div class="code-window-bar">
+              <div class="ddot"></div><div class="ddot"></div><div class="ddot"></div>
+              <div class="file">~/neexus/<span style="color:var(--text);">site-client.html</span></div>
+            </div>
+            <div class="code-content">
+              <div class="ln" data-line><span class="lnum">01</span><span><span class="kw">&lt;section</span> <span class="pr">class</span>=<span class="str">"hero"</span><span class="kw">&gt;</span></span></div>
+              <div class="ln" data-line><span class="lnum">02</span><span>&nbsp;&nbsp;<span class="kw">&lt;h1&gt;</span>Bienvenue chez <span class="str">{{client}}</span><span class="kw">&lt;/h1&gt;</span></span></div>
+              <div class="ln" data-line><span class="lnum">03</span><span>&nbsp;&nbsp;<span class="com">// Génération SEO automatique</span></span></div>
+              <div class="ln" data-line><span class="lnum">04</span><span>&nbsp;&nbsp;<span class="kw">&lt;p&gt;</span><span class="fn">{{tagline}}</span><span class="kw">&lt;/p&gt;</span></span></div>
+              <div class="ln" data-line><span class="lnum">05</span><span><span class="kw">&lt;/section&gt;</span><span class="typing-cursor"></span></span></div>
+            </div>
+            <div class="code-preview">
+              <div class="pv-bar" id="pv-bar"></div>
+              <div class="pv-block w-3" data-pv></div>
+              <div class="pv-block w-2" data-pv></div>
+              <div class="pv-block w-1" data-pv></div>
+              <div class="pv-block w-2" data-pv></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <div class="services-dots" id="services-dots">
+      <div class="ddot is-active"></div>
+      <div class="ddot"></div>
+      <div class="ddot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     METHODE
+     ============================================================ -->
+<section class="section methode" id="methode">
+  <div class="container">
+    <div class="methode-inner">
+      <div class="methode-sticky">
+        <div class="section-eyebrow">
+          <span class="num">03</span>
+          <span class="line"></span>
+          <span class="label">Méthode</span>
+        </div>
+        <h2 data-split>Notre méthode en 4 étapes.</h2>
+        <p>Une approche éprouvée, transparente, sans surprise. De l'audit gratuit au déploiement, vous savez toujours où vous en êtes.</p>
+        <div class="methode-progress"><div class="fill" id="methode-fill"></div></div>
+        <div class="methode-progress-label">
+          <span id="methode-step-label">00</span>
+          <span>/04</span>
+        </div>
+      </div>
+      <div class="methode-steps">
+        <article class="methode-step" data-step>
+          <div class="step-head">
+            <div class="step-num">01</div>
+            <div class="step-tag">Semaine 1 · Gratuit</div>
+          </div>
+          <h3>Audit gratuit</h3>
+          <p>On analyse vos process actuels, on identifie les goulots d'étranglement, et on chiffre les <b style="color:var(--text);">3 quick-wins</b> à plus fort impact.</p>
+          <div class="step-deliverables">
+            <span>Cartographie process</span>
+            <span>Calcul ROI</span>
+            <span>Roadmap 90j</span>
+          </div>
+        </article>
+        <article class="methode-step" data-step>
+          <div class="step-head">
+            <div class="step-num">02</div>
+            <div class="step-tag">Semaine 2-3</div>
+          </div>
+          <h3>Stratégie</h3>
+          <p>On conçoit la solution sur mesure. Architecture, choix techniques, planning précis — vous validez chaque étape avant qu'on touche à quoi que ce soit.</p>
+          <div class="step-deliverables">
+            <span>Architecture</span>
+            <span>Maquettes</span>
+            <span>Specs techniques</span>
+          </div>
+        </article>
+        <article class="methode-step" data-step>
+          <div class="step-head">
+            <div class="step-num">03</div>
+            <div class="step-tag">Semaine 4-8</div>
+          </div>
+          <h3>Déploiement</h3>
+          <p>On construit, on intègre, on teste, on forme vos équipes. <b style="color:var(--text);">Zéro perturbation</b> de votre activité — la bascule se fait quand vous êtes prêt.</p>
+          <div class="step-deliverables">
+            <span>Build &amp; tests</span>
+            <span>Formation</span>
+            <span>Mise en prod</span>
+          </div>
+        </article>
+        <article class="methode-step" data-step>
+          <div class="step-head">
+            <div class="step-num">04</div>
+            <div class="step-tag">En continu</div>
+          </div>
+          <h3>Optimisation</h3>
+          <p>On mesure, on ajuste, on scale. Vos workflows évoluent avec votre business. Maintenance, support, et itérations basées sur les données.</p>
+          <div class="step-deliverables">
+            <span>Monitoring</span>
+            <span>A/B testing</span>
+            <span>Évolutions</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     RESULTATS (PINNED, SCRUB-DRIVEN COUNTERS)
+     ============================================================ -->
+<section class="results" id="resultats">
+  <div class="results-pin" id="results-pin">
+    <div class="results-inner">
+      <div class="results-text">
+        <div class="section-eyebrow" style="justify-content:center;">
+          <span class="num">04</span>
+          <span class="line"></span>
+          <span class="label">Résultats</span>
+        </div>
+        <h2>Des chiffres, <span class="gradient-text italic">pas des promesses.</span></h2>
+        <p>Voici ce que nos clients constatent en moyenne dans les <b style="color:var(--text);">90 jours</b> qui suivent le déploiement. Mesurés, vérifiés, reproductibles.</p>
+      </div>
+      <div class="results-grid">
+        <div class="result-card" data-card data-result>
+          <div class="num"><span class="big-counter" data-target="47">0</span><span class="unit">h</span></div>
+          <div class="lbl">Économisées par mois</div>
+          <div class="desc">en moyenne, et par collaborateur impliqué dans les workflows automatisés</div>
+        </div>
+        <div class="result-card" data-card data-result>
+          <div class="num"><span class="big-counter" data-target="3">0</span><span class="unit">x</span></div>
+          <div class="lbl">Plus de leads qualifiés</div>
+          <div class="desc">grâce à la qualification automatique et au temps de réponse immédiat</div>
+        </div>
+        <div class="result-card" data-card data-result>
+          <div class="num"><span class="big-counter" data-target="98">0</span><span class="unit">%</span></div>
+          <div class="lbl">Satisfaction client</div>
+          <div class="desc">mesurée sur les 12 derniers mois, sur l'ensemble des projets livrés</div>
+        </div>
+        <div class="result-card" data-card data-result>
+          <div class="num"><span class="prefix">&lt;</span><span class="big-counter" data-target="24">0</span><span class="unit">h</span></div>
+          <div class="lbl">Temps de réponse moyen</div>
+          <div class="desc">aux demandes entrantes — chatbot, email, formulaire, WhatsApp</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TEMOIGNAGES
+     ============================================================ -->
+<section class="section testi" id="temoignages">
+  <div class="container">
+    <div class="testi-head">
+      <div class="section-eyebrow" style="justify-content:center;">
+        <span class="num">05</span>
+        <span class="line"></span>
+        <span class="label">Témoignages</span>
+      </div>
+      <h2 data-split>Ce qu'ils en disent.</h2>
+      <p data-fade>Trois clients, trois secteurs, trois pays. Une seule conviction : on ne perd plus son temps sur ce qu'une machine peut faire.</p>
+    </div>
     <div class="testi-grid">
-      <article class="testi-item">
+      <article class="testi-card" data-tilt data-card>
         <div class="city">GE · CH</div>
         <div class="quote-mark">"</div>
-        <p class="quote">NEEXUS a automatisé nos réservations et notre SAV. On a récupéré 20h par semaine.</p>
+        <p class="quote">NEEXUS a automatisé nos réservations et notre SAV. On a récupéré 20h par semaine. Mon équipe s'est remise à sourire — ça vaut tous les ROI du monde.</p>
         <div class="author">
           <div class="av">MD</div>
-          <div><div class="name">Marc Dubois</div><div class="role">CEO · Le Comptoir</div></div>
+          <div class="author-meta">
+            <div class="name">Marc Dubois</div>
+            <div class="role">CEO · Restaurant Le Comptoir</div>
+          </div>
         </div>
       </article>
-      <article class="testi-item">
+      <article class="testi-card" data-tilt data-card>
         <div class="city">LY · FR</div>
         <div class="quote-mark">"</div>
-        <p class="quote">Leur chatbot gère 70% de nos demandes de premier contact. Mon équipe se concentre sur les dossiers.</p>
+        <p class="quote">Leur chatbot gère 70% de nos demandes de premier contact. Mon équipe peut enfin se concentrer sur les dossiers — ceux qui paient nos factures.</p>
         <div class="author">
           <div class="av">SM</div>
-          <div><div class="name">Sophie Martin</div><div class="role">Directrice · Martin &amp; Associés</div></div>
+          <div class="author-meta">
+            <div class="name">Sophie Martin</div>
+            <div class="role">Directrice · Cabinet Martin &amp; Associés</div>
+          </div>
         </div>
       </article>
-      <article class="testi-item">
+      <article class="testi-card" data-tilt data-card>
         <div class="city">ZH · CH</div>
         <div class="quote-mark">"</div>
-        <p class="quote">Le ROI a été visible dès le premier mois. On aurait dû le faire 3 ans plus tôt.</p>
+        <p class="quote">Le ROI a été visible dès le premier mois. Les automatisations Make ont changé notre façon de travailler. Sincèrement, on aurait dû le faire trois ans plus tôt.</p>
         <div class="author">
           <div class="av">TK</div>
-          <div><div class="name">Thomas Keller</div><div class="role">Fondateur · TK Immobilier</div></div>
+          <div class="author-meta">
+            <div class="name">Thomas Keller</div>
+            <div class="role">Fondateur · TK Immobilier</div>
+          </div>
         </div>
       </article>
     </div>
   </div>
+</section>
 
-  <!-- 90% – 100% : CTA FINAL -->
-  <div class="content-block block-cta" data-block="6" data-range="90,100" id="cta">
-    <h2>Prêt à automatiser <span class="grad">votre croissance</span> ?</h2>
-    <p>On identifie ensemble les <b>3 quick-wins</b> qui auront le plus d'impact sur votre business. 30 minutes, en visio, gratuit, sans engagement.</p>
-    <div class="cta-row">
-      <a href="mailto:contact@neexusds.com" class="btn btn-primary">Réserver mon audit gratuit <span class="arrow">→</span></a>
-      <a href="#temoignages" class="btn btn-ghost" data-jump="0.80">Voir un cas client <span class="arrow">↗</span></a>
-    </div>
+<!-- ============================================================
+     CTA FINAL
+     ============================================================ -->
+<section class="cta-final" id="cta">
+  <div class="section-eyebrow" style="justify-content:center;margin-bottom:40px;">
+    <span class="num">06</span>
+    <span class="line"></span>
+    <span class="label">Et maintenant ?</span>
+  </div>
+  <h2 data-split-cta>
+    Prêt à automatiser <span class="grad italic">votre croissance</span> ?
+  </h2>
+  <p data-fade>
+    On identifie ensemble les <b style="color:var(--text);">3 quick-wins</b> qui auront le plus
+    d'impact sur votre business. 30 minutes, en visio, gratuit, sans engagement.
+  </p>
+  <div class="cta-row" data-fade>
+    <a href="mailto:contact@neexusds.com" class="btn btn-primary" data-cursor data-magnetic>
+      Réserver mon audit gratuit
+      <span class="arrow">→</span>
+    </a>
+    <a href="#temoignages" class="btn btn-ghost" data-cursor data-magnetic>
+      Voir un cas client
+      <span class="arrow">↗</span>
+    </a>
   </div>
 </section>
 
@@ -831,26 +1542,26 @@ button{font:inherit;color:inherit;background:none;border:0;}
   <div class="footer-inner">
     <div class="footer-top">
       <div class="footer-brand">
-        <a href="#top" class="logo" aria-label="NEEXUS">
+        <a href="#" class="logo" aria-label="NEEXUS">
           <img src="logo.png" alt="NEEXUS — Smart Digital Solution Agency" loading="lazy" />
         </a>
-        <p>On automatise ce qui freine votre croissance pour que vous puissiez vous concentrer sur ce qui compte vraiment.</p>
+        <p>Smart Digital Solution Agency. On automatise ce qui freine votre croissance pour que vous puissiez vous concentrer sur ce qui compte vraiment.</p>
       </div>
       <div class="footer-col">
         <h4>Services</h4>
         <ul>
-          <li><a href="#services" data-jump="0.30">IA &amp; Agents</a></li>
-          <li><a href="#services" data-jump="0.30">Automatisation</a></li>
-          <li><a href="#services" data-jump="0.30">Présence digitale</a></li>
-          <li><a href="#methode" data-jump="0.50">Notre méthode</a></li>
+          <li><a href="#services">IA &amp; Agents</a></li>
+          <li><a href="#services">Automatisation</a></li>
+          <li><a href="#services">Présence digitale</a></li>
+          <li><a href="#methode">Notre méthode</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Agence</h4>
         <ul>
-          <li><a href="#resultats" data-jump="0.65">Résultats</a></li>
-          <li><a href="#temoignages" data-jump="0.80">Témoignages</a></li>
-          <li><a href="#cta" data-jump="0.92">Audit gratuit</a></li>
+          <li><a href="#resultats">Résultats</a></li>
+          <li><a href="#temoignages">Témoignages</a></li>
+          <li><a href="#cta">Audit gratuit</a></li>
           <li><a href="mailto:contact@neexusds.com">Contact</a></li>
         </ul>
       </div>
@@ -863,33 +1574,42 @@ button{font:inherit;color:inherit;background:none;border:0;}
         </ul>
       </div>
     </div>
+    <div class="footer-mega">NEEXUS</div>
     <div class="footer-bottom">
       <div>© 2026 SDS Smart Digital Solution LLC — Tous droits réservés</div>
       <div class="footer-socials">
-        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8.5 10.5h-3v8h3zm-1.5-4a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3M18.5 13.7c0-2.5-1.6-3.4-3-3.4-.7 0-1.6.4-2 .9v-.7h-3v8h3v-4.4c0-.7.5-1.4 1.3-1.4s1.2.7 1.2 1.4v4.4h2.5z"/></svg></a>
-        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
-        <a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2H21l-7.06 8.07L22 22h-6.59l-4.61-6.04L5.5 22H2.74l7.55-8.63L2 2h6.74l4.16 5.5z"/></svg></a>
+        <a href="#" aria-label="LinkedIn" data-cursor>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8.5 10.5h-3v8h3zm-1.5-4a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3M18.5 13.7c0-2.5-1.6-3.4-3-3.4-.7 0-1.6.4-2 .9v-.7h-3v8h3v-4.4c0-.7.5-1.4 1.3-1.4s1.2.7 1.2 1.4v4.4h2.5z"/></svg>
+        </a>
+        <a href="#" aria-label="Instagram" data-cursor>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+        </a>
+        <a href="#" aria-label="X" data-cursor>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2H21l-7.06 8.07L22 22h-6.59l-4.61-6.04L5.5 22H2.74l7.55-8.63L2 2h6.74l4.16 5.5z"/></svg>
+        </a>
       </div>
     </div>
   </div>
 </footer>
 
 <!-- ============================================================
-     SCRIPTS
+     SCRIPTS — desktop/mobile split via gsap.matchMedia()
      ============================================================ -->
 <script>
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const isMobile = window.matchMedia('(max-width: 768px)').matches;
+const QUERY_DESKTOP = '(min-width: 1025px)';
+const QUERY_MOBILE  = '(max-width: 1024px)';
 
 /* ============================================================
-   PRELOADER — 3s logo reveal + curtain
+   PRELOADER — 3s cinematic
    ============================================================ */
 const preloader = document.getElementById('preloader');
 const preloaderLogo = document.getElementById('preloader-logo');
 const preloaderCounter = document.getElementById('preloader-counter');
 const preloaderTag = document.getElementById('preloader-tag');
+const preloaderLine = document.getElementById('preloader-line');
 
 gsap.set('.nav', { yPercent: -100, opacity: 0 });
 
@@ -900,6 +1620,7 @@ const tlPre = gsap.timeline({
 });
 
 tlPre
+  .to(preloaderLine, { width: '38vw', duration: .8, ease: 'expo.out' }, 0)
   .to(preloaderLogo, { opacity: 1, scale: 1, duration: 1.1, ease: 'expo.out' }, .1)
   .to(preloaderLogo, {
     filter: 'drop-shadow(0 0 40px rgba(124,92,252,.85)) drop-shadow(0 0 80px rgba(214,51,132,.5))',
@@ -912,7 +1633,7 @@ tlPre
   }, .25)
   .to(preloaderCounter, { opacity: 1, duration: .4 }, .25)
   .to(preloaderTag, { opacity: 1, duration: .4 }, .8)
-  .to([preloaderCounter, preloaderTag], { opacity: 0, duration: .35 }, 2.05)
+  .to([preloaderCounter, preloaderTag, preloaderLine], { opacity: 0, duration: .35 }, 2.05)
   .to(preloaderLogo, {
     y: -80, scale: .92, opacity: 0,
     filter: 'drop-shadow(0 0 0 rgba(124,92,252,0)) blur(2px)',
@@ -923,29 +1644,54 @@ tlPre
   .set(preloader, { display: 'none' });
 
 /* ============================================================
-   INIT SITE
+   INIT — runs after preloader, splits by media query
    ============================================================ */
 function initSite(){
   initNav();
   initScrollProgress();
+  initSplitTitles();
+  initSplitCta();
+  initFades();
+  initServiceVisuals();
 
-  /* matchMedia split: desktop runs video-scrubbed scene,
-     mobile runs simple stacked fade-ins. */
-  gsap.matchMedia().add({
-    isDesktop: '(min-width: 769px)',
-    isMobile: '(max-width: 768px)',
-  }, (ctx) => {
-    if (ctx.conditions.isDesktop) {
-      initLenis();
-      initDesktopVideoScene();
-    } else {
-      initMobileSections();
-    }
+  const mm = gsap.matchMedia();
+
+  /* ---------- DESKTOP (≥ 1025px) ---------- */
+  mm.add(QUERY_DESKTOP, () => {
+    document.body.classList.add('has-cursor');
+    initLenis();
+    initCursor();
+    initMagnetic();
+    initTilt();
+    initOrbsParallax();
+    initHeroPinned();
+    initProblemsDesktop();
+    initServicesHorizontal();
+    initMethodeDesktop();
+    initResultsPinned();
+    initTestiDesktop();
+    initFooterMega();
+    return () => {
+      document.body.classList.remove('has-cursor');
+      if (window.__lenis) { window.__lenis.destroy(); window.__lenis = null; }
+    };
   });
+
+  /* ---------- MOBILE / TABLET (≤ 1024px) ---------- */
+  mm.add(QUERY_MOBILE, () => {
+    initHeroMobile();
+    initProblemsMobile();
+    initServicesMobile();
+    initMethodeMobile();
+    initResultsMobile();
+    initTestiMobile();
+  });
+
+  ScrollTrigger.refresh();
 }
 
 /* ============================================================
-   NAV — scrolled state + burger
+   NAV + SCROLL PROGRESS (both)
    ============================================================ */
 function initNav(){
   const nav = document.getElementById('nav');
@@ -960,10 +1706,6 @@ function initNav(){
     a.addEventListener('click', () => mobileMenu.classList.remove('is-open'));
   });
 }
-
-/* ============================================================
-   SCROLL PROGRESS BAR
-   ============================================================ */
 function initScrollProgress(){
   gsap.to('#scroll-progress', {
     scaleX: 1, ease: 'none',
@@ -972,273 +1714,479 @@ function initScrollProgress(){
 }
 
 /* ============================================================
-   LENIS — smooth scroll desktop only
+   LENIS — desktop only
    ============================================================ */
-let lenis;
 function initLenis(){
   if (reducedMotion) return;
-  lenis = new Lenis({
+  const lenis = new Lenis({
     duration: 1.15,
     easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
     wheelMultiplier: 1,
     touchMultiplier: 1.5,
   });
+  window.__lenis = lenis;
   lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add(time => { lenis.raf(time * 1000); });
+  gsap.ticker.add(t => { lenis.raf(t * 1000); });
   gsap.ticker.lagSmoothing(0);
 
-  /* Jump-to-progress links (nav, footer) */
-  document.querySelectorAll('a[data-jump]').forEach(a => {
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
-      e.preventDefault();
-      const p = parseFloat(a.dataset.jump);
-      jumpToProgress(p);
-      document.getElementById('mobile-menu')?.classList.remove('is-open');
+      const id = a.getAttribute('href');
+      if (id.length > 1 && document.querySelector(id)) {
+        e.preventDefault();
+        lenis.scrollTo(id, { offset: -40, duration: 1.6 });
+        document.getElementById('mobile-menu')?.classList.remove('is-open');
+      }
     });
   });
-}
-
-function jumpToProgress(p){
-  // p ∈ [0,1] within the pinned scene
-  const stage = document.getElementById('stage-viewport');
-  const range = ScrollTrigger.maxScroll(window);
-  // We pin the stage starting at stage.offsetTop (=0 after preloader).
-  // The pinned scroll length is range minus footer.
-  // Easiest: use ScrollTrigger to translate progress to scroll.
-  const st = ScrollTrigger.getById('main-scene');
-  if (!st) return;
-  const target = st.start + (st.end - st.start) * p;
-  if (lenis) lenis.scrollTo(target, { duration: 1.6 });
-  else window.scrollTo({ top: target, behavior: 'smooth' });
 }
 
 /* ============================================================
-   DESKTOP — pinned video scene with content overlays
+   CURSOR — desktop only
    ============================================================ */
-function initDesktopVideoScene(){
-  const video = document.getElementById('bg-video');
-  const stage = document.getElementById('stage-viewport');
-  const hud = document.getElementById('hud-progress');
-
-  // Shorter scroll = fewer per-frame currentTime calls = smoother scrubbing.
-  // 400% (4 viewports) is comfortable for a ~10-20s clip.
-  const SCROLL_LENGTH = '+=400%';
-
-  // Force load + first paint, then pause so only scroll drives playback.
-  video.load();
-  video.muted = true;
-  video.playsInline = true;
-  const playPromise = video.play();
-  if (playPromise && playPromise.then) {
-    playPromise.then(() => video.pause()).catch(() => {});
-  } else {
-    video.pause();
-  }
-
-  const blocks = Array.from(document.querySelectorAll('.content-block')).map(el => {
-    const [s, e] = el.dataset.range.split(',').map(v => parseFloat(v) / 100);
-    return { el, start: s, end: e, fade: 0.04 };
+function initCursor(){
+  const cursor = document.getElementById('cursor');
+  const glow = document.getElementById('cursor-glow');
+  let mx = window.innerWidth/2, my = window.innerHeight/2;
+  let cx = mx, cy = my, gx = mx, gy = my;
+  window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
+  gsap.ticker.add(() => {
+    cx += (mx - cx) * 0.45;
+    cy += (my - cy) * 0.45;
+    gx += (mx - gx) * 0.08;
+    gy += (my - gy) * 0.08;
+    cursor.style.transform = `translate3d(${cx}px,${cy}px,0) translate(-50%,-50%)`;
+    glow.style.transform   = `translate3d(${gx}px,${gy}px,0) translate(-50%,-50%)`;
   });
+  document.querySelectorAll('[data-cursor], a, button, .problem-card, .testi-card, .result-card, .methode-step').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
+  });
+}
 
-  // Service piliers fade in sequentially within block-services range
-  const pillars = Array.from(document.querySelectorAll('.service-item'));
-
-  // Counter elements (set once when entering results range, count up)
-  const counters = Array.from(document.querySelectorAll('.counter')).map(el => ({
-    el, target: +el.dataset.target, played: false, current: 0
-  }));
-
-  function blockOpacity(p, b){
-    const fade = b.fade;
-    if (p < b.start - fade) return 0;
-    if (p < b.start)        return (p - (b.start - fade)) / fade;
-    if (p < b.end - fade)   return 1;
-    if (p < b.end)          return 1 - (p - (b.end - fade)) / fade;
-    return 0;
-  }
-
-  function pillarOpacity(p, pillarIndex){
-    // Service block runs 0.30 → 0.50 (range = 0.20)
-    // Pillar 0: visible 0.30 → 0.50
-    // Pillar 1: appears 0.36 → visible until 0.50
-    // Pillar 2: appears 0.42 → visible until 0.50
-    const appearStart = 0.30 + pillarIndex * 0.06;
-    const appearEnd   = appearStart + 0.04;
-    const overallOut  = 0.50;
-    const fadeOut     = 0.04;
-    if (p < appearStart) return 0;
-    if (p < appearEnd)   return (p - appearStart) / 0.04;
-    if (p < overallOut - fadeOut) return 1;
-    if (p < overallOut)  return 1 - (p - (overallOut - fadeOut)) / fadeOut;
-    return 0;
-  }
-
-  function setHudActive(p){
-    // Steps: 0:Init(0-.15), 1:Hero(.15-.30), 2:Services(.30-.50), 3:Methode(.50-.65),
-    //        4:Results(.65-.80), 5:Testi(.80-.90), 6:Audit(.90-1)
-    const bounds = [0.15, 0.30, 0.50, 0.65, 0.80, 0.90, 1.01];
-    let active = 0;
-    for (let i = 0; i < bounds.length; i++) {
-      if (p < bounds[i]) { active = i; break; }
-    }
-    hud.querySelectorAll('.step').forEach((s, i) => {
-      s.classList.toggle('is-active', i === active);
+/* ============================================================
+   MAGNETIC BUTTONS + 3D TILT — desktop only
+   ============================================================ */
+function initMagnetic(){
+  document.querySelectorAll('[data-magnetic]').forEach(btn => {
+    let bb;
+    btn.addEventListener('mouseenter', () => { bb = btn.getBoundingClientRect(); });
+    btn.addEventListener('mousemove', e => {
+      if (!bb) bb = btn.getBoundingClientRect();
+      const relX = e.clientX - bb.left - bb.width / 2;
+      const relY = e.clientY - bb.top - bb.height / 2;
+      gsap.to(btn, { x: relX * 0.25, y: relY * 0.35, duration: .5, ease: 'power3.out' });
     });
-  }
-
-  function tickCounters(p){
-    if (p < 0.65 || p > 0.82) return;
-    // Play once when entering 0.65
-    counters.forEach(c => {
-      if (c.played) return;
-      c.played = true;
-      gsap.to(c, {
-        current: c.target,
-        duration: 1.6,
-        ease: 'power2.out',
-        onUpdate: () => { c.el.textContent = Math.round(c.current); }
+    btn.addEventListener('mouseleave', () => {
+      gsap.to(btn, { x: 0, y: 0, duration: .8, ease: 'elastic.out(1,.4)' });
+    });
+  });
+}
+function initTilt(){
+  document.querySelectorAll('[data-tilt]').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - .5;
+      const y = (e.clientY - r.top) / r.height - .5;
+      gsap.to(card, {
+        rotationY: x * 6,
+        rotationX: -y * 6,
+        transformPerspective: 1000,
+        duration: .5, ease: 'power2.out'
       });
     });
+    card.addEventListener('mouseleave', () => {
+      gsap.to(card, { rotationY: 0, rotationX: 0, duration: .8, ease: 'power3.out' });
+    });
+  });
+}
+
+/* ============================================================
+   SPLIT TITLES + CTA — both
+   ============================================================ */
+function initSplitTitles(){
+  document.querySelectorAll('[data-split]').forEach(el => {
+    new SplitType(el, { types: 'lines, words', tagName: 'span' });
+    el.querySelectorAll('.word').forEach(w => {
+      w.style.display = 'inline-block';
+      w.style.overflow = 'hidden';
+      const inner = document.createElement('span');
+      inner.style.display = 'inline-block';
+      inner.innerHTML = w.innerHTML;
+      w.innerHTML = '';
+      w.appendChild(inner);
+    });
+    gsap.from(el.querySelectorAll('.word > span'), {
+      yPercent: 110, stagger: .04, duration: 1, ease: 'power4.out',
+      scrollTrigger: { trigger: el, start: 'top 85%' }
+    });
+  });
+}
+function initSplitCta(){
+  document.querySelectorAll('[data-split-cta]').forEach(el => {
+    new SplitType(el, { types: 'words' });
+    el.querySelectorAll('.word').forEach(w => {
+      w.style.display = 'inline-block';
+      w.style.overflow = 'hidden';
+      const inner = document.createElement('span');
+      inner.style.display = 'inline-block';
+      inner.innerHTML = w.innerHTML;
+      w.innerHTML = '';
+      w.appendChild(inner);
+    });
+    gsap.from(el.querySelectorAll('.word > span'), {
+      yPercent: 110, rotate: 6, stagger: .06, duration: 1.2, ease: 'power4.out',
+      scrollTrigger: { trigger: el, start: 'top 80%' }
+    });
+  });
+}
+
+/* ============================================================
+   FADES — both
+   ============================================================ */
+function initFades(){
+  document.querySelectorAll('[data-fade]').forEach(el => {
+    gsap.from(el, {
+      y: 24, opacity: 0, duration: 1, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 88%' }
+    });
+  });
+}
+
+/* ============================================================
+   SERVICE VISUALS — chat / workflow / code (both)
+   ============================================================ */
+function initServiceVisuals(){
+  document.querySelectorAll('[data-visual]').forEach(visual => {
+    ScrollTrigger.create({
+      trigger: visual, start: 'top 80%', once: true,
+      onEnter: () => playVisual(visual)
+    });
+  });
+}
+function playVisual(visual){
+  const type = visual.dataset.visual;
+  if (type === 'chat'){
+    const msgs = visual.querySelectorAll('[data-msg]');
+    gsap.to(msgs, { y: 0, opacity: 1, stagger: .35, duration: .6, ease: 'power2.out', delay: .2 });
   }
-
-  // Apply initial state: only block-logo visible
-  blocks.forEach((b, i) => { b.el.style.opacity = i === 0 ? 1 : 0; });
-  pillars.forEach((p, i) => { p.style.opacity = i === 0 ? 1 : 0; });
-  gsap.to(hud, { opacity: 1, duration: .6, delay: .3 });
-
-  /* === Decouple video updates from scroll updates ===
-     onUpdate fires up to 60×/s. video.currentTime triggers a decoder seek
-     which on H.264 video can be slow. We:
-      a) only update currentTime if it moved by more than 1/30 s
-      b) skip if the previous seek is still pending (video.seeking)
-  */
-  let targetTime = 0;
-  let lastApplied = -1;
-  const canFastSeek = typeof video.fastSeek === 'function';
-  function maybeUpdateVideo(){
-    if (!video.duration || isNaN(video.duration)) return;
-    if (video.seeking) return;
-    if (Math.abs(targetTime - lastApplied) < 0.033) return;
-    const t = Math.min(Math.max(targetTime, 0), video.duration - 0.05);
-    // fastSeek snaps to the nearest keyframe → far cheaper than exact seek,
-    // and absolutely fine for a backdrop video where pixel-exact frames don't matter.
-    if (canFastSeek) video.fastSeek(t);
-    else video.currentTime = t;
-    lastApplied = targetTime;
+  if (type === 'workflow'){
+    const flows = visual.querySelectorAll('[data-flow]');
+    flows.forEach(f => {
+      const len = f.getTotalLength();
+      f.style.strokeDasharray = len;
+      f.style.strokeDashoffset = len;
+    });
+    gsap.to(flows, { strokeDashoffset: 0, duration: 1.4, stagger: .15, ease: 'power2.inOut', delay: .3 });
+    gsap.from(visual.querySelectorAll('[data-node-w]'), {
+      scale: 0, transformOrigin: 'center',
+      stagger: .08, duration: .8, ease: 'back.out(1.7)'
+    });
   }
-  // Drive the (cheap) video update on the rAF tick rather than per scroll event
-  gsap.ticker.add(maybeUpdateVideo);
+  if (type === 'code'){
+    const lines = visual.querySelectorAll('[data-line]');
+    gsap.to(lines, { opacity: 1, stagger: .25, duration: .3, delay: .2 });
+    const blocks = visual.querySelectorAll('[data-pv]');
+    gsap.to(blocks, { opacity: 1, stagger: .15, duration: .4, delay: 1.4 });
+    gsap.to('#pv-bar', { width: '100%', duration: 1.2, ease: 'power2.inOut', delay: 1.2 });
+  }
+}
 
-  // The MASTER ScrollTrigger — pins the stage, scrubs video + opacities
+/* ============================================================
+   ORBS PARALLAX — desktop only
+   ============================================================ */
+function initOrbsParallax(){
+  gsap.to('.orb-1', { y: -260, x: 80,  ease: 'none', scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 0.6 } });
+  gsap.to('.orb-2', { y: -520, x: -60, ease: 'none', scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 1.0 } });
+  gsap.to('.orb-3', { y: -380, x: 40,  ease: 'none', scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 1.4 } });
+  gsap.to('.orb-4', { y: -220, x: -30, ease: 'none', scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 0.8 } });
+}
+
+/* ============================================================
+   HERO — desktop pinned 150vh, 4 phases
+   ============================================================ */
+function initHeroPinned(){
+  document.querySelectorAll('[data-hero-line]').forEach(line => new SplitType(line, { types: 'chars' }));
+
+  gsap.set('.hero-badge', { opacity: 1, y: 0 });
+  gsap.set('[data-hero-line] .char', { rotateX: -90, y: 90, opacity: 0 });
+  gsap.set('.hero-sub',     { opacity: 0, y: 36 });
+  gsap.set('.cta-row .btn', { opacity: 0, y: 36 });
+  gsap.set('.hero-stat',    { opacity: 0, y: 24 });
+
+  const heroCounters = document.querySelectorAll('.hero-stat .counter');
+  const counterStates = Array.from(heroCounters).map(el => ({ el, target: +el.dataset.target, v: 0 }));
+  counterStates.forEach(c => c.el.textContent = '0');
+
+  const heroTl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.hero',
+      start: 'top top',
+      end: '+=150%',
+      pin: true,
+      pinSpacing: true,
+      scrub: 1,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+    }
+  });
+
+  heroTl
+    // Phase 1: chars 3D rotate in
+    .to('[data-hero-line] .char', {
+      rotateX: 0, y: 0, opacity: 1,
+      stagger: { each: .012, from: 'start' },
+      duration: 1, ease: 'power3.out'
+    }, 0)
+    // Phase 2: subtitle + CTAs
+    .to('.hero-sub',     { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 1.1)
+    .to('.cta-row .btn', { opacity: 1, y: 0, stagger: .08, duration: .6, ease: 'back.out(1.4)' }, 1.25)
+    // Phase 3: stats counters scrub up
+    .to('.hero-stat', { opacity: 1, y: 0, stagger: .12, duration: .7, ease: 'power3.out' }, 2)
+    .to(counterStates, {
+      v: i => counterStates[i].target,
+      ease: 'none', duration: 1,
+      onUpdate: function(){
+        counterStates.forEach(c => c.el.textContent = Math.round(c.v));
+      }
+    }, 2.1)
+    // Phase 4: hero scales out + blur
+    .to('.hero-inner', { scale: .95, opacity: 0, filter: 'blur(2px)', duration: 1, ease: 'power2.in' }, 3.1)
+    .to('.hero-grid-bg', { opacity: 0, duration: 1, ease: 'power2.in' }, 3.1);
+}
+
+/* ============================================================
+   HERO — mobile simple entry
+   ============================================================ */
+function initHeroMobile(){
+  document.querySelectorAll('[data-hero-line]').forEach(line => new SplitType(line, { types: 'chars' }));
+  gsap.set('.hero-badge', { opacity: 1, y: 0 });
+
+  const tl = gsap.timeline({ delay: .2 });
+  tl.from('[data-hero-line] .char', {
+      rotateX: -90, y: 50, opacity: 0,
+      stagger: .012, duration: .8, ease: 'power3.out'
+    })
+    .from('.hero-sub',     { opacity: 0, y: 24, duration: .7, ease: 'power3.out' }, '-=.5')
+    .from('.cta-row .btn', { opacity: 0, y: 24, stagger: .08, duration: .6, ease: 'power3.out' }, '-=.4')
+    .from('.hero-stat',    { opacity: 0, y: 20, stagger: .1, duration: .6, ease: 'power3.out' }, '-=.3');
+
+  document.querySelectorAll('.hero-stat .counter').forEach(el => {
+    const target = +el.dataset.target;
+    const obj = { v: 0 };
+    gsap.to(obj, {
+      v: target, duration: 1.8, delay: 1.2, ease: 'power2.out',
+      onUpdate: () => el.textContent = Math.round(obj.v)
+    });
+  });
+}
+
+/* ============================================================
+   PROBLEMS — desktop clip-path reveal / mobile fade
+   ============================================================ */
+function initProblemsDesktop(){
+  gsap.utils.toArray('.problem-card').forEach((card, i) => {
+    gsap.from(card, {
+      y: 60, opacity: 0,
+      clipPath: 'inset(100% 0 0 0)',
+      duration: 1.1, delay: i * .08, ease: 'power4.out',
+      scrollTrigger: { trigger: card, start: 'top 85%' }
+    });
+  });
+}
+function initProblemsMobile(){
+  gsap.utils.toArray('.problem-card').forEach((card, i) => {
+    gsap.from(card, {
+      y: 30, opacity: 0,
+      duration: .65, delay: i * .06, ease: 'power2.out',
+      scrollTrigger: { trigger: card, start: 'top 92%', once: true }
+    });
+  });
+}
+
+/* ============================================================
+   SERVICES — desktop horizontal scroll / mobile stack
+   ============================================================ */
+function initServicesHorizontal(){
+  const container = document.getElementById('horizontal-container');
+  const track = document.getElementById('horizontal-track');
+  const panels = gsap.utils.toArray('.service-panel');
+  const dots = gsap.utils.toArray('#services-dots .ddot');
+  if (!container || !track || panels.length === 0) return;
+
+  const totalScroll = () => track.scrollWidth - window.innerWidth;
+
+  gsap.to(track, {
+    x: () => -totalScroll(),
+    ease: 'none',
+    scrollTrigger: {
+      trigger: container,
+      pin: true,
+      pinSpacing: true,
+      scrub: 1.2,
+      start: 'top top',
+      end: () => '+=' + totalScroll(),
+      invalidateOnRefresh: true,
+      anticipatePin: 1,
+      onUpdate: self => {
+        const idx = Math.min(panels.length - 1, Math.round(self.progress * (panels.length - 1)));
+        dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
+      }
+    }
+  });
+}
+function initServicesMobile(){
+  gsap.utils.toArray('.service-panel').forEach((p, i) => {
+    gsap.from(p, {
+      y: 30, opacity: 0, duration: .7, ease: 'power2.out',
+      scrollTrigger: { trigger: p, start: 'top 90%', once: true }
+    });
+  });
+}
+
+/* ============================================================
+   METHODE — desktop progress + clip-path reveals / mobile fade
+   ============================================================ */
+function initMethodeDesktop(){
+  const steps = gsap.utils.toArray('[data-step]');
+  const fill = document.getElementById('methode-fill');
+  const stepLabel = document.getElementById('methode-step-label');
+
+  steps.forEach((step, i) => {
+    gsap.from(step, {
+      y: 80, opacity: 0,
+      clipPath: 'inset(0 0 100% 0)',
+      duration: 1.2, ease: 'power4.out',
+      scrollTrigger: { trigger: step, start: 'top 82%' }
+    });
+    ScrollTrigger.create({
+      trigger: step,
+      start: 'top center',
+      end: 'bottom center',
+      onEnter: () => {
+        gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
+        if (stepLabel) stepLabel.textContent = String(i + 1).padStart(2, '0');
+      },
+      onEnterBack: () => {
+        gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
+        if (stepLabel) stepLabel.textContent = String(i + 1).padStart(2, '0');
+      },
+      onLeaveBack: () => {
+        if (i === 0) {
+          gsap.to(fill, { scaleX: 0, duration: .6 });
+          if (stepLabel) stepLabel.textContent = '00';
+        }
+      }
+    });
+  });
+}
+function initMethodeMobile(){
+  gsap.utils.toArray('[data-step]').forEach((step, i) => {
+    gsap.from(step, {
+      y: 30, opacity: 0,
+      duration: .65, delay: i * .06, ease: 'power2.out',
+      scrollTrigger: { trigger: step, start: 'top 92%', once: true }
+    });
+  });
+}
+
+/* ============================================================
+   RESULTATS — desktop pinned scrubbed counters / mobile simple
+   ============================================================ */
+function initResultsPinned(){
+  const pin = document.getElementById('results-pin');
+  if (!pin) return;
+  const counters = gsap.utils.toArray('.big-counter');
+  const counterStates = counters.map(el => ({ el, target: +el.dataset.target, v: 0 }));
+  counters.forEach(el => el.textContent = '0');
+  const cards = gsap.utils.toArray('.result-card');
+
+  gsap.set(cards, { y: 70, opacity: 0, scale: .95 });
+  gsap.set('.results-text', { opacity: 0, y: 30 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: pin,
+      start: 'top top',
+      end: '+=120%',
+      pin: true,
+      scrub: 1,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+    }
+  });
+
+  tl.to('.results-text', { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 0)
+    .to(cards, {
+      y: 0, opacity: 1, scale: 1,
+      stagger: .12, duration: .9, ease: 'power3.out'
+    }, .3)
+    .to(counterStates, {
+      v: i => counterStates[i].target,
+      ease: 'none', duration: 1.4,
+      onUpdate: function(){
+        counterStates.forEach(c => c.el.textContent = Math.round(c.v));
+      }
+    }, .6);
+}
+function initResultsMobile(){
+  const pin = document.getElementById('results-pin');
+  if (!pin) return;
+  const cards = gsap.utils.toArray('.result-card');
+
+  gsap.from(cards, {
+    y: 30, opacity: 0, stagger: .1, duration: .65, ease: 'power2.out',
+    scrollTrigger: { trigger: pin, start: 'top 85%', once: true }
+  });
+
+  const counters = document.querySelectorAll('.big-counter');
   ScrollTrigger.create({
-    id: 'main-scene',
-    trigger: stage,
-    start: 'top top',
-    end: SCROLL_LENGTH,
-    pin: true,
-    pinSpacing: true,
-    scrub: 1.5,
-    anticipatePin: 1,
-    invalidateOnRefresh: true,
-    onUpdate: self => {
-      const p = self.progress;
-
-      // 1) Just stash the target time — actual seek happens in rAF tick
-      if (video.duration) targetTime = p * video.duration;
-
-      // 2) Block opacities (cheap, every frame is fine)
-      blocks.forEach(b => { b.el.style.opacity = blockOpacity(p, b); });
-
-      // 3) Service pillars sequential reveal
-      pillars.forEach((piEl, i) => { piEl.style.opacity = pillarOpacity(p, i); });
-
-      // 4) Counters
-      tickCounters(p);
-
-      // 5) HUD step indicator
-      setHudActive(p);
-    }
-  });
-
-  // Refresh once video metadata is known (so duration is non-NaN)
-  if (video.readyState >= 1) {
-    ScrollTrigger.refresh();
-  } else {
-    video.addEventListener('loadedmetadata', () => ScrollTrigger.refresh(), { once: true });
-  }
-}
-
-/* ============================================================
-   MOBILE — simple stacked sections with fade-ins
-   ============================================================ */
-function initMobileSections(){
-  /* 1) Wipe any lingering inline styles from a desktop->mobile resize */
-  document.querySelectorAll('.content-block, .service-item').forEach(el => {
-    el.style.removeProperty('opacity');
-    el.style.removeProperty('transform');
-  });
-
-  /* 2) Helper: ScrollTrigger does NOT retroactively fire onEnter for
-        elements that are already in viewport at setup. So if an element
-        is already visible (e.g. the first content block right under the
-        nav), we run the animation immediately. Otherwise we attach a
-        scroll-trigger. This guarantees nothing stays stuck at opacity:0. */
-  function fadeUp(el, opts){
-    const vh = window.innerHeight || 1;
-    const rect = el.getBoundingClientRect();
-    const alreadyVisible = rect.top < vh * 0.9 && rect.bottom > 0;
-    const base = { y: 30, opacity: 0, ease: 'power2.out', duration: .7, ...opts };
-    if (alreadyVisible) {
-      gsap.from(el, base);
-    } else {
-      gsap.from(el, {
-        ...base,
-        scrollTrigger: { trigger: el, start: 'top 92%', once: true }
-      });
-    }
-  }
-
-  document.querySelectorAll('.content-block').forEach(el => fadeUp(el, { y: 28, duration: .7 }));
-  document.querySelectorAll('.service-item').forEach((el, i) => fadeUp(el, { y: 22, delay: i * .08, duration: .6 }));
-  document.querySelectorAll('.methode-step, .result-item, .testi-item').forEach((el, i) => fadeUp(el, { y: 18, delay: (i % 4) * .06, duration: .55 }));
-
-  /* 3) Counters fire when results block enters viewport */
-  const resultsBlock = document.querySelector('.block-results');
-  if (resultsBlock) {
-    const fire = () => {
-      document.querySelectorAll('.counter').forEach(el => {
+    trigger: pin, start: 'top 75%', once: true,
+    onEnter: () => {
+      counters.forEach(el => {
         const target = +el.dataset.target;
         const obj = { v: 0 };
         gsap.to(obj, {
           v: target, duration: 1.6, ease: 'power2.out',
-          onUpdate: () => { el.textContent = Math.round(obj.v); }
+          onUpdate: () => el.textContent = Math.round(obj.v)
         });
       });
-    };
-    const rect = resultsBlock.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) fire();
-    else ScrollTrigger.create({ trigger: resultsBlock, start: 'top 80%', once: true, onEnter: fire });
-  }
+    }
+  });
+}
 
-  /* 4) Close mobile menu on anchor click — native browser scroll handles the jump */
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', () => {
-      document.getElementById('mobile-menu')?.classList.remove('is-open');
+/* ============================================================
+   TEMOIGNAGES — desktop clip-path / mobile fade
+   ============================================================ */
+function initTestiDesktop(){
+  gsap.utils.toArray('.testi-card').forEach((card, i) => {
+    gsap.from(card, {
+      y: 70, opacity: 0,
+      clipPath: 'inset(0 0 100% 0)',
+      rotate: i % 2 === 0 ? -.4 : .4,
+      duration: 1.1, delay: i * .12, ease: 'power4.out',
+      scrollTrigger: { trigger: '.testi-grid', start: 'top 80%' }
     });
   });
+}
+function initTestiMobile(){
+  gsap.utils.toArray('.testi-card').forEach((card, i) => {
+    gsap.from(card, {
+      y: 30, opacity: 0,
+      duration: .65, delay: i * .06, ease: 'power2.out',
+      scrollTrigger: { trigger: card, start: 'top 92%', once: true }
+    });
+  });
+}
 
-  /* 5) Safety net: after the next frame, force any block that ended up at
-        opacity:0 (because no animation fired) back to opacity:1. */
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      document.querySelectorAll('.content-block, .service-item, .methode-step, .result-item, .testi-item').forEach(el => {
-        if (parseFloat(getComputedStyle(el).opacity) === 0) {
-          el.style.opacity = '1';
-          el.style.transform = 'none';
-        }
-      });
-    }, 1500);
+/* ============================================================
+   FOOTER MEGA — desktop only
+   ============================================================ */
+function initFooterMega(){
+  gsap.from('.footer-mega', {
+    yPercent: 30, opacity: 0, ease: 'none',
+    scrollTrigger: { trigger: '.footer', start: 'top 80%', end: 'bottom bottom', scrub: 1 }
   });
 }
 
