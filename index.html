@@ -791,6 +791,315 @@ body.has-cursor .cursor-glow{display:block;}
   font-size:12.5px;color:var(--text-mute);line-height:1.55;
   position:relative;z-index:1;
 }
+.results-footnote{
+  margin-top:48px;
+  text-align:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.04em;
+  color:var(--text-mute);
+  font-style:italic;
+  max-width:60ch;
+  margin-inline:auto;
+}
+
+/* ============================================================
+   POUR QUI (PROFILS) — desktop carrousel snap / mobile stack
+   ============================================================ */
+.profiles{
+  position:relative;
+  padding:140px 0;
+  z-index:2;
+}
+.profiles-head{
+  max-width:var(--container);
+  margin:0 auto 60px;
+  padding:0 36px;
+}
+.profiles-head h2{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(36px,5.4vw,80px);
+  line-height:1;letter-spacing:-.025em;
+  max-width:20ch;margin-bottom:28px;
+}
+.profiles-head .intro{
+  color:var(--text-dim);
+  font-size:clamp(15px,1.1vw,17px);
+  max-width:64ch;line-height:1.65;
+}
+.profiles-head .intro b{color:var(--text);font-weight:500;}
+
+.profiles-carousel{
+  display:flex;
+  gap:24px;
+  padding:40px 22vw 40px 22vw;
+  overflow-x:auto;
+  overflow-y:visible;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.profiles-carousel::-webkit-scrollbar{display:none;}
+
+.profile-card{
+  flex:0 0 56vw;
+  max-width:540px;
+  min-width:300px;
+  scroll-snap-align:center;
+  padding:44px 38px;
+  border-radius:var(--r-lg);
+  background:var(--glass);
+  border:1px solid var(--line);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  position:relative;
+  overflow:hidden;
+  transform:scale(.85);
+  filter:saturate(.55) brightness(.7);
+  transition:transform .55s cubic-bezier(.2,.8,.2,1),filter .45s ease;
+  will-change:transform,filter;
+}
+.profile-card.is-active{
+  transform:scale(1);
+  filter:saturate(1) brightness(1);
+}
+.profile-card::before{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;
+  background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.4) 25%,transparent 50%,rgba(214,51,132,.4) 75%,transparent 100%);
+  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  padding:1px;opacity:0;
+  transition:opacity .5s;
+  animation:rotateBorder 8s linear infinite;
+  pointer-events:none;
+}
+.profile-card.is-active::before{opacity:.7;}
+.profile-card .sector{
+  display:inline-block;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--magenta);
+  padding:6px 12px;border:1px solid rgba(214,51,132,.3);
+  border-radius:100px;background:rgba(214,51,132,.06);
+  margin-bottom:22px;
+}
+.profile-card h3{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(22px,2.2vw,30px);
+  letter-spacing:-.015em;line-height:1.1;
+  margin-bottom:24px;
+}
+.profile-card .block{margin-bottom:18px;}
+.profile-card .block:last-child{margin-bottom:0;}
+.profile-card .block .label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text-mute);
+  margin-bottom:8px;
+}
+.profile-card .block p{
+  color:var(--text-dim);
+  font-size:14.5px;line-height:1.6;
+}
+.profile-card .block.deploy p{color:var(--text);}
+
+.profiles-bridge{
+  max-width:var(--container);
+  margin:60px auto 0;
+  padding:0 36px;
+  text-align:center;
+}
+.profiles-bridge .lead{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(20px,2vw,28px);
+  letter-spacing:-.01em;line-height:1.3;
+  margin-bottom:14px;
+  max-width:30ch;margin-inline:auto;
+}
+.profiles-bridge p{
+  color:var(--text-dim);
+  font-size:15px;line-height:1.65;
+  max-width:48ch;margin-inline:auto;
+}
+.profiles-bridge p b{color:var(--text);font-weight:500;}
+
+/* ============================================================
+   STACK (15 logos d'outils, zoom irrégulier désynchronisé)
+   ============================================================ */
+.stack-section{
+  position:relative;
+  padding:140px 36px;
+  z-index:2;
+  background:var(--bg-0);
+}
+.stack-head{
+  max-width:var(--container);
+  margin:0 auto 60px;
+  text-align:center;
+}
+.stack-head h2{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(34px,5vw,68px);
+  line-height:1;letter-spacing:-.025em;
+  margin-bottom:24px;max-width:22ch;margin-inline:auto;
+}
+.stack-head .intro{
+  color:var(--text-dim);
+  font-size:clamp(15px,1.1vw,17px);
+  max-width:54ch;margin:0 auto;line-height:1.65;
+}
+.stack-grid{
+  max-width:var(--container);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:16px;
+}
+.stack-tile{
+  position:relative;
+  aspect-ratio:1 / 1;
+  border-radius:var(--r-lg);
+  background:var(--glass);
+  border:1px solid var(--line);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:10px;
+  padding:18px 12px;
+  cursor:default;
+  transform-origin:center;
+  will-change:transform;
+  transition:border-color .35s,background-color .35s;
+  overflow:hidden;
+}
+.stack-tile::before{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;
+  padding:1px;opacity:0;
+  background:var(--grad);
+  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  transition:opacity .35s;
+  pointer-events:none;
+}
+.stack-tile:hover::before{opacity:.85;}
+.stack-tile:hover{background:var(--glass-strong);}
+.stack-tile .mark{
+  width:46px;height:46px;
+  display:grid;place-items:center;
+  border-radius:12px;
+  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:18px;
+  letter-spacing:-.02em;
+  position:relative;
+  flex-shrink:0;
+}
+.stack-tile .mark svg{display:block;width:24px;height:24px;}
+.stack-tile .label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;
+  letter-spacing:.04em;
+  color:var(--text-dim);
+  text-align:center;
+  line-height:1.2;
+}
+.stack-tile .tooltip{
+  position:absolute;
+  bottom:calc(100% + 12px);left:50%;
+  transform:translateX(-50%) translateY(4px);
+  background:rgba(7,10,20,.95);
+  border:1px solid var(--line-strong);
+  padding:10px 14px;border-radius:10px;
+  font-size:11.5px;color:var(--text);
+  width:max-content;max-width:240px;
+  text-align:center;line-height:1.4;
+  opacity:0;pointer-events:none;
+  transition:opacity .25s,transform .25s;
+  z-index:5;
+}
+.stack-tile:hover .tooltip{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ============================================================
+   FAQ — accordion 7 items
+   ============================================================ */
+.faq{
+  position:relative;
+  padding:140px 36px;
+  z-index:2;
+}
+.faq-head{
+  max-width:880px;
+  margin:0 auto 60px;
+  text-align:center;
+}
+.faq-head h2{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(34px,5vw,68px);
+  line-height:1;letter-spacing:-.025em;
+  margin-bottom:24px;max-width:24ch;margin-inline:auto;
+}
+.faq-head .intro{
+  color:var(--text-dim);
+  font-size:clamp(15px,1.1vw,17px);
+  max-width:48ch;margin:0 auto;line-height:1.65;
+}
+.faq-list{
+  max-width:880px;
+  margin:0 auto;
+  border-top:1px solid var(--line);
+}
+.faq-item{
+  border-bottom:1px solid var(--line);
+  transition:background .35s ease;
+}
+.faq-item:hover:not(.is-open){background:var(--grad-soft);}
+.faq-question{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:24px;
+  width:100%;
+  padding:26px 12px;
+  cursor:pointer;
+  text-align:left;
+  font-family:'Syne',sans-serif;font-weight:500;
+  font-size:clamp(1.05rem,1.5vw,1.3rem);
+  letter-spacing:-.005em;
+  color:var(--text);
+  background:transparent;
+  border:0;
+}
+.faq-icon{
+  flex:0 0 34px;
+  width:34px;height:34px;
+  border-radius:50%;
+  border:1px solid var(--line-strong);
+  position:relative;
+  display:grid;place-items:center;
+  color:var(--text);
+  transition:transform .35s ease,background .35s,border-color .35s;
+}
+.faq-icon::before,.faq-icon::after{
+  content:'';position:absolute;
+  top:50%;left:50%;
+  width:12px;height:1.5px;
+  background:currentColor;
+  border-radius:2px;
+}
+.faq-icon::before{transform:translate(-50%,-50%);}
+.faq-icon::after{transform:translate(-50%,-50%) rotate(90deg);}
+.faq-item.is-open .faq-icon{
+  background:rgba(124,92,252,.18);
+  border-color:rgba(124,92,252,.45);
+  transform:rotate(45deg);
+}
+.faq-answer{
+  height:0;
+  overflow:hidden;
+}
+.faq-answer-inner{
+  padding:0 12px 26px;
+  color:var(--text-dim);
+  font-size:15px;line-height:1.7;
+  max-width:72ch;
+}
+.faq-answer-inner b{color:var(--text);font-weight:500;}
 
 /* ============================================================
    TEMOIGNAGES
@@ -948,6 +1257,11 @@ body.has-cursor .cursor-glow{display:block;}
   .methode-sticky{position:relative;top:0;}
   .methode-steps{gap:24px;}
   .results-pin{min-height:auto;padding:100px 36px;}
+  /* Profiles: narrower carousel, less side padding */
+  .profiles-carousel{padding-left:10vw;padding-right:10vw;}
+  .profile-card{flex-basis:70vw;}
+  /* Stack: tighter grid */
+  .stack-grid{grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;}
 }
 @media (max-width:768px){
   /* === KILL EXPENSIVE EFFECTS ON MOBILE === */
@@ -980,6 +1294,52 @@ body.has-cursor .cursor-glow{display:block;}
   .services-stack{gap:60px;}
   .service-panel{padding:50px 0;}
   .preloader-logo,.preloader-logo img{height:80px;}
+
+  /* Profiles: stack vertically (no horizontal carousel on mobile) */
+  .profiles{padding:90px 0;}
+  .profiles-head{padding:0 22px;margin-bottom:40px;}
+  .profiles-carousel{
+    flex-direction:column;
+    padding:0 22px;
+    overflow-x:visible;
+    scroll-snap-type:none;
+    gap:18px;
+  }
+  .profile-card{
+    flex:0 0 auto;
+    width:100%;
+    max-width:none;
+    min-width:0;
+    transform:scale(1);
+    filter:none;
+    padding:32px 26px;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    background:rgba(15,20,36,.85);
+  }
+  .profile-card::before{display:none;}
+  .profiles-bridge{margin-top:40px;padding:0 22px;}
+
+  /* Stack: tighten + 3 cols + remove backdrop-filter */
+  .stack-section{padding:90px 22px;}
+  .stack-head{margin-bottom:40px;}
+  .stack-grid{grid-template-columns:repeat(3,1fr);gap:10px;}
+  .stack-tile{
+    padding:14px 8px;gap:8px;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    background:rgba(15,20,36,.85);
+  }
+  .stack-tile .mark{width:38px;height:38px;font-size:15px;}
+  .stack-tile .label{font-size:9.5px;}
+  .stack-tile .tooltip{display:none;}
+
+  /* FAQ: tighter padding */
+  .faq{padding:80px 22px;}
+  .faq-head{margin-bottom:40px;}
+  .faq-question{padding:22px 8px;font-size:1.02rem;gap:14px;}
+  .faq-answer-inner{padding:0 8px 22px;font-size:14.5px;}
+  .faq-icon{flex-basis:30px;width:30px;height:30px;}
 }
 </style>
 </head>
@@ -1023,6 +1383,7 @@ body.has-cursor .cursor-glow{display:block;}
     <a href="#methode" data-cursor>Méthode</a>
     <a href="#resultats" data-cursor>Résultats</a>
     <a href="#temoignages" data-cursor>Témoignages</a>
+    <a href="#faq" data-cursor>FAQ</a>
   </div>
   <a href="#cta" class="nav-cta" data-cursor data-magnetic>
     Audit gratuit <span class="arrow">→</span>
@@ -1037,6 +1398,7 @@ body.has-cursor .cursor-glow{display:block;}
   <a href="#methode">Méthode</a>
   <a href="#resultats">Résultats</a>
   <a href="#temoignages">Témoignages</a>
+  <a href="#faq">FAQ</a>
   <a href="#cta" class="gradient-text">Audit gratuit →</a>
 </div>
 
@@ -1103,11 +1465,11 @@ body.has-cursor .cursor-glow{display:block;}
           <span class="line"></span>
           <span class="label">Pain Points</span>
         </div>
-        <h2 class="section-title" data-split>Si vous reconnaissez ces situations, on peut vous aider.</h2>
+        <h2 class="section-title" data-split>Si vous reconnaissez ces situations, vos équipes méritent mieux.</h2>
       </div>
       <p class="problems-intro" data-fade>
         Ces frictions coûtent en moyenne <b>28h par semaine</b> à une PME.
-        Le pire : la plupart des dirigeants ne réalisent même pas qu'elles existent.
+        Et surtout, elles épuisent les équipes qui les subissent au quotidien.
       </p>
     </div>
     <div class="problems-grid">
@@ -1115,7 +1477,7 @@ body.has-cursor .cursor-glow{display:block;}
         <div class="tag">P-01</div>
         <div class="icon">🔄</div>
         <h3>Tâches répétitives</h3>
-        <p>Votre équipe passe <b style="color:var(--text);">60% de son temps</b> sur des tâches qui ne génèrent aucun chiffre d'affaires. Saisie manuelle, copier-coller entre outils, relances, devis…</p>
+        <p>Votre équipe passe <b style="color:var(--text);">60% de son temps</b> sur des tâches qui ne génèrent aucun chiffre d'affaires. Saisie manuelle, copier-coller entre outils, relances, devis — autant d'heures qui devraient servir à autre chose.</p>
       </article>
       <article class="problem-card" data-card>
         <div class="tag">P-02</div>
@@ -1133,9 +1495,113 @@ body.has-cursor .cursor-glow{display:block;}
         <div class="tag">P-04</div>
         <div class="icon">⏰</div>
         <h3>Pas le temps</h3>
-        <p>Trop occupé à faire tourner le quotidien pour penser à demain. La transformation digitale reste un projet "qu'on lancera bientôt"… depuis trois ans.</p>
+        <p>Trop occupé à faire tourner le quotidien pour penser à demain. La transformation digitale reste un projet « qu'on lancera bientôt »… depuis trois ans. Pendant ce temps, vos meilleurs éléments s'épuisent.</p>
       </article>
     </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     POUR QUI (PROFILS) — desktop carrousel snap, mobile stack
+     ============================================================ -->
+<section class="profiles" id="profils">
+  <div class="profiles-head">
+    <div class="section-eyebrow">
+      <span class="num">02</span>
+      <span class="line"></span>
+      <span class="label">Profils</span>
+    </div>
+    <h2 data-split>Là où la différence se voit le plus.</h2>
+    <p class="intro" data-fade>
+      Voici quelques contextes que nous connaissons bien — ceux où nos clients ont retrouvé du temps,
+      de la sérénité, et souvent du chiffre. <b>Si le vôtre n'y figure pas exactement, c'est sans doute
+      parce qu'il mérite une étude qui lui ressemble.</b>
+    </p>
+  </div>
+
+  <div class="profiles-carousel" id="profiles-carousel">
+    <article class="profile-card" data-profile>
+      <div class="sector">Commerces &amp; proximité</div>
+      <h3>Restaurants, salons, cliniques</h3>
+      <div class="block">
+        <div class="label">Le quotidien</div>
+        <p>Vous ratez des appels pendant que vous êtes en service. Donc des réservations. Donc du chiffre.</p>
+      </div>
+      <div class="block deploy">
+        <div class="label">Ce qu'on déploie</div>
+        <p>Un agent vocal IA qui prend le relais quand personne ne peut décrocher. Il enregistre les réservations, gère les annulations, envoie les rappels. Branché à votre agenda. Votre équipe ne lève plus le nez du client en face d'elle.</p>
+      </div>
+    </article>
+
+    <article class="profile-card" data-profile>
+      <div class="sector">PME &amp; grandes entreprises</div>
+      <h3>Scaler sans s'épuiser</h3>
+      <div class="block">
+        <div class="label">Le quotidien</div>
+        <p>Vos équipes plafonnent. Embaucher coûte cher, prend du temps, et ne résout pas le fond du sujet.</p>
+      </div>
+      <div class="block deploy">
+        <div class="label">Ce qu'on déploie</div>
+        <p>Des automatisations sur vos workflows internes (RH, comptabilité, achats, reporting). Vos équipes redeviennent disponibles pour la stratégie, la décision, la relation. La croissance ne se paie plus en burnout.</p>
+      </div>
+    </article>
+
+    <article class="profile-card" data-profile>
+      <div class="sector">Support client</div>
+      <h3>Services SAV débordés</h3>
+      <div class="block">
+        <div class="label">Le quotidien</div>
+        <p>80% de vos tickets sont les mêmes 10 questions. Vos agents s'essoufflent à répéter, et les vraies urgences attendent leur tour.</p>
+      </div>
+      <div class="block deploy">
+        <div class="label">Ce qu'on déploie</div>
+        <p>Un assistant IA multicanal qui absorbe le volume répétitif et alimente votre base de connaissance en continu. Vos agents reprennent la main sur les cas qui ont besoin d'eux — avec tout le contexte déjà préparé.</p>
+      </div>
+    </article>
+
+    <article class="profile-card" data-profile>
+      <div class="sector">E-commerce</div>
+      <h3>Monétiser l'audience qu'on a déjà</h3>
+      <div class="block">
+        <div class="label">Le quotidien</div>
+        <p>Coût d'acquisition qui grimpe, panier moyen qui stagne, paniers abandonnés qui ne reviennent jamais.</p>
+      </div>
+      <div class="block deploy">
+        <div class="label">Ce qu'on déploie</div>
+        <p>Automatisation des relances, recommandations personnalisées, assistant pré-achat, segmentation comportementale. Vous monétisez intelligemment l'audience que vous avez déjà conquise.</p>
+      </div>
+    </article>
+
+    <article class="profile-card" data-profile>
+      <div class="sector">B2B &amp; fidélisation</div>
+      <h3>Fidéliser plutôt que courir après</h3>
+      <div class="block">
+        <div class="label">Le quotidien</div>
+        <p>Vous courez après les nouveaux clients pendant que les actuels glissent doucement vers la concurrence.</p>
+      </div>
+      <div class="block deploy">
+        <div class="label">Ce qu'on déploie</div>
+        <p>Programmes de fidélisation automatisés, détection prédictive des signaux de churn, parcours de réactivation personnalisés. Vous augmentez le CA sans dépenser un euro en acquisition.</p>
+      </div>
+    </article>
+
+    <article class="profile-card" data-profile>
+      <div class="sector">Opérations</div>
+      <h3>Équipes débordées</h3>
+      <div class="block">
+        <div class="label">Le quotidien</div>
+        <p>Vos meilleurs éléments passent leur journée sur des tâches qu'ils détestent. Et c'est souvent pour ça qu'ils partent.</p>
+      </div>
+      <div class="block deploy">
+        <div class="label">Ce qu'on déploie</div>
+        <p>Audit de la journée type, identification des 30% de tâches automatisables, déploiement progressif. Ils retrouvent leur temps. Leur motivation. Et la capacité de faire ce pour quoi vous les avez recrutés.</p>
+      </div>
+    </article>
+  </div>
+
+  <div class="profiles-bridge" data-fade>
+    <div class="lead">Aucun de ces contextes ne ressemble exactement au vôtre&nbsp;?</div>
+    <p>C'est souvent un bon signe — ça veut dire qu'il y a probablement des leviers spécifiques à votre métier qu'on n'a pas encore explorés ensemble. <b>C'est exactement pour ça que l'audit existe.</b></p>
   </div>
 </section>
 
@@ -1146,7 +1612,7 @@ body.has-cursor .cursor-glow{display:block;}
   <div class="services-head">
     <div>
       <div class="section-eyebrow">
-        <span class="num">02</span>
+        <span class="num">03</span>
         <span class="line"></span>
         <span class="label">Services</span>
       </div>
@@ -1166,7 +1632,7 @@ body.has-cursor .cursor-glow{display:block;}
           <div class="service-text">
             <span class="pillar-num">PILIER 01</span>
             <h3>IA &amp; Agents<br/><span class="italic gradient-text">Intelligents</span></h3>
-            <p class="lead">Des agents conversationnels qui répondent, qualifient, vendent et planifient — 24h/24, dans toutes les langues, sans pause café.</p>
+            <p class="lead">Des agents conversationnels qui prennent en charge le répétitif, qualifient, et passent la main à vos équipes pile au bon moment — 24h/24, dans toutes les langues, sans pause café.</p>
             <ul>
               <li>Chatbots intelligents multi-canaux (site, WhatsApp, Instagram)</li>
               <li>Secrétaire IA — gestion d'appels et prise de RDV automatique</li>
@@ -1206,7 +1672,7 @@ body.has-cursor .cursor-glow{display:block;}
           <div class="service-text">
             <span class="pillar-num">PILIER 02</span>
             <h3>Automatisation &amp; <span class="italic gradient-text">Workflows</span></h3>
-            <p class="lead">On connecte vos outils existants pour qu'ils travaillent ensemble. Plus de double saisie, plus d'oublis — juste des données qui circulent toutes seules.</p>
+            <p class="lead">On connecte vos outils existants pour qu'ils travaillent ensemble. Plus de double saisie, plus d'oublis. Vos équipes retrouvent du temps pour ce qui compte vraiment.</p>
             <ul>
               <li>Automatisations Make / n8n sur mesure</li>
               <li>Applications internes métier (no-code &amp; code)</li>
@@ -1313,7 +1779,7 @@ body.has-cursor .cursor-glow{display:block;}
     <div class="methode-inner">
       <div class="methode-sticky">
         <div class="section-eyebrow">
-          <span class="num">03</span>
+          <span class="num">04</span>
           <span class="line"></span>
           <span class="label">Méthode</span>
         </div>
@@ -1391,7 +1857,7 @@ body.has-cursor .cursor-glow{display:block;}
     <div class="results-inner">
       <div class="results-text">
         <div class="section-eyebrow" style="justify-content:center;">
-          <span class="num">04</span>
+          <span class="num">05</span>
           <span class="line"></span>
           <span class="label">Résultats</span>
         </div>
@@ -1401,7 +1867,7 @@ body.has-cursor .cursor-glow{display:block;}
       <div class="results-grid">
         <div class="result-card" data-card data-result>
           <div class="num"><span class="big-counter" data-target="47">0</span><span class="unit">h</span></div>
-          <div class="lbl">Économisées par mois</div>
+          <div class="lbl">Heures rendues par mois aux équipes</div>
           <div class="desc">en moyenne, et par collaborateur impliqué dans les workflows automatisés</div>
         </div>
         <div class="result-card" data-card data-result>
@@ -1416,10 +1882,106 @@ body.has-cursor .cursor-glow{display:block;}
         </div>
         <div class="result-card" data-card data-result>
           <div class="num"><span class="prefix">&lt;</span><span class="big-counter" data-target="24">0</span><span class="unit">h</span></div>
-          <div class="lbl">Temps de réponse moyen</div>
+          <div class="lbl">Temps de première réponse, tous canaux</div>
           <div class="desc">aux demandes entrantes — chatbot, email, formulaire, WhatsApp</div>
         </div>
       </div>
+      <p class="results-footnote">Chiffres mesurés sur l'ensemble des projets livrés. Grille de calcul disponible sur demande.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STACK — 15 logos d'outils, zoom irrégulier désynchronisé
+     ============================================================ -->
+<section class="stack-section" id="stack">
+  <div class="stack-head">
+    <div class="section-eyebrow" style="justify-content:center;">
+      <span class="num">06</span>
+      <span class="line"></span>
+      <span class="label">Stack</span>
+    </div>
+    <h2 data-split>Le meilleur de l'IA. Au service de votre business.</h2>
+    <p class="intro" data-fade>
+      On ne vous vend pas un outil. On choisit le bon pour chaque mission, parmi les meilleurs du marché. Voici ceux qu'on déploie le plus souvent.
+    </p>
+  </div>
+
+  <div class="stack-grid" id="stack-grid">
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#d97757,#b35a3c);color:#fff;">C</div>
+      <div class="label">Claude</div>
+      <div class="tooltip">IA conversationnelle de raisonnement avancé (Anthropic)</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#10a37f,#0d8a6a);color:#fff;">GPT</div>
+      <div class="label">ChatGPT</div>
+      <div class="tooltip">Génération de contenu et assistants (OpenAI)</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#4285f4,#7c5cfc,#d63384);color:#fff;">G</div>
+      <div class="label">Gemini</div>
+      <div class="tooltip">IA multimodale texte/image/vidéo (Google)</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#ea4f6b,#c63556);color:#fff;">n8n</div>
+      <div class="label">n8n</div>
+      <div class="tooltip">Plateforme d'automatisation open-source</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#6d00cc,#9b00ff);color:#fff;">M</div>
+      <div class="label">Make</div>
+      <div class="tooltip">Automatisation no-code de bout en bout</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#ff4a00,#cc3b00);color:#fff;">Z</div>
+      <div class="label">Zapier</div>
+      <div class="tooltip">Intégrations entre 6 000+ applications</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#1a1a1a,#3a3a3a);color:#fff;border:1px solid rgba(255,255,255,.15);">11</div>
+      <div class="label">ElevenLabs</div>
+      <div class="tooltip">Voix IA ultra-réalistes en 30+ langues</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#00d4ff,#0099cc);color:#0a0e1a;">V</div>
+      <div class="label">Vapi</div>
+      <div class="tooltip">Agents vocaux IA en temps réel</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#5b6cff,#3848d6);color:#fff;">R</div>
+      <div class="label">Retell AI</div>
+      <div class="tooltip">Conversations vocales naturelles</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#3d5afe,#283db8);color:#fff;">VF</div>
+      <div class="label">Voiceflow</div>
+      <div class="tooltip">Conception de chatbots et agents vocaux</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#0a0a0a,#2a2a2a);color:#fff;border:1px solid rgba(255,255,255,.18);">⌘</div>
+      <div class="label">Cursor</div>
+      <div class="tooltip">Développement assisté par IA</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#1c1c1e,#3a3a3c);color:#fff;border:1px solid rgba(255,255,255,.15);">MJ</div>
+      <div class="label">Midjourney</div>
+      <div class="tooltip">Génération d'images qualité studio</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#7c5cfc,#5c3eff);color:#fff;">HG</div>
+      <div class="label">HeyGen</div>
+      <div class="tooltip">Vidéos avec avatars IA</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#003d8f,#0066d4);color:#fff;">io</div>
+      <div class="label">Ionos</div>
+      <div class="tooltip">Hébergement et infrastructure cloud</div>
+    </div>
+    <div class="stack-tile" data-tool>
+      <div class="mark" style="background:linear-gradient(135deg,#ffffff,#e6e6e6);color:#0a0e1a;">N</div>
+      <div class="label">Notion AI</div>
+      <div class="tooltip">Productivité et knowledge base augmentée</div>
     </div>
   </div>
 </section>
@@ -1431,7 +1993,7 @@ body.has-cursor .cursor-glow{display:block;}
   <div class="container">
     <div class="testi-head">
       <div class="section-eyebrow" style="justify-content:center;">
-        <span class="num">05</span>
+        <span class="num">07</span>
         <span class="line"></span>
         <span class="label">Témoignages</span>
       </div>
@@ -1480,11 +2042,105 @@ body.has-cursor .cursor-glow{display:block;}
 </section>
 
 <!-- ============================================================
+     FAQ — accordion 7 items
+     ============================================================ -->
+<section class="faq" id="faq">
+  <div class="faq-head">
+    <div class="section-eyebrow" style="justify-content:center;">
+      <span class="num">08</span>
+      <span class="line"></span>
+      <span class="label">Questions</span>
+    </div>
+    <h2 data-split>Les questions qu'on nous pose toutes les semaines.</h2>
+    <p class="intro" data-fade>Si la vôtre n'y est pas, écrivez-nous — on répond dans la journée.</p>
+  </div>
+  <div class="faq-list" id="faq-list">
+    <div class="faq-item">
+      <button class="faq-question" type="button" aria-expanded="false">
+        <span>Combien ça coûte&nbsp;?</span>
+        <span class="faq-icon" aria-hidden="true"></span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Ça dépend de ce qu'on déploie. Un agent vocal IA pour un commerce démarre à <b>quelques centaines d'euros par mois</b>. Une refonte complète de workflow B2B, c'est un projet. Dans tous les cas, on ne lance rien tant que le ROI n'est pas chiffré et accepté par vous.
+        </div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" type="button" aria-expanded="false">
+        <span>Combien de temps avant de voir des résultats&nbsp;?</span>
+        <span class="faq-icon" aria-hidden="true"></span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Les premières automatisations sont en production en <b>2 à 4 semaines</b>. Les premiers gains chiffrables, en <b>30 à 60 jours</b>. Vous ne payez pas pour attendre.
+        </div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" type="button" aria-expanded="false">
+        <span>Est-ce que je dois changer mes outils&nbsp;?</span>
+        <span class="faq-icon" aria-hidden="true"></span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Non. On s'intègre à ce qui existe&nbsp;: votre CRM, votre ERP, votre site, vos messageries. Si un outil est vraiment limitant, on vous le dit. Mais c'est rare.
+        </div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" type="button" aria-expanded="false">
+        <span>Vos solutions vont-elles remplacer mes équipes&nbsp;?</span>
+        <span class="faq-icon" aria-hidden="true"></span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          <b>Non, et c'est même tout le contraire.</b> Notre rôle est de retirer aux équipes ce qui les épuise sans valeur ajoutée. Vos collaborateurs gardent leur poste, gagnent du temps, et remontent en compétence sur ce qui compte vraiment.
+        </div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" type="button" aria-expanded="false">
+        <span>Mes équipes vont devoir apprendre quoi&nbsp;?</span>
+        <span class="faq-icon" aria-hidden="true"></span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Le minimum. Notre objectif, c'est que vos équipes utilisent <b>moins d'outils, pas plus</b>. On forme les bons interlocuteurs, on documente tout, on reste disponibles.
+        </div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" type="button" aria-expanded="false">
+        <span>Et la confidentialité de mes données&nbsp;?</span>
+        <span class="faq-icon" aria-hidden="true"></span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          On travaille en <b>RGPD strict</b>, avec des solutions hébergées en Europe quand le client le demande, et des accords de confidentialité dès le premier échange. Vos données ne nourrissent jamais un modèle public.
+        </div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" type="button" aria-expanded="false">
+        <span>Vous travaillez avec quelle taille d'entreprise&nbsp;?</span>
+        <span class="faq-icon" aria-hidden="true"></span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          De l'indépendant qui rate trop d'appels au groupe avec 500 collaborateurs. La méthode s'adapte. <b>Le ROI doit être là dans tous les cas.</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
      CTA FINAL
      ============================================================ -->
 <section class="cta-final" id="cta">
   <div class="section-eyebrow" style="justify-content:center;margin-bottom:40px;">
-    <span class="num">06</span>
+    <span class="num">09</span>
     <span class="line"></span>
     <span class="label">Et maintenant ?</span>
   </div>
@@ -1629,10 +2285,13 @@ function initSite(){
   /* Universal animations — identical on desktop and mobile */
   initHero();
   initProblems();
+  initProfiles();
   initServices();
   initMethode();
   initResults();
+  initStack();
   initTesti();
+  initFaq();
 
   /* Desktop-only polish (smooth scroll, custom cursor, hover effects) */
   gsap.matchMedia().add(QUERY_DESKTOP, () => {
@@ -1642,6 +2301,7 @@ function initSite(){
     initMagnetic();
     initTilt();
     initOrbsParallax();
+    initProfilesCarousel();   // snap-scroll detection of active card
     return () => {
       document.body.classList.remove('has-cursor');
       if (window.__lenis) { window.__lenis.destroy(); window.__lenis = null; }
@@ -2008,6 +2668,189 @@ function initTesti(){
       y: 40, opacity: 0,
       duration: .85, delay: i * .1, ease: 'power3.out',
       scrollTrigger: { trigger: '.testi-grid', start: 'top 82%', once: true }
+    });
+  });
+}
+
+/* ============================================================
+   PROFILS — fade-up cards + bridge fade
+   ============================================================ */
+function initProfiles(){
+  const cards = gsap.utils.toArray('.profile-card');
+  gsap.from(cards, {
+    y: 60, opacity: 0, scale: .96,
+    stagger: .08, duration: .9, ease: 'power3.out',
+    scrollTrigger: { trigger: '.profiles-carousel', start: 'top 78%', once: true }
+  });
+  const bridge = document.querySelector('.profiles-bridge');
+  if (bridge) {
+    gsap.from(bridge, {
+      y: 30, opacity: 0, duration: .8, ease: 'power3.out',
+      scrollTrigger: { trigger: bridge, start: 'top 88%', once: true }
+    });
+  }
+}
+
+/* ============================================================
+   PROFILS CAROUSEL — detect active (centered) card on desktop
+   The carousel uses CSS scroll-snap. We use IntersectionObserver
+   to find which card is centered and toggle .is-active.
+   ============================================================ */
+function initProfilesCarousel(){
+  const carousel = document.getElementById('profiles-carousel');
+  const cards = Array.from(document.querySelectorAll('.profile-card'));
+  if (!carousel || cards.length === 0) return;
+
+  // Initial: center the middle card on first paint so it looks active
+  requestAnimationFrame(() => {
+    const middle = Math.floor(cards.length / 2);
+    cards[middle]?.classList.add('is-active');
+    const target = cards[middle];
+    if (target) {
+      const offset = target.offsetLeft - (carousel.clientWidth - target.clientWidth) / 2;
+      carousel.scrollTo({ left: offset, behavior: 'instant' in carousel ? 'instant' : 'auto' });
+    }
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    let bestCard = null;
+    let bestRatio = 0;
+    cards.forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const containerRect = carousel.getBoundingClientRect();
+      const cardCenter = rect.left + rect.width / 2;
+      const containerCenter = containerRect.left + containerRect.width / 2;
+      const distance = Math.abs(cardCenter - containerCenter);
+      const score = 1 - Math.min(distance / containerRect.width, 1);
+      if (score > bestRatio) { bestRatio = score; bestCard = card; }
+    });
+    cards.forEach(c => c.classList.toggle('is-active', c === bestCard));
+  }, { root: carousel, threshold: [0, .25, .5, .75, 1] });
+
+  cards.forEach(c => observer.observe(c));
+  // Also recompute on scroll (smoother)
+  let raf;
+  carousel.addEventListener('scroll', () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      const containerRect = carousel.getBoundingClientRect();
+      const containerCenter = containerRect.left + containerRect.width / 2;
+      let bestCard = null, bestScore = 0;
+      cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const cardCenter = rect.left + rect.width / 2;
+        const distance = Math.abs(cardCenter - containerCenter);
+        const score = 1 - Math.min(distance / (containerRect.width / 2), 1);
+        if (score > bestScore) { bestScore = score; bestCard = card; }
+      });
+      cards.forEach(c => c.classList.toggle('is-active', c === bestCard));
+    });
+  }, { passive: true });
+}
+
+/* ============================================================
+   STACK — irregular breathing zoom on each tile (desynchronized)
+   ============================================================ */
+function initStack(){
+  const tiles = gsap.utils.toArray('.stack-tile');
+  if (tiles.length === 0) return;
+
+  // Staggered random entry
+  gsap.from(tiles, {
+    scale: .6, opacity: 0,
+    stagger: { each: .05, from: 'random' },
+    duration: .8, ease: 'back.out(1.4)',
+    scrollTrigger: { trigger: '.stack-grid', start: 'top 78%', once: true }
+  });
+
+  // Respect prefers-reduced-motion — no infinite loops in that case
+  if (reducedMotion) return;
+
+  // On a chacque tuile, son propre cycle de respiration (3-7s, scale 0.92-1.10)
+  tiles.forEach(tile => {
+    const minScale = 0.92 + Math.random() * 0.02;   // 0.92 → 0.94
+    const maxScale = 1.04 + Math.random() * 0.06;   // 1.04 → 1.10
+    const duration = 3 + Math.random() * 4;          // 3s → 7s
+    const delay    = Math.random() * 2;              // 0 → 2s
+
+    gsap.fromTo(tile,
+      { scale: minScale },
+      { scale: maxScale, duration, delay, repeat: -1, yoyo: true, ease: 'sine.inOut' }
+    );
+
+    // Pause sur hover (desktop)
+    tile.addEventListener('mouseenter', () => {
+      gsap.killTweensOf(tile);
+      gsap.to(tile, { scale: 1.15, duration: .35, ease: 'power2.out' });
+    });
+    tile.addEventListener('mouseleave', () => {
+      gsap.killTweensOf(tile);
+      const ns = 0.92 + Math.random() * 0.02;
+      const xs = 1.04 + Math.random() * 0.06;
+      const d  = 3 + Math.random() * 4;
+      gsap.to(tile, { scale: ns, duration: .5, ease: 'power2.inOut',
+        onComplete: () => {
+          gsap.fromTo(tile, { scale: ns }, { scale: xs, duration: d, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+        }
+      });
+    });
+  });
+
+  // Parallax souris (desktop bonus, max 8px de déplacement)
+  const grid = document.getElementById('stack-grid');
+  if (grid && window.matchMedia('(min-width: 1025px)').matches) {
+    let mx = 0, my = 0, tx = 0, ty = 0;
+    grid.addEventListener('mousemove', e => {
+      const r = grid.getBoundingClientRect();
+      mx = ((e.clientX - r.left) / r.width - .5) * -16; // max ±8px direction opposée
+      my = ((e.clientY - r.top) / r.height - .5) * -16;
+    });
+    gsap.ticker.add(() => {
+      tx += (mx - tx) * 0.08;
+      ty += (my - ty) * 0.08;
+      grid.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+    });
+  }
+}
+
+/* ============================================================
+   FAQ — accordion (one-at-a-time, vanilla JS + GSAP height anim)
+   ============================================================ */
+function initFaq(){
+  const items = gsap.utils.toArray('.faq-item');
+  if (items.length === 0) return;
+
+  // Entry animation
+  gsap.from(items, {
+    y: 24, opacity: 0,
+    stagger: .06, duration: .6, ease: 'power3.out',
+    scrollTrigger: { trigger: '.faq-list', start: 'top 82%', once: true }
+  });
+
+  items.forEach(item => {
+    const trigger = item.querySelector('.faq-question');
+    const answer = item.querySelector('.faq-answer');
+    if (!trigger || !answer) return;
+
+    trigger.addEventListener('click', () => {
+      const isOpen = item.classList.toggle('is-open');
+      trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+      if (isOpen) {
+        // Close other open items for a clean one-at-a-time UX
+        items.forEach(other => {
+          if (other !== item && other.classList.contains('is-open')) {
+            const otherAnswer = other.querySelector('.faq-answer');
+            other.classList.remove('is-open');
+            other.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
+            gsap.to(otherAnswer, { height: 0, duration: .4, ease: 'power3.inOut' });
+          }
+        });
+        gsap.set(answer, { height: 'auto' });
+        gsap.from(answer, { height: 0, duration: .45, ease: 'power3.inOut' });
+      } else {
+        gsap.to(answer, { height: 0, duration: .4, ease: 'power3.inOut' });
+      }
     });
   });
 }

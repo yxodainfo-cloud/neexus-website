@@ -327,3 +327,35 @@ Vercel déploie automatiquement sur neexusds.com.
 4. Les animations doivent être fluides (60fps) et jamais saccadées
 5. Le site doit être responsive et fonctionnel sur mobile
 6. Tout dans un seul fichier index.html
+
+---
+
+## PHASE 2 — ENRICHISSEMENT (Mai 2026)
+
+Ce site est désormais en Phase 2. Voir `BRIEF-ENRICHISSEMENT.md` pour le détail.
+
+**Ajouts de sections :**
+- Section "Pour Qui" (`#profils`, `03 Profils`) — 6 contextes clients avec carrousel snap horizontal sur desktop, stack vertical sur mobile (entre Problems et Services)
+- Section "Notre Stack" (`#stack`, `06 Stack`) — 15 logos d'outils avec animation zoom in/out désynchronisé via `gsap.fromTo(...repeat:-1, yoyo:true)` par tuile, durées 3-7s aléatoires (entre Résultats et Témoignages)
+- Section "FAQ" (`#faq`, `08 Questions`) — accordéon 7 questions, ouverture mutuellement exclusive (entre Témoignages et CTA Final)
+
+**Renumérotation des sections existantes :**
+- Méthode : 03 → 04
+- Résultats : 04 → 05
+- Témoignages : 05 → 07
+- CTA Final : 06 → 09
+
+**Navbar :** ajout du lien "FAQ" entre "Témoignages" et "Audit gratuit" (desktop + menu mobile).
+
+**Ajustements de ton :**
+- Renforcement systématique du principe directeur : *la techno augmente les équipes, elle ne les remplace pas*.
+- Voir BRIEF-ENRICHISSEMENT.md §2 pour la liste précise des modifications de copy sur les sections existantes (Problems intro + P-01 + P-04, sous-titres Pilier 01 et 02 des Services, libellés Résultats 1 et 4 + footnote).
+
+**Stack technique :** inchangée (HTML + GSAP + Lenis + SplitType, single-file, déploiement Vercel auto).
+
+**Conventions à respecter pour toute Phase 3+ :**
+- Réutiliser les design tokens existants dans `:root` (ne pas en ajouter d'autres sans raison)
+- Suivre le pattern `gsap.matchMedia()` pour le split desktop (`QUERY_DESKTOP = '(min-width: 1025px)'`) vs mobile (`QUERY_MOBILE = '(max-width: 1024px)'`)
+- Animations universelles dans `initSite()` directement, polish desktop dans le bloc `mm.add(QUERY_DESKTOP, …)`
+- Toute animation en boucle infinie (style stack zoom) doit être désactivée si `prefers-reduced-motion: reduce`
+- Sur mobile (≤ 768px), désactiver les `backdrop-filter` coûteux et les `::before` avec `conic-gradient` animés
