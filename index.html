@@ -70,12 +70,15 @@ body{
   line-height:1.55;
   font-size:clamp(15px,1vw,17px);
   overflow-x:hidden;
-  cursor:none;
 }
-body.no-cursor{cursor:auto;}
+body.no-cursor,
+body{cursor:auto;}
+body.has-cursor{cursor:none;}
+body.has-cursor button,
+body.has-cursor a{cursor:none;}
 img,svg{display:block;max-width:100%;}
 a{color:inherit;text-decoration:none;}
-button{font:inherit;color:inherit;background:none;border:0;cursor:none;}
+button{font:inherit;color:inherit;background:none;border:0;}
 ::selection{background:rgba(124,92,252,.45);color:#fff;}
 
 /* Lenis */
@@ -88,14 +91,7 @@ html.lenis,html.lenis body{height:auto;}
    TYPO
    ============================================================ */
 .display{font-family:'Syne',sans-serif;font-weight:700;letter-spacing:-.02em;line-height:.96;}
-.eyebrow{
-  font-family:'DM Sans',sans-serif;
-  font-size:11px;
-  font-weight:500;
-  text-transform:uppercase;
-  letter-spacing:.22em;
-  color:var(--text-dim);
-}
+.eyebrow{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.22em;color:var(--text-dim);}
 .mono{font-family:'JetBrains Mono',monospace;font-size:.78em;letter-spacing:0;}
 .gradient-text{
   background:var(--grad-text);
@@ -107,7 +103,13 @@ html.lenis,html.lenis body{height:auto;}
 
 /* ============================================================
    CURSOR + NOISE + SCROLL PROGRESS
+   Cursor is DESKTOP-ONLY (≥ 1025px) — gated via .has-cursor class
    ============================================================ */
+.cursor,
+.cursor-glow{display:none;}
+body.has-cursor .cursor,
+body.has-cursor .cursor-glow{display:block;}
+
 .cursor{
   position:fixed;top:0;left:0;
   width:12px;height:12px;
@@ -152,7 +154,7 @@ html.lenis,html.lenis body{height:auto;}
 }
 
 /* ============================================================
-   PRELOADER
+   PRELOADER — logo 120px height
    ============================================================ */
 .preloader{
   position:fixed;inset:0;
@@ -176,14 +178,18 @@ html.lenis,html.lenis body{height:auto;}
 .preloader-logo{
   position:relative;
   z-index:2;
-  width:min(60vw,640px);
-  max-width:90vw;
+  height:120px;
+  width:auto;
   opacity:0;
   transform:scale(.78);
   filter:drop-shadow(0 0 0 rgba(124,92,252,0));
   will-change:transform,opacity,filter;
 }
-.preloader-logo img{width:100%;height:auto;display:block;}
+.preloader-logo img{
+  height:120px;
+  width:auto;
+  display:block;
+}
 .preloader-counter{
   position:absolute;
   bottom:48px;
@@ -234,20 +240,17 @@ html.lenis,html.lenis body{height:auto;}
   transform-origin:0 0;
   will-change:transform;
 }
-/* Trace base + decorative */
 .tr{
   fill:none;
   stroke:rgba(77,124,255,.18);
   stroke-width:1.6;
-  stroke-linecap:round;
-  stroke-linejoin:round;
+  stroke-linecap:round;stroke-linejoin:round;
 }
 .tr-main{
   fill:none;
   stroke:rgba(124,92,252,.55);
   stroke-width:2.6;
-  stroke-linecap:round;
-  stroke-linejoin:round;
+  stroke-linecap:round;stroke-linejoin:round;
   filter:drop-shadow(0 0 4px rgba(124,92,252,.35));
 }
 .tr-flow{
@@ -255,8 +258,6 @@ html.lenis,html.lenis body{height:auto;}
   animation:flowDash 5s linear infinite;
 }
 @keyframes flowDash{ to { stroke-dashoffset:-420; } }
-
-/* Energy pulse along main traces */
 .tr-pulse{
   fill:none;
   stroke:url(#grad-trace);
@@ -268,86 +269,28 @@ html.lenis,html.lenis body{height:auto;}
   opacity:.85;
 }
 
-/* Node visual: chip frame + halo + core */
-.node-g .chip{
-  fill:#0b1020;
-  stroke:rgba(124,92,252,.45);
-  stroke-width:1.4;
-}
-.node-g .chip-inner{
-  fill:rgba(124,92,252,.04);
-  stroke:rgba(255,255,255,.05);
-  stroke-width:1;
-}
-.node-g .pin{
-  stroke:rgba(124,92,252,.55);
-  stroke-width:1.5;
-  stroke-linecap:round;
-}
-.node-g .core{
-  fill:url(#grad-core);
-  filter:drop-shadow(0 0 14px rgba(214,51,132,.85));
-}
-.node-g .halo{
-  fill:none;
-  stroke:rgba(214,51,132,.5);
-  stroke-width:1.4;
-  opacity:.55;
-}
-.node-g .halo-2{
-  fill:none;
-  stroke:rgba(124,92,252,.35);
-  stroke-width:1;
-  opacity:.4;
-  stroke-dasharray:3 5;
-  animation:nodeSpin 22s linear infinite;
-}
-@keyframes nodeSpin{ to { transform:rotate(360deg); transform-box:fill-box; transform-origin:center; } }
-.node-g .num{
-  font-family:'JetBrains Mono',monospace;
-  font-size:18px;
-  fill:rgba(255,255,255,.75);
-  font-weight:600;
-  text-anchor:middle;
-  dominant-baseline:central;
-}
+.node-g .chip{fill:#0b1020;stroke:rgba(124,92,252,.45);stroke-width:1.4;}
+.node-g .chip-inner{fill:rgba(124,92,252,.04);stroke:rgba(255,255,255,.05);stroke-width:1;}
+.node-g .pin{stroke:rgba(124,92,252,.55);stroke-width:1.5;stroke-linecap:round;}
+.node-g .core{fill:url(#grad-core);filter:drop-shadow(0 0 14px rgba(214,51,132,.85));}
+.node-g .halo{fill:none;stroke:rgba(214,51,132,.5);stroke-width:1.4;opacity:.55;}
+.node-g .halo-2{fill:none;stroke:rgba(124,92,252,.35);stroke-width:1;opacity:.4;stroke-dasharray:3 5;}
+.node-g .num{font-family:'JetBrains Mono',monospace;font-size:18px;fill:rgba(255,255,255,.75);font-weight:600;text-anchor:middle;dominant-baseline:central;}
 
-/* Decorative components */
-.comp-ic{
-  fill:#0d1226;
-  stroke:rgba(124,92,252,.32);
-  stroke-width:1.2;
-}
-.comp-ic-pin{
-  stroke:rgba(124,92,252,.4);
-  stroke-width:1;
-}
-.comp-cap{
-  fill:rgba(214,51,132,.06);
-  stroke:rgba(214,51,132,.35);
-  stroke-width:1;
-}
-.comp-res{
-  fill:rgba(77,124,255,.06);
-  stroke:rgba(77,124,255,.35);
-  stroke-width:1;
-}
-.via{
-  fill:#0b1020;
-  stroke:rgba(124,92,252,.5);
-  stroke-width:1;
-}
+.comp-ic{fill:#0d1226;stroke:rgba(124,92,252,.32);stroke-width:1.2;}
+.comp-ic-pin{stroke:rgba(124,92,252,.4);stroke-width:1;}
+.comp-cap{fill:rgba(214,51,132,.06);stroke:rgba(214,51,132,.35);stroke-width:1;}
+.comp-res{fill:rgba(77,124,255,.06);stroke:rgba(77,124,255,.35);stroke-width:1;}
+.via{fill:#0b1020;stroke:rgba(124,92,252,.5);stroke-width:1;}
 
 /* ============================================================
-   NAV
+   NAV — logo 40px height
    ============================================================ */
 .nav{
   position:fixed;top:0;left:0;right:0;
   z-index:1000;
   padding:22px 36px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  display:flex;align-items:center;justify-content:space-between;
   transition:padding .35s ease, background-color .35s ease, border-color .35s ease, backdrop-filter .35s ease;
   border-bottom:1px solid transparent;
 }
@@ -361,7 +304,7 @@ html.lenis,html.lenis body{height:auto;}
 .nav-logo{
   display:block;
   position:relative;
-  height:38px;
+  height:40px;
   aspect-ratio:3.4 / 1;
   transition:transform .35s cubic-bezier(.2,.8,.2,1), filter .35s, height .35s;
   filter:drop-shadow(0 2px 14px rgba(124,92,252,.25));
@@ -372,28 +315,18 @@ html.lenis,html.lenis body{height:auto;}
   object-fit:cover;
   object-position:top center;
 }
-.nav-logo:hover{
-  transform:translateY(-1px);
-  filter:drop-shadow(0 4px 22px rgba(124,92,252,.55));
-}
-.nav.is-scrolled .nav-logo{height:32px;}
+.nav-logo:hover{transform:translateY(-1px);filter:drop-shadow(0 4px 22px rgba(124,92,252,.55));}
+.nav.is-scrolled .nav-logo{height:34px;}
 .nav-links{display:flex;gap:32px;align-items:center;}
 .nav-links a{
-  font-size:13px;
-  letter-spacing:.02em;
-  color:var(--text-dim);
-  position:relative;
-  padding:6px 0;
-  transition:color .25s;
+  font-size:13px;letter-spacing:.02em;color:var(--text-dim);
+  position:relative;padding:6px 0;transition:color .25s;
   font-family:'JetBrains Mono',monospace;
 }
 .nav-links a::after{
-  content:'';
-  position:absolute;left:0;bottom:0;
-  width:100%;height:1px;
-  background:var(--grad-text);
-  transform:scaleX(0);
-  transform-origin:0;
+  content:'';position:absolute;left:0;bottom:0;
+  width:100%;height:1px;background:var(--grad-text);
+  transform:scaleX(0);transform-origin:0;
   transition:transform .35s cubic-bezier(.4,0,.2,1);
 }
 .nav-links a:hover{color:var(--text);}
@@ -401,8 +334,7 @@ html.lenis,html.lenis body{height:auto;}
 .nav-cta{
   display:inline-flex;align-items:center;gap:10px;
   font-size:13px;font-weight:500;
-  padding:11px 20px;
-  border-radius:100px;
+  padding:11px 20px;border-radius:100px;
   border:1px solid var(--line-strong);
   background:rgba(10,14,26,.55);
   backdrop-filter:blur(12px);
@@ -413,12 +345,9 @@ html.lenis,html.lenis body{height:auto;}
 .nav-cta:hover .arrow{transform:translateX(4px);}
 .nav-burger{
   display:none;
-  width:40px;height:40px;
-  border-radius:50%;
-  border:1px solid var(--line-strong);
-  background:rgba(255,255,255,.03);
-  align-items:center;justify-content:center;
-  flex-direction:column;gap:4px;
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid var(--line-strong);background:rgba(255,255,255,.03);
+  align-items:center;justify-content:center;flex-direction:column;gap:4px;
 }
 .nav-burger span{display:block;width:16px;height:1px;background:#fff;transition:transform .3s, opacity .3s;}
 
@@ -427,66 +356,48 @@ html.lenis,html.lenis body{height:auto;}
   background:rgba(7,10,20,.96);
   backdrop-filter:blur(24px);
   z-index:999;
-  display:none;
-  flex-direction:column;
+  display:none;flex-direction:column;
   padding:120px 36px 60px;
   transform:translateY(-100%);
   transition:transform .55s cubic-bezier(.7,0,.3,1);
 }
 .mobile-menu.is-open{transform:translateY(0);}
 .mobile-menu a{
-  font-family:'Syne',sans-serif;
-  font-size:34px;font-weight:600;letter-spacing:-.02em;
-  padding:18px 0;
-  border-bottom:1px solid var(--line);
+  font-family:'Syne',sans-serif;font-size:32px;font-weight:600;letter-spacing:-.02em;
+  padding:16px 0;border-bottom:1px solid var(--line);
 }
 
 /* ============================================================
-   HUD — fixed UI showing the current node + total
+   HUD — DESKTOP ONLY
    ============================================================ */
+.hud,.hud-right{display:none;}
+body.has-cursor .hud,
+body.has-cursor .hud-right{display:flex;}
 .hud{
-  position:fixed;
-  left:36px;bottom:36px;
-  z-index:50;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:10px 16px;
+  position:fixed;left:36px;bottom:36px;z-index:50;
+  align-items:center;gap:14px;padding:10px 16px;
   background:var(--glass-strong);
   border:1px solid var(--line);
   backdrop-filter:blur(14px);
   border-radius:100px;
   font-family:'JetBrains Mono',monospace;
-  font-size:11px;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--text-dim);
-  pointer-events:none;
-  opacity:0;
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);
+  pointer-events:none;opacity:0;
 }
 .hud .dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--magenta);
+  width:6px;height:6px;border-radius:50%;background:var(--magenta);
   box-shadow:0 0 12px var(--magenta);
   animation:hudPulse 1.8s infinite ease-in-out;
 }
-@keyframes hudPulse{ 0%,100%{opacity:.5;transform:scale(.8);} 50%{opacity:1;transform:scale(1);} }
+@keyframes hudPulse{0%,100%{opacity:.5;transform:scale(.8);}50%{opacity:1;transform:scale(1);}}
 .hud .label{color:var(--text);font-weight:600;letter-spacing:.05em;}
 .hud .total{color:var(--text-mute);}
-
 .hud-right{
-  position:fixed;
-  right:36px;bottom:36px;
-  z-index:50;
+  position:fixed;right:36px;bottom:36px;z-index:50;
   font-family:'JetBrains Mono',monospace;
-  font-size:10px;
-  letter-spacing:.22em;
-  text-transform:uppercase;
-  color:var(--text-mute);
-  writing-mode:vertical-rl;
-  transform:rotate(180deg);
-  pointer-events:none;
-  opacity:0;
+  font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--text-mute);
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  pointer-events:none;opacity:0;
 }
 
 /* ============================================================
@@ -497,18 +408,11 @@ main{position:relative;z-index:5;}
   position:relative;
   min-height:100vh;
   padding:130px 36px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:flex;align-items:center;justify-content:center;
   z-index:5;
 }
 .node-section.is-first{padding-top:0;}
-.node-content{
-  width:100%;
-  max-width:var(--container);
-  position:relative;
-  z-index:5;
-}
+.node-content{width:100%;max-width:var(--container);position:relative;z-index:5;}
 .node-card{
   position:relative;
   background:var(--glass);
@@ -525,60 +429,41 @@ main{position:relative;z-index:5;}
   border-radius:inherit;
   background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.5) 25%,transparent 50%,rgba(214,51,132,.5) 75%,transparent 100%);
   -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-  padding:1px;
-  opacity:.6;
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  padding:1px;opacity:.6;
   animation:rotateBorder 8s linear infinite;
   pointer-events:none;
 }
 @property --rot{syntax:'<angle>';initial-value:0deg;inherits:false;}
-@keyframes rotateBorder{ to { --rot:360deg; } }
+@keyframes rotateBorder{to{--rot:360deg;}}
 
 .section-tag{
-  display:inline-flex;
-  align-items:center;
-  gap:12px;
+  display:inline-flex;align-items:center;gap:12px;
   margin-bottom:32px;
   font-family:'JetBrains Mono',monospace;
-  font-size:11px;
-  letter-spacing:.22em;
-  text-transform:uppercase;
-  color:var(--text-dim);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--text-dim);
 }
 .section-tag .node-id{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:6px 12px;
-  border:1px solid var(--line-strong);
-  border-radius:100px;
-  background:rgba(124,92,252,.08);
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 12px;border:1px solid var(--line-strong);
+  border-radius:100px;background:rgba(124,92,252,.08);
 }
 .section-tag .node-id::before{
-  content:'';
-  width:6px;height:6px;border-radius:50%;
-  background:var(--magenta);
-  box-shadow:0 0 10px var(--magenta);
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--magenta);box-shadow:0 0 10px var(--magenta);
 }
 .section-tag .line{width:48px;height:1px;background:var(--line-strong);}
 .section-tag .label{color:var(--text);}
 
 .section-title{
-  font-family:'Syne',sans-serif;
-  font-weight:600;
+  font-family:'Syne',sans-serif;font-weight:600;
   font-size:clamp(36px,5.4vw,80px);
-  line-height:1;
-  letter-spacing:-.025em;
-  max-width:18ch;
-  margin-bottom:28px;
+  line-height:1;letter-spacing:-.025em;
+  max-width:18ch;margin-bottom:28px;
 }
 .section-sub{
-  color:var(--text-dim);
-  font-size:clamp(15px,1.1vw,18px);
-  line-height:1.6;
-  max-width:54ch;
-  margin-bottom:40px;
+  color:var(--text-dim);font-size:clamp(15px,1.1vw,18px);
+  line-height:1.6;max-width:54ch;margin-bottom:40px;
 }
 .section-sub b{color:var(--text);font-weight:500;}
 
@@ -586,318 +471,272 @@ main{position:relative;z-index:5;}
    HERO (NODE 01)
    ============================================================ */
 .hero{
-  min-height:100vh;
-  padding:0 36px;
-  display:flex;
-  align-items:center;
-  position:relative;
+  min-height:100vh;padding:0 36px;
+  display:flex;align-items:center;position:relative;
 }
 .hero-inner{
-  width:100%;
-  max-width:var(--container);
-  margin:0 auto;
-  position:relative;
-  text-align:center;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding-top:60px;
+  width:100%;max-width:var(--container);margin:0 auto;
+  position:relative;text-align:center;
+  display:flex;flex-direction:column;align-items:center;padding-top:60px;
 }
 .hero-badge{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
+  display:inline-flex;align-items:center;gap:10px;
   padding:8px 16px 8px 12px;
   border:1px solid var(--line-strong);
   background:rgba(10,14,26,.7);
-  backdrop-filter:blur(10px);
-  border-radius:100px;
-  font-size:12px;
-  letter-spacing:.05em;
-  width:fit-content;
-  margin-bottom:36px;
+  backdrop-filter:blur(10px);border-radius:100px;
+  font-size:12px;letter-spacing:.05em;
+  width:fit-content;margin-bottom:36px;
   font-family:'JetBrains Mono',monospace;
 }
 .hero-badge .pulse-dot{
   width:8px;height:8px;border-radius:50%;
-  background:var(--blue);
-  position:relative;
+  background:var(--blue);position:relative;
   box-shadow:0 0 10px var(--blue);
 }
 .hero-badge .pulse-dot::after{
-  content:'';
-  position:absolute;inset:-4px;
-  border-radius:50%;
-  border:1px solid var(--blue);
+  content:'';position:absolute;inset:-4px;
+  border-radius:50%;border:1px solid var(--blue);
   animation:pulse 2.4s infinite;
 }
-@keyframes pulse{
-  0%{transform:scale(1);opacity:.8;}
-  100%{transform:scale(2.4);opacity:0;}
-}
+@keyframes pulse{0%{transform:scale(1);opacity:.8;}100%{transform:scale(2.4);opacity:0;}}
 .hero-title{
-  font-family:'Syne',sans-serif;
-  font-weight:700;
+  font-family:'Syne',sans-serif;font-weight:700;
   font-size:clamp(48px,8.4vw,140px);
-  line-height:.92;
-  letter-spacing:-.035em;
-  margin-bottom:32px;
-  perspective:1200px;
-  max-width:18ch;
+  line-height:.92;letter-spacing:-.035em;
+  margin-bottom:32px;perspective:1200px;max-width:18ch;
 }
 .hero-title .line{display:block;overflow:hidden;perspective:1200px;}
 .hero-title .line-2{
   background:var(--grad-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
 }
-.hero-title .char{
-  display:inline-block;
-  will-change:transform,opacity;
-  transform-style:preserve-3d;
-}
+.hero-title .char{display:inline-block;will-change:transform,opacity;transform-style:preserve-3d;}
 .hero-sub{
   font-size:clamp(15px,1.2vw,19px);
-  color:var(--text-dim);
-  max-width:54ch;
-  line-height:1.55;
-  margin-bottom:44px;
+  color:var(--text-dim);max-width:54ch;
+  line-height:1.55;margin-bottom:44px;
 }
 .hero-sub b{color:var(--text);font-weight:500;}
 .cta-row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:68px;}
 .btn{
-  display:inline-flex;
-  align-items:center;gap:12px;
-  padding:18px 28px;
-  border-radius:100px;
+  display:inline-flex;align-items:center;gap:12px;
+  padding:18px 28px;border-radius:100px;
   font-size:14px;font-weight:500;letter-spacing:.01em;
   position:relative;
   transition:transform .4s cubic-bezier(.2,.8,.2,1);
   will-change:transform;
 }
 .btn-primary{
-  background:var(--grad);
-  color:#fff;
+  background:var(--grad);color:#fff;
   box-shadow:0 12px 40px rgba(124,92,252,.45);
 }
 .btn-primary::before{
-  content:'';
-  position:absolute;inset:0;
-  border-radius:inherit;
+  content:'';position:absolute;inset:0;border-radius:inherit;
   background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 50%);
   pointer-events:none;
 }
 .btn-primary:hover{box-shadow:0 18px 50px rgba(124,92,252,.65);}
 .btn-ghost{
-  background:rgba(10,14,26,.65);
-  color:var(--text);
+  background:rgba(10,14,26,.65);color:var(--text);
   border:1px solid var(--line-strong);
-  position:relative;
-  backdrop-filter:blur(10px);
+  position:relative;backdrop-filter:blur(10px);
 }
 .btn-ghost::before{
-  content:'';
-  position:absolute;inset:-1px;
-  border-radius:inherit;
+  content:'';position:absolute;inset:-1px;border-radius:inherit;
   background:var(--grad);
   -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-  padding:1px;
-  opacity:0;
-  transition:opacity .35s;
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  padding:1px;opacity:0;transition:opacity .35s;
 }
 .btn-ghost:hover::before{opacity:1;}
 .btn .arrow{transition:transform .35s;}
 .btn:hover .arrow{transform:translate(2px,-2px);}
 
 .hero-stats{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:48px;
-  max-width:780px;
-  width:100%;
-  border-top:1px solid var(--line);
-  padding-top:36px;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:48px;max-width:780px;width:100%;
+  border-top:1px solid var(--line);padding-top:36px;
 }
 .hero-stat{text-align:center;}
 .hero-stat .num{
-  font-family:'Syne',sans-serif;
-  font-weight:700;
-  font-size:clamp(28px,3.4vw,46px);
-  line-height:1;
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(28px,3.4vw,46px);line-height:1;
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
-  margin-bottom:8px;
-  letter-spacing:-.02em;
+  margin-bottom:8px;letter-spacing:-.02em;
 }
-.hero-stat .lbl{
-  font-size:12px;
-  color:var(--text-dim);
-  letter-spacing:.04em;
-  line-height:1.4;
-}
+.hero-stat .lbl{font-size:12px;color:var(--text-dim);letter-spacing:.04em;line-height:1.4;}
 
 /* ============================================================
    PAIN POINTS (NODE 02)
    ============================================================ */
 .pain-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:18px;
-  margin-top:42px;
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:18px;margin-top:42px;
 }
 .pain-card{
-  position:relative;
-  padding:32px 30px;
-  border-radius:var(--r-md);
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--line);
+  position:relative;padding:32px 30px;border-radius:var(--r-md);
+  background:rgba(255,255,255,.03);border:1px solid var(--line);
   overflow:hidden;
   transition:transform .5s cubic-bezier(.2,.8,.2,1),background-color .35s;
 }
 .pain-card::before{
-  content:'';
-  position:absolute;inset:-1px;
-  border-radius:inherit;
+  content:'';position:absolute;inset:-1px;border-radius:inherit;
   background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.5) 25%,transparent 50%,rgba(214,51,132,.5) 75%,transparent 100%);
   -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-  padding:1px;opacity:0;
-  transition:opacity .5s;
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  padding:1px;opacity:0;transition:opacity .5s;
   animation:rotateBorder 6s linear infinite;
 }
 .pain-card:hover{transform:translateY(-4px);background:rgba(255,255,255,.05);}
 .pain-card:hover::before{opacity:1;}
 .pain-card .icon{
-  width:48px;height:48px;
-  border-radius:12px;
-  background:var(--grad-soft);
-  border:1px solid var(--line);
-  display:grid;place-items:center;
-  margin-bottom:22px;
-  font-size:22px;
+  width:48px;height:48px;border-radius:12px;
+  background:var(--grad-soft);border:1px solid var(--line);
+  display:grid;place-items:center;margin-bottom:22px;font-size:22px;
 }
-.pain-card h3{
-  font-family:'Syne',sans-serif;
-  font-weight:600;font-size:22px;
-  letter-spacing:-.01em;
-  margin-bottom:12px;
-}
+.pain-card h3{font-family:'Syne',sans-serif;font-weight:600;font-size:22px;letter-spacing:-.01em;margin-bottom:12px;}
 .pain-card p{color:var(--text-dim);font-size:14.5px;line-height:1.6;}
 .pain-card .tag{
-  position:absolute;
-  top:22px;right:24px;
+  position:absolute;top:22px;right:24px;
   font-family:'JetBrains Mono',monospace;
   font-size:10px;letter-spacing:.1em;color:var(--text-mute);
 }
 
 /* ============================================================
-   SERVICES NODES (03 / 04 / 05)
+   SERVICES (NODE 03) — HORIZONTAL SCROLL ON DESKTOP, STACK ON MOBILE
    ============================================================ */
-.service-grid{
+.services-section{
+  position:relative;
+  padding:0;
+  z-index:5;
+  min-height:auto;
+}
+.services-head{
+  max-width:var(--container);
+  margin:0 auto;
+  padding:130px 36px 60px;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:60px;
-  align-items:center;
+  gap:80px;
+  align-items:end;
+}
+.services-head .intro{
+  color:var(--text-dim);
+  max-width:42ch;
+  font-size:16px;line-height:1.65;
+}
+.services-head .intro b{color:var(--text);font-weight:500;}
+
+.horizontal-container{
+  position:relative;
+  height:100vh;
+  width:100%;
+  overflow:hidden;
+}
+.horizontal-track{
+  display:flex;
+  height:100%;
+  width:max-content;
+  will-change:transform;
+}
+.service-panel{
+  flex:0 0 100vw;
+  height:100%;
+  padding:60px 36px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.service-panel .panel-num{
+  position:absolute;top:60px;left:36px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;letter-spacing:.2em;color:var(--text-mute);
+}
+.service-grid{
+  width:100%;max-width:var(--container);
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
 }
 .service-text .pillar-num{
   font-family:'JetBrains Mono',monospace;
-  font-size:11px;
-  color:var(--magenta);
-  letter-spacing:.22em;
-  margin-bottom:18px;
-  display:inline-block;
-  padding:6px 12px;
+  font-size:11px;color:var(--magenta);
+  letter-spacing:.22em;margin-bottom:18px;
+  display:inline-block;padding:6px 12px;
   border:1px solid rgba(214,51,132,.3);
-  border-radius:100px;
-  background:rgba(214,51,132,.06);
+  border-radius:100px;background:rgba(214,51,132,.06);
 }
 .service-text h3{
-  font-family:'Syne',sans-serif;
-  font-weight:700;
-  font-size:clamp(32px,4.2vw,60px);
-  line-height:1;
-  letter-spacing:-.025em;
-  margin-bottom:20px;
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(32px,4.2vw,60px);line-height:1;
+  letter-spacing:-.025em;margin-bottom:20px;
 }
-.service-text .lead{
-  font-size:16px;color:var(--text-dim);
-  line-height:1.65;margin-bottom:28px;max-width:42ch;
-}
+.service-text .lead{font-size:16px;color:var(--text-dim);line-height:1.65;margin-bottom:28px;max-width:42ch;}
 .service-text ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
 .service-text li{
-  display:flex;gap:14px;
-  align-items:flex-start;
+  display:flex;gap:14px;align-items:flex-start;
   font-size:14.5px;color:var(--text);
-  padding:12px 0;
-  border-bottom:1px solid var(--line);
+  padding:12px 0;border-bottom:1px solid var(--line);
 }
 .service-text li::before{
-  content:'';
-  flex:0 0 6px;
+  content:'';flex:0 0 6px;
   width:6px;height:6px;border-radius:50%;
-  background:var(--grad);
-  margin-top:7px;
+  background:var(--grad);margin-top:7px;
   box-shadow:0 0 10px rgba(124,92,252,.6);
 }
 .service-visual{
-  position:relative;
-  height:480px;
+  position:relative;height:480px;
   border-radius:var(--r-md);
   background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
   border:1px solid var(--line);
-  overflow:hidden;
-  backdrop-filter:blur(14px);
+  overflow:hidden;backdrop-filter:blur(14px);
 }
 .service-visual::before{
-  content:'';
-  position:absolute;inset:0;
+  content:'';position:absolute;inset:0;
   background:
     radial-gradient(circle at 20% 0%,rgba(77,124,255,.18),transparent 60%),
     radial-gradient(circle at 100% 100%,rgba(214,51,132,.18),transparent 60%);
   pointer-events:none;
 }
 
+/* Service progress indicator (dots at bottom of horizontal container) */
+.services-dots{
+  position:absolute;bottom:40px;left:50%;
+  transform:translateX(-50%);
+  display:flex;gap:14px;z-index:6;
+}
+.services-dots .ddot{
+  width:24px;height:2px;background:var(--line-strong);
+  border-radius:100px;position:relative;overflow:hidden;
+}
+.services-dots .ddot::after{
+  content:'';position:absolute;inset:0;
+  background:var(--grad);
+  transform:scaleX(0);transform-origin:0;
+  transition:transform .4s ease;
+}
+.services-dots .ddot.is-active::after{transform:scaleX(1);}
+
 /* Chat visual */
 .chat-visual{padding:22px;}
-.chat-header{
-  display:flex;align-items:center;gap:10px;
-  padding-bottom:16px;
-  border-bottom:1px solid var(--line);
-  margin-bottom:20px;
-}
+.chat-header{display:flex;align-items:center;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:20px;}
 .chat-header .av{
   width:36px;height:36px;border-radius:50%;
-  background:var(--grad);
-  display:grid;place-items:center;
+  background:var(--grad);display:grid;place-items:center;
   font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#fff;
 }
 .chat-header .meta{flex:1;}
 .chat-header .meta .name{font-size:13px;font-weight:500;}
 .chat-header .meta .status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px;margin-top:2px;}
 .chat-header .meta .status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
-.chat-header .ch-btn{
-  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-mute);
-  padding:4px 8px;border:1px solid var(--line);border-radius:6px;
-}
+.chat-header .ch-btn{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-mute);padding:4px 8px;border:1px solid var(--line);border-radius:6px;}
 .chat-msgs{display:flex;flex-direction:column;gap:10px;padding:0 4px;}
 .msg{
-  max-width:78%;
-  padding:10px 14px;
-  border-radius:18px;
+  max-width:78%;padding:10px 14px;border-radius:18px;
   font-size:13px;line-height:1.4;
   opacity:0;transform:translateY(12px);
 }
 .msg.user{align-self:flex-end;background:rgba(255,255,255,.06);border:1px solid var(--line);border-bottom-right-radius:6px;}
-.msg.ai{
-  align-self:flex-start;
-  background:var(--grad-soft);
-  border:1px solid rgba(124,92,252,.25);
-  border-bottom-left-radius:6px;
-}
+.msg.ai{align-self:flex-start;background:var(--grad-soft);border:1px solid rgba(124,92,252,.25);border-bottom-left-radius:6px;}
 .msg .meta{font-size:10px;color:var(--text-mute);margin-top:4px;font-family:'JetBrains Mono',monospace;}
 .typing{
   align-self:flex-start;display:flex;align-items:center;gap:4px;
@@ -931,12 +770,7 @@ main{position:relative;z-index:5;}
 .code-content .str{color:#86efac;}
 .code-content .com{color:var(--text-mute);font-style:italic;}
 .code-content .pr{color:#fbbf24;}
-.code-content .typing-cursor{
-  display:inline-block;width:6px;height:14px;
-  background:var(--grad);
-  animation:blink 1s infinite;
-  margin-left:2px;vertical-align:middle;
-}
+.code-content .typing-cursor{display:inline-block;width:6px;height:14px;background:var(--grad);animation:blink 1s infinite;margin-left:2px;vertical-align:middle;}
 @keyframes blink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
 .code-preview{margin-top:18px;padding:16px;border-radius:10px;background:rgba(15,20,36,.8);border:1px solid var(--line);}
 .code-preview .pv-bar{height:4px;background:var(--grad);border-radius:100px;margin-bottom:12px;width:0;}
@@ -946,86 +780,60 @@ main{position:relative;z-index:5;}
 .code-preview .pv-block.w-1{width:80%;}
 
 /* ============================================================
-   METHODE (NODE 06)
+   METHODE (NODE 04)
    ============================================================ */
-.methode-inner{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:40px;
-}
 .methode-steps{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:20px;
-  margin-top:42px;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:20px;margin-top:42px;
 }
 .methode-step{
   position:relative;
   padding:32px 26px;
   border-radius:var(--r-md);
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);border:1px solid var(--line);
 }
 .methode-step::after{
-  content:'';
-  position:absolute;
-  right:-22px;top:50%;
-  width:22px;height:1px;
+  content:'';position:absolute;
+  right:-22px;top:50%;width:22px;height:1px;
   background:linear-gradient(90deg,rgba(124,92,252,.6),transparent);
 }
 .methode-step:last-child::after{display:none;}
 .methode-step .step-num{
-  font-family:'Syne',sans-serif;
-  font-weight:700;font-size:48px;
-  line-height:1;
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:48px;line-height:1;
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
   letter-spacing:-.04em;margin-bottom:16px;
 }
-.methode-step .step-tag{
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;color:var(--text-mute);
-  letter-spacing:.1em;text-transform:uppercase;
-  margin-bottom:12px;
-}
+.methode-step .step-tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-mute);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
 .methode-step h3{font-family:'Syne',sans-serif;font-weight:600;font-size:20px;letter-spacing:-.01em;margin-bottom:10px;}
 .methode-step p{color:var(--text-dim);font-size:13.5px;line-height:1.55;}
 
 /* ============================================================
-   RESULTATS (NODE 07)
+   RESULTATS (NODE 05)
    ============================================================ */
 .results-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:18px;
-  margin-top:42px;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:18px;margin-top:42px;
 }
 .result-card{
   position:relative;
   padding:42px 24px 32px;
   border-radius:var(--r-md);
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--line);
-  text-align:center;
-  overflow:hidden;
+  background:rgba(255,255,255,.03);border:1px solid var(--line);
+  text-align:center;overflow:hidden;
 }
 .result-card::after{
-  content:'';
-  position:absolute;
-  top:50%;left:50%;
-  width:90%;aspect-ratio:1;
+  content:'';position:absolute;
+  top:50%;left:50%;width:90%;aspect-ratio:1;
   transform:translate(-50%,-55%);
   background:radial-gradient(circle at center,rgba(124,92,252,.32),rgba(214,51,132,.16) 35%,transparent 65%);
-  filter:blur(36px);
-  opacity:.55;
-  pointer-events:none;
-  z-index:0;
+  filter:blur(36px);opacity:.55;
+  pointer-events:none;z-index:0;
 }
 .result-card .num{
-  font-family:'Syne',sans-serif;
-  font-weight:700;
-  font-size:clamp(3.5rem,7vw,7rem);
-  line-height:.9;
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(3.5rem,7vw,7rem);line-height:.9;
   letter-spacing:-.05em;
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
@@ -1040,42 +848,32 @@ main{position:relative;z-index:5;}
 .result-card .desc{font-size:12px;color:var(--text-mute);line-height:1.5;position:relative;z-index:1;}
 
 /* ============================================================
-   TEMOIGNAGES (NODE 08)
+   TEMOIGNAGES (NODE 06)
    ============================================================ */
 .testi-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-  margin-top:42px;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:18px;margin-top:42px;
 }
 .testi-card{
   position:relative;
-  padding:32px;
-  border-radius:var(--r-md);
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--line);
+  padding:32px;border-radius:var(--r-md);
+  background:rgba(255,255,255,.03);border:1px solid var(--line);
   transition:transform .55s cubic-bezier(.2,.8,.2,1),background-color .35s;
-  transform-style:preserve-3d;
-  perspective:1000px;
+  transform-style:preserve-3d;perspective:1000px;
   overflow:hidden;
 }
 .testi-card::before{
-  content:'';
-  position:absolute;inset:-1px;
-  border-radius:inherit;
+  content:'';position:absolute;inset:-1px;border-radius:inherit;
   background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.5) 25%,transparent 50%,rgba(214,51,132,.5) 75%,transparent 100%);
   -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-  padding:1px;opacity:0;
-  transition:opacity .5s;
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  padding:1px;opacity:0;transition:opacity .5s;
   animation:rotateBorder 6s linear infinite;
   pointer-events:none;z-index:2;
 }
 .testi-card:hover::before{opacity:1;}
 .testi-card .quote-mark{
-  font-family:'Syne',sans-serif;
-  font-size:56px;line-height:.5;
+  font-family:'Syne',sans-serif;font-size:56px;line-height:.5;
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
   margin-bottom:16px;
@@ -1083,8 +881,7 @@ main{position:relative;z-index:5;}
 .testi-card .quote{font-size:14.5px;line-height:1.6;color:var(--text);margin-bottom:26px;min-height:110px;}
 .testi-card .author{display:flex;align-items:center;gap:12px;padding-top:20px;border-top:1px solid var(--line);}
 .testi-card .av{
-  width:42px;height:42px;border-radius:50%;
-  background:var(--grad);
+  width:42px;height:42px;border-radius:50%;background:var(--grad);
   display:grid;place-items:center;
   font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#fff;flex:0 0 42px;
 }
@@ -1093,41 +890,25 @@ main{position:relative;z-index:5;}
 .testi-card .city{position:absolute;top:22px;right:24px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--text-mute);}
 
 /* ============================================================
-   CTA FINAL (NODE 09)
+   CTA FINAL (NODE 07)
    ============================================================ */
-.cta-final{
-  text-align:center;
-  position:relative;
-}
+.cta-final{text-align:center;position:relative;}
 .cta-final .node-card{padding:80px 50px;}
 .cta-final h2{
-  font-family:'Syne',sans-serif;
-  font-weight:700;
+  font-family:'Syne',sans-serif;font-weight:700;
   font-size:clamp(42px,7vw,108px);
-  letter-spacing:-.035em;
-  line-height:.95;
-  max-width:18ch;
-  margin:0 auto 28px;
+  letter-spacing:-.035em;line-height:.95;
+  max-width:18ch;margin:0 auto 28px;
 }
-.cta-final h2 .grad{
-  background:var(--grad-text);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-.cta-final p{
-  color:var(--text-dim);
-  font-size:17px;
-  max-width:52ch;
-  margin:0 auto 44px;
-  line-height:1.55;
-}
+.cta-final h2 .grad{background:var(--grad-text);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.cta-final p{color:var(--text-dim);font-size:17px;max-width:52ch;margin:0 auto 44px;line-height:1.55;}
 .cta-final .cta-row{justify-content:center;margin-bottom:0;}
 
 /* ============================================================
    FOOTER
    ============================================================ */
 .footer{
-  position:relative;
-  z-index:5;
+  position:relative;z-index:5;
   padding:80px 36px 40px;
   background:rgba(7,10,20,.85);
   backdrop-filter:blur(20px);
@@ -1143,15 +924,9 @@ main{position:relative;z-index:5;}
 .footer-col a{font-size:14px;color:var(--text-dim);transition:color .25s;}
 .footer-col a:hover{color:var(--text);}
 .footer-bottom{
-  padding-top:32px;
-  border-top:1px solid var(--line);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:20px;
-  font-size:12px;
-  color:var(--text-mute);
+  padding-top:32px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:20px;font-size:12px;color:var(--text-mute);
 }
 .footer-socials{display:flex;gap:14px;}
 .footer-socials a{
@@ -1164,21 +939,27 @@ main{position:relative;z-index:5;}
 .footer-socials svg{width:14px;height:14px;}
 
 /* ============================================================
-   RESPONSIVE
+   RESPONSIVE — tablet (≤1024) and mobile (≤768)
+   On tablet+mobile: stack everything, NO horizontal scroll, NO pin
    ============================================================ */
 @media (max-width:1024px){
-  .pain-grid,.service-grid,.methode-steps,.results-grid,.testi-grid,.footer-top{
-    grid-template-columns:1fr;gap:18px;
+  .pain-grid,.methode-steps,.results-grid,.testi-grid,.footer-top,.services-head,.service-grid{
+    grid-template-columns:1fr;gap:24px;
   }
   .results-grid{grid-template-columns:repeat(2,1fr);}
   .methode-steps{grid-template-columns:repeat(2,1fr);}
   .methode-step::after{display:none;}
   .service-visual{height:380px;}
   .node-card{padding:40px;}
+  .services-head{padding:100px 36px 40px;}
+  /* SERVICES: collapse to stacked vertical layout */
+  .horizontal-container{height:auto;width:100%;overflow:visible;}
+  .horizontal-track{display:flex;flex-direction:column;width:100%;height:auto;transform:none!important;}
+  .service-panel{flex:0 0 auto;width:100%;height:auto;padding:60px 36px;}
+  .service-panel .panel-num{position:relative;top:auto;left:auto;margin-bottom:18px;}
+  .services-dots{display:none;}
 }
 @media (max-width:768px){
-  body{cursor:auto;}
-  .cursor,.cursor-glow{display:none;}
   .nav{padding:18px 22px;}
   .nav.is-scrolled{padding:12px 22px;}
   .nav-links,.nav-cta{display:none;}
@@ -1192,7 +973,9 @@ main{position:relative;z-index:5;}
   .footer-top{grid-template-columns:1fr;}
   .node-card{padding:32px 26px;border-radius:var(--r-md);}
   .cta-final .node-card{padding:60px 28px;}
-  .hud,.hud-right{display:none;}
+  .service-panel{padding:40px 22px;}
+  .services-head{padding:80px 22px 32px;}
+  .preloader-logo,.preloader-logo img{height:80px;}
 }
 </style>
 </head>
@@ -1204,52 +987,41 @@ main{position:relative;z-index:5;}
 <!-- Scroll progress -->
 <div class="scroll-progress" id="scroll-progress"></div>
 
-<!-- Cursor -->
+<!-- Cursor (desktop only — body.has-cursor class) -->
 <div class="cursor-glow" id="cursor-glow"></div>
 <div class="cursor" id="cursor"></div>
 
 <!-- ============================================================
-     CIRCUIT BACKGROUND — fixed canvas, camera-pannable
+     CIRCUIT BACKGROUND — fixed canvas
+     Camera animation runs DESKTOP ONLY (≥ 1025px).
+     On tablet/mobile: SVG is set to a static centered view.
      ============================================================ -->
 <div class="circuit-bg" id="circuit-bg" aria-hidden="true">
   <svg id="circuit-svg" viewBox="0 0 4000 3000" preserveAspectRatio="xMidYMid slice">
     <defs>
-      <!-- Grid pattern -->
       <pattern id="grid-pattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
         <circle cx="40" cy="40" r="1" fill="rgba(124,92,252,.13)"/>
       </pattern>
-      <!-- Trace gradient -->
       <linearGradient id="grad-trace" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#4d7cff"/>
         <stop offset="50%" stop-color="#7c5cfc"/>
         <stop offset="100%" stop-color="#d63384"/>
       </linearGradient>
-      <!-- Core radial -->
       <radialGradient id="grad-core" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stop-color="#ffffff" stop-opacity=".95"/>
         <stop offset="35%" stop-color="#e8548e" stop-opacity=".95"/>
         <stop offset="100%" stop-color="#7c5cfc" stop-opacity=".4"/>
       </radialGradient>
-      <!-- Soft halo radial -->
       <radialGradient id="grad-halo" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stop-color="rgba(214,51,132,.4)"/>
         <stop offset="60%" stop-color="rgba(124,92,252,.18)"/>
         <stop offset="100%" stop-color="transparent"/>
       </radialGradient>
-      <!-- Glow filter -->
-      <filter id="glow-soft" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="6" result="b"/>
-        <feMerge>
-          <feMergeNode in="b"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
     </defs>
 
-    <!-- Grid background -->
     <rect width="4000" height="3000" fill="url(#grid-pattern)"/>
 
-    <!-- Large background chip rectangles (depth layers) -->
+    <!-- Background chip rectangles -->
     <g opacity=".5">
       <rect x="200"  y="200"  width="600" height="400" rx="14" class="comp-ic"/>
       <rect x="240"  y="240"  width="520" height="320" rx="8"  class="comp-ic" opacity=".6"/>
@@ -1260,7 +1032,7 @@ main{position:relative;z-index:5;}
       <rect x="1500" y="2700" width="1000" height="220" rx="14" class="comp-ic"/>
     </g>
 
-    <!-- Decorative secondary traces (background depth) -->
+    <!-- Decorative secondary traces -->
     <g class="trace-deco">
       <path class="tr" d="M0,1500 H400 V1200 H600 V1000"/>
       <path class="tr" d="M4000,1500 H3700 V1200 H3400 V1000"/>
@@ -1274,14 +1046,11 @@ main{position:relative;z-index:5;}
       <path class="tr" d="M1700,1100 H2300"/>
       <path class="tr" d="M900,1800 H1100 V2000 H1300"/>
       <path class="tr" d="M3100,1800 H2900 V2000 H2700"/>
-      <!-- Sub-circuit lines -->
       <path class="tr" d="M2000,150 V300 H1700 V450"/>
       <path class="tr" d="M2000,150 V300 H2300 V450"/>
     </g>
 
-    <!-- Small decorative components: resistors, capacitors, ICs -->
     <g class="comps">
-      <!-- Resistors (rectangles) -->
       <rect class="comp-res" x="700"  y="1100" width="60" height="22" rx="3"/>
       <rect class="comp-res" x="3300" y="1100" width="60" height="22" rx="3"/>
       <rect class="comp-res" x="1900" y="2000" width="60" height="22" rx="3"/>
@@ -1290,8 +1059,6 @@ main{position:relative;z-index:5;}
       <rect class="comp-res" x="3340" y="400"  width="60" height="22" rx="3"/>
       <rect class="comp-res" x="1000" y="2400" width="60" height="22" rx="3"/>
       <rect class="comp-res" x="3000" y="2400" width="60" height="22" rx="3"/>
-
-      <!-- Capacitors (circles) -->
       <circle class="comp-cap" cx="500"  cy="1700" r="14"/>
       <circle class="comp-cap" cx="3500" cy="1700" r="14"/>
       <circle class="comp-cap" cx="2000" cy="900"  r="14"/>
@@ -1300,8 +1067,6 @@ main{position:relative;z-index:5;}
       <circle class="comp-cap" cx="2700" cy="800"  r="14"/>
       <circle class="comp-cap" cx="900"  cy="1800" r="14"/>
       <circle class="comp-cap" cx="3100" cy="1800" r="14"/>
-
-      <!-- Vias (small dots) -->
       <circle class="via" cx="2700" cy="500"  r="5"/>
       <circle class="via" cx="3500" cy="1200" r="5"/>
       <circle class="via" cx="3500" cy="1800" r="5"/>
@@ -1312,194 +1077,107 @@ main{position:relative;z-index:5;}
       <circle class="via" cx="1200" cy="1500" r="5"/>
       <circle class="via" cx="1700" cy="1500" r="5"/>
       <circle class="via" cx="2300" cy="1500" r="5"/>
-
-      <!-- Decorative ICs with pins -->
       <g transform="translate(700,1500)">
         <rect class="comp-ic" x="-60" y="-30" width="120" height="60" rx="4"/>
         <g class="comp-ic-pin">
-          <line x1="-60" y1="-15" x2="-70" y2="-15"/>
-          <line x1="-60" y1="0"   x2="-70" y2="0"/>
-          <line x1="-60" y1="15"  x2="-70" y2="15"/>
-          <line x1="60"  y1="-15" x2="70"  y2="-15"/>
-          <line x1="60"  y1="0"   x2="70"  y2="0"/>
-          <line x1="60"  y1="15"  x2="70"  y2="15"/>
+          <line x1="-60" y1="-15" x2="-70" y2="-15"/><line x1="-60" y1="0"   x2="-70" y2="0"/>
+          <line x1="-60" y1="15"  x2="-70" y2="15"/><line x1="60"  y1="-15" x2="70"  y2="-15"/>
+          <line x1="60"  y1="0"   x2="70"  y2="0"/><line x1="60"  y1="15"  x2="70"  y2="15"/>
         </g>
-        <text x="0" y="0" class="nlabel" fill="rgba(255,255,255,.4)" style="font-size:10px;">NX-1A</text>
       </g>
       <g transform="translate(3300,1500)">
         <rect class="comp-ic" x="-60" y="-30" width="120" height="60" rx="4"/>
         <g class="comp-ic-pin">
-          <line x1="-60" y1="-15" x2="-70" y2="-15"/>
-          <line x1="-60" y1="0"   x2="-70" y2="0"/>
-          <line x1="-60" y1="15"  x2="-70" y2="15"/>
-          <line x1="60"  y1="-15" x2="70"  y2="-15"/>
-          <line x1="60"  y1="0"   x2="70"  y2="0"/>
-          <line x1="60"  y1="15"  x2="70"  y2="15"/>
+          <line x1="-60" y1="-15" x2="-70" y2="-15"/><line x1="-60" y1="0"   x2="-70" y2="0"/>
+          <line x1="-60" y1="15"  x2="-70" y2="15"/><line x1="60"  y1="-15" x2="70"  y2="-15"/>
+          <line x1="60"  y1="0"   x2="70"  y2="0"/><line x1="60"  y1="15"  x2="70"  y2="15"/>
         </g>
-        <text x="0" y="0" class="nlabel" fill="rgba(255,255,255,.4)" style="font-size:10px;">NX-2B</text>
       </g>
       <g transform="translate(2000,2150)">
         <rect class="comp-ic" x="-80" y="-22" width="160" height="44" rx="4"/>
-        <text x="0" y="0" class="nlabel" fill="rgba(255,255,255,.4)" style="font-size:10px;">SDS-PROC-9</text>
       </g>
     </g>
 
-    <!-- MAIN TRACES connecting the 9 nodes (PCB right-angle bends) -->
+    <!-- MAIN TRACES — 6 paths connecting the 7 nodes -->
     <g class="trace-main-group">
-      <path class="tr-main tr-flow" id="trace-1-2" d="M2000,500 H2700 V800 H3200"/>
-      <path class="tr-main tr-flow" id="trace-2-3" d="M3200,800 H3500 V1500"/>
-      <path class="tr-main tr-flow" id="trace-3-4" d="M3500,1500 V2200 H3200"/>
-      <path class="tr-main tr-flow" id="trace-4-5" d="M3200,2200 H2800 V2500 H2400"/>
-      <path class="tr-main tr-flow" id="trace-5-6" d="M2400,2500 H1600"/>
-      <path class="tr-main tr-flow" id="trace-6-7" d="M1600,2500 H1200 V2200 H800"/>
-      <path class="tr-main tr-flow" id="trace-7-8" d="M800,2200 V1500 H500"/>
-      <path class="tr-main tr-flow" id="trace-8-9" d="M500,1500 H2000"/>
+      <path class="tr-main tr-flow" id="trace-1-2" d="M2000,500 H2800 V900 H3300"/>
+      <path class="tr-main tr-flow" id="trace-2-3" d="M3300,900 H3500 V1700"/>
+      <path class="tr-main tr-flow" id="trace-3-4" d="M3500,1700 V2200 H2800 V2500"/>
+      <path class="tr-main tr-flow" id="trace-4-5" d="M2800,2500 H1200 V2400 H800 V2200"/>
+      <path class="tr-main tr-flow" id="trace-5-6" d="M800,2200 V1500 H500 V1300"/>
+      <path class="tr-main tr-flow" id="trace-6-7" d="M500,1300 V1500 H2000"/>
     </g>
 
-    <!-- ACTIVE traces (energy pulse along — animated by JS) -->
     <g class="trace-pulse-group">
-      <path class="tr-pulse" id="pulse-1-2" d="M2000,500 H2700 V800 H3200"/>
-      <path class="tr-pulse" id="pulse-2-3" d="M3200,800 H3500 V1500"/>
-      <path class="tr-pulse" id="pulse-3-4" d="M3500,1500 V2200 H3200"/>
-      <path class="tr-pulse" id="pulse-4-5" d="M3200,2200 H2800 V2500 H2400"/>
-      <path class="tr-pulse" id="pulse-5-6" d="M2400,2500 H1600"/>
-      <path class="tr-pulse" id="pulse-6-7" d="M1600,2500 H1200 V2200 H800"/>
-      <path class="tr-pulse" id="pulse-7-8" d="M800,2200 V1500 H500"/>
-      <path class="tr-pulse" id="pulse-8-9" d="M500,1500 H2000"/>
+      <path class="tr-pulse" id="pulse-1-2" d="M2000,500 H2800 V900 H3300"/>
+      <path class="tr-pulse" id="pulse-2-3" d="M3300,900 H3500 V1700"/>
+      <path class="tr-pulse" id="pulse-3-4" d="M3500,1700 V2200 H2800 V2500"/>
+      <path class="tr-pulse" id="pulse-4-5" d="M2800,2500 H1200 V2400 H800 V2200"/>
+      <path class="tr-pulse" id="pulse-5-6" d="M800,2200 V1500 H500 V1300"/>
+      <path class="tr-pulse" id="pulse-6-7" d="M500,1300 V1500 H2000"/>
     </g>
 
-    <!-- NODES (9 chips at trace endpoints) -->
+    <!-- 7 NODES -->
     <g class="nodes-group">
-      <!-- Reusable node template applied to each: -->
       <g class="node-g" id="node-1" transform="translate(2000,500)">
         <circle r="160" fill="url(#grad-halo)" opacity=".75"/>
         <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
         <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
-        <g class="pin">
-          <line x1="-86" y1="-32" x2="-100" y2="-32"/>
-          <line x1="-86" y1="-10" x2="-100" y2="-10"/>
-          <line x1="-86" y1="12"  x2="-100" y2="12"/>
-          <line x1="-86" y1="34"  x2="-100" y2="34"/>
-          <line x1="86"  y1="-32" x2="100"  y2="-32"/>
-          <line x1="86"  y1="-10" x2="100"  y2="-10"/>
-          <line x1="86"  y1="12"  x2="100"  y2="12"/>
-          <line x1="86"  y1="34"  x2="100"  y2="34"/>
-        </g>
-        <circle class="halo" r="56"/>
-        <circle class="halo-2" r="78"/>
+        <g class="pin"><line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/><line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/><line x1="86" y1="-32" x2="100" y2="-32"/><line x1="86" y1="-10" x2="100" y2="-10"/><line x1="86" y1="12"  x2="100" y2="12"/><line x1="86" y1="34"  x2="100" y2="34"/></g>
+        <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
         <circle class="core" r="16"/>
         <text class="num" x="0" y="-78">N01</text>
       </g>
-      <g class="node-g" id="node-2" transform="translate(3200,800)">
+      <g class="node-g" id="node-2" transform="translate(3300,900)">
         <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
         <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
         <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
-        <g class="pin">
-          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
-          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
-          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
-          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
-        </g>
+        <g class="pin"><line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/><line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/><line x1="86" y1="-32" x2="100" y2="-32"/><line x1="86" y1="-10" x2="100" y2="-10"/><line x1="86" y1="12"  x2="100" y2="12"/><line x1="86" y1="34"  x2="100" y2="34"/></g>
         <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
         <circle class="core" r="16"/>
         <text class="num" x="0" y="-78">N02</text>
       </g>
-      <g class="node-g" id="node-3" transform="translate(3500,1500)">
-        <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
-        <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
-        <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
-        <g class="pin">
-          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
-          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
-          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
-          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
-        </g>
-        <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
-        <circle class="core" r="16"/>
-        <text class="num" x="0" y="-78">N03</text>
+      <g class="node-g" id="node-3" transform="translate(3500,1700)">
+        <circle r="180" fill="url(#grad-halo)" opacity=".7"/>
+        <rect class="chip" x="-100" y="-66" width="200" height="132" rx="6"/>
+        <rect class="chip-inner" x="-84" y="-50" width="168" height="100" rx="3"/>
+        <g class="pin"><line x1="-100" y1="-40" x2="-114" y2="-40"/><line x1="-100" y1="-15" x2="-114" y2="-15"/><line x1="-100" y1="10"  x2="-114" y2="10"/><line x1="-100" y1="35"  x2="-114" y2="35"/><line x1="100" y1="-40" x2="114" y2="-40"/><line x1="100" y1="-15" x2="114" y2="-15"/><line x1="100" y1="10"  x2="114" y2="10"/><line x1="100" y1="35"  x2="114" y2="35"/></g>
+        <circle class="halo" r="64"/><circle class="halo-2" r="88"/>
+        <circle class="core" r="18"/>
+        <text class="num" x="0" y="-86">N03</text>
       </g>
-      <g class="node-g" id="node-4" transform="translate(3200,2200)">
+      <g class="node-g" id="node-4" transform="translate(2800,2500)">
         <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
         <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
         <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
-        <g class="pin">
-          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
-          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
-          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
-          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
-        </g>
+        <g class="pin"><line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/><line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/><line x1="86" y1="-32" x2="100" y2="-32"/><line x1="86" y1="-10" x2="100" y2="-10"/><line x1="86" y1="12"  x2="100" y2="12"/><line x1="86" y1="34"  x2="100" y2="34"/></g>
         <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
         <circle class="core" r="16"/>
         <text class="num" x="0" y="-78">N04</text>
       </g>
-      <g class="node-g" id="node-5" transform="translate(2400,2500)">
+      <g class="node-g" id="node-5" transform="translate(800,2200)">
         <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
         <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
         <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
-        <g class="pin">
-          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
-          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
-          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
-          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
-        </g>
+        <g class="pin"><line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/><line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/><line x1="86" y1="-32" x2="100" y2="-32"/><line x1="86" y1="-10" x2="100" y2="-10"/><line x1="86" y1="12"  x2="100" y2="12"/><line x1="86" y1="34"  x2="100" y2="34"/></g>
         <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
         <circle class="core" r="16"/>
         <text class="num" x="0" y="-78">N05</text>
       </g>
-      <g class="node-g" id="node-6" transform="translate(1600,2500)">
+      <g class="node-g" id="node-6" transform="translate(500,1300)">
         <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
         <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
         <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
-        <g class="pin">
-          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
-          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
-          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
-          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
-        </g>
+        <g class="pin"><line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/><line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/><line x1="86" y1="-32" x2="100" y2="-32"/><line x1="86" y1="-10" x2="100" y2="-10"/><line x1="86" y1="12"  x2="100" y2="12"/><line x1="86" y1="34"  x2="100" y2="34"/></g>
         <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
         <circle class="core" r="16"/>
         <text class="num" x="0" y="-78">N06</text>
       </g>
-      <g class="node-g" id="node-7" transform="translate(800,2200)">
-        <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
-        <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
-        <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
-        <g class="pin">
-          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
-          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
-          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
-          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
-        </g>
-        <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
-        <circle class="core" r="16"/>
-        <text class="num" x="0" y="-78">N07</text>
-      </g>
-      <g class="node-g" id="node-8" transform="translate(500,1500)">
-        <circle r="160" fill="url(#grad-halo)" opacity=".65"/>
-        <rect class="chip" x="-86" y="-58" width="172" height="116" rx="6"/>
-        <rect class="chip-inner" x="-72" y="-44" width="144" height="88" rx="3"/>
-        <g class="pin">
-          <line x1="-86" y1="-32" x2="-100" y2="-32"/><line x1="-86" y1="-10" x2="-100" y2="-10"/>
-          <line x1="-86" y1="12"  x2="-100" y2="12"/><line x1="-86" y1="34"  x2="-100" y2="34"/>
-          <line x1="86"  y1="-32" x2="100"  y2="-32"/><line x1="86"  y1="-10" x2="100"  y2="-10"/>
-          <line x1="86"  y1="12"  x2="100"  y2="12"/><line x1="86"  y1="34"  x2="100"  y2="34"/>
-        </g>
-        <circle class="halo" r="56"/><circle class="halo-2" r="78"/>
-        <circle class="core" r="16"/>
-        <text class="num" x="0" y="-78">N08</text>
-      </g>
-      <g class="node-g" id="node-9" transform="translate(2000,1500)">
+      <g class="node-g" id="node-7" transform="translate(2000,1500)">
         <circle r="220" fill="url(#grad-halo)" opacity=".85"/>
         <rect class="chip" x="-110" y="-72" width="220" height="144" rx="8"/>
         <rect class="chip-inner" x="-94" y="-56" width="188" height="112" rx="4"/>
-        <g class="pin">
-          <line x1="-110" y1="-44" x2="-126" y2="-44"/><line x1="-110" y1="-22" x2="-126" y2="-22"/>
-          <line x1="-110" y1="0"   x2="-126" y2="0"/><line x1="-110" y1="22"   x2="-126" y2="22"/>
-          <line x1="-110" y1="44"  x2="-126" y2="44"/>
-          <line x1="110" y1="-44" x2="126" y2="-44"/><line x1="110" y1="-22" x2="126" y2="-22"/>
-          <line x1="110" y1="0"   x2="126" y2="0"/><line x1="110" y1="22"   x2="126" y2="22"/>
-          <line x1="110" y1="44"  x2="126" y2="44"/>
-        </g>
+        <g class="pin"><line x1="-110" y1="-44" x2="-126" y2="-44"/><line x1="-110" y1="-22" x2="-126" y2="-22"/><line x1="-110" y1="0"   x2="-126" y2="0"/><line x1="-110" y1="22"   x2="-126" y2="22"/><line x1="-110" y1="44"  x2="-126" y2="44"/><line x1="110" y1="-44" x2="126" y2="-44"/><line x1="110" y1="-22" x2="126" y2="-22"/><line x1="110" y1="0"   x2="126" y2="0"/><line x1="110" y1="22"   x2="126" y2="22"/><line x1="110" y1="44"  x2="126" y2="44"/></g>
         <circle class="halo" r="72"/><circle class="halo-2" r="98"/>
         <circle class="core" r="22"/>
         <text class="num" x="0" y="-94">CORE</text>
@@ -1525,11 +1203,11 @@ main{position:relative;z-index:5;}
   </a>
   <div class="nav-links">
     <a href="#node-section-3" data-cursor>Services</a>
-    <a href="#node-section-6" data-cursor>Méthode</a>
-    <a href="#node-section-7" data-cursor>Résultats</a>
-    <a href="#node-section-8" data-cursor>Témoignages</a>
+    <a href="#node-section-4" data-cursor>Méthode</a>
+    <a href="#node-section-5" data-cursor>Résultats</a>
+    <a href="#node-section-6" data-cursor>Témoignages</a>
   </div>
-  <a href="#node-section-9" class="nav-cta" data-cursor data-magnetic>
+  <a href="#node-section-7" class="nav-cta" data-cursor data-magnetic>
     Audit gratuit <span class="arrow">→</span>
   </a>
   <button class="nav-burger" id="nav-burger" aria-label="Menu">
@@ -1537,25 +1215,24 @@ main{position:relative;z-index:5;}
   </button>
 </nav>
 
-<!-- Mobile menu -->
 <div class="mobile-menu" id="mobile-menu">
   <a href="#node-section-3">Services</a>
-  <a href="#node-section-6">Méthode</a>
-  <a href="#node-section-7">Résultats</a>
-  <a href="#node-section-8">Témoignages</a>
-  <a href="#node-section-9" class="gradient-text">Audit gratuit →</a>
+  <a href="#node-section-4">Méthode</a>
+  <a href="#node-section-5">Résultats</a>
+  <a href="#node-section-6">Témoignages</a>
+  <a href="#node-section-7" class="gradient-text">Audit gratuit →</a>
 </div>
 
-<!-- HUD (current node indicator) -->
+<!-- HUD -->
 <div class="hud" id="hud">
   <span class="dot"></span>
   <span><span class="label" id="hud-label">N01</span> · <span id="hud-name">Hero</span></span>
-  <span class="total">/ 09 nodes</span>
+  <span class="total">/ 07 nodes</span>
 </div>
 <div class="hud-right" id="hud-right">SDS · CIRCUIT · LIVE</div>
 
 <!-- ============================================================
-     SECTIONS — 9 NODES
+     SECTIONS — 7 NODES
      ============================================================ -->
 <main>
 
@@ -1578,7 +1255,7 @@ main{position:relative;z-index:5;}
         les outils des grandes entreprises, pour la vôtre.
       </p>
       <div class="cta-row" data-hero-fade>
-        <a href="#node-section-9" class="btn btn-primary" data-cursor data-magnetic>
+        <a href="#node-section-7" class="btn btn-primary" data-cursor data-magnetic>
           Réserver mon audit gratuit
           <span class="arrow">→</span>
         </a>
@@ -1648,181 +1325,187 @@ main{position:relative;z-index:5;}
     </div>
   </section>
 
-  <!-- ===== NODE 03 · IA & AGENTS ===== -->
-  <section class="node-section" id="node-section-3" data-node="3" data-node-name="IA & Agents">
-    <div class="node-content">
-      <div class="node-card">
+  <!-- ===== NODE 03 · SERVICES (HORIZONTAL SCROLL DESKTOP / STACK MOBILE) ===== -->
+  <section class="node-section services-section" id="node-section-3" data-node="3" data-node-name="Services · 3 piliers">
+    <div class="services-head">
+      <div>
         <div class="section-tag">
           <span class="node-id">N03</span>
           <span class="line"></span>
-          <span class="label">Pilier · IA &amp; Agents Intelligents</span>
+          <span class="label">Services · 3 piliers</span>
         </div>
-        <div class="service-grid">
-          <div class="service-text">
-            <span class="pillar-num">PILIER 01</span>
-            <h3>IA &amp; Agents <span class="italic gradient-text">Intelligents</span></h3>
-            <p class="lead">Des agents conversationnels qui répondent, qualifient, vendent et planifient — 24h/24, dans toutes les langues, sans pause café.</p>
-            <ul>
-              <li>Chatbots intelligents multi-canaux (site, WhatsApp, Instagram)</li>
-              <li>Secrétaire IA — gestion d'appels et prise de RDV automatique</li>
-              <li>SAV automatisé avec escalade intelligente vers l'humain</li>
-              <li>Répondeurs IA pour emails et messages entrants</li>
-            </ul>
-          </div>
-          <div class="service-visual chat-visual" data-visual="chat">
-            <div class="chat-header">
-              <div class="av">N</div>
-              <div class="meta">
-                <div class="name">Assistant Neexus</div>
-                <div class="status">En ligne · répond instantanément</div>
-              </div>
-              <div class="ch-btn">AI ↗</div>
+        <h2 class="section-title" data-split>Trois piliers pour digitaliser votre entreprise.</h2>
+      </div>
+      <p class="intro" data-fade>
+        On ne fait pas tout. On fait <b>trois choses, mais on les fait
+        mieux que les autres</b>. Chaque pilier est conçu pour générer un ROI mesurable
+        dès les premières semaines.
+      </p>
+    </div>
+
+    <div class="horizontal-container" id="horizontal-container">
+      <div class="horizontal-track" id="horizontal-track">
+
+        <!-- Pilier 01 — IA -->
+        <article class="service-panel">
+          <div class="panel-num">01 / 03 — IA</div>
+          <div class="service-grid">
+            <div class="service-text">
+              <span class="pillar-num">PILIER 01</span>
+              <h3>IA &amp; Agents <span class="italic gradient-text">Intelligents</span></h3>
+              <p class="lead">Des agents conversationnels qui répondent, qualifient, vendent et planifient — 24h/24, dans toutes les langues, sans pause café.</p>
+              <ul>
+                <li>Chatbots intelligents multi-canaux (site, WhatsApp, Instagram)</li>
+                <li>Secrétaire IA — gestion d'appels et prise de RDV automatique</li>
+                <li>SAV automatisé avec escalade intelligente vers l'humain</li>
+                <li>Répondeurs IA pour emails et messages entrants</li>
+              </ul>
             </div>
-            <div class="chat-msgs">
-              <div class="msg user" data-msg>Bonjour, je voudrais réserver une table pour 4 ce vendredi soir.</div>
-              <div class="msg ai" data-msg>
-                Bonsoir ! Avec plaisir 🌿 Pour vendredi, j'ai 20h ou 22h. Vous préférez ?
-                <div class="meta">Répondu en 0.4s</div>
+            <div class="service-visual chat-visual" data-visual="chat">
+              <div class="chat-header">
+                <div class="av">N</div>
+                <div class="meta">
+                  <div class="name">Assistant Neexus</div>
+                  <div class="status">En ligne · répond instantanément</div>
+                </div>
+                <div class="ch-btn">AI ↗</div>
               </div>
-              <div class="msg user" data-msg>20h c'est parfait.</div>
-              <div class="msg ai" data-msg>
-                Réservé ! Confirmation envoyée par SMS. Table en terrasse ?
-                <div class="meta">CRM mis à jour automatiquement</div>
+              <div class="chat-msgs">
+                <div class="msg user" data-msg>Bonjour, je voudrais réserver une table pour 4 ce vendredi soir.</div>
+                <div class="msg ai" data-msg>
+                  Bonsoir ! Avec plaisir 🌿 Pour vendredi, j'ai 20h ou 22h. Vous préférez ?
+                  <div class="meta">Répondu en 0.4s</div>
+                </div>
+                <div class="msg user" data-msg>20h c'est parfait.</div>
+                <div class="msg ai" data-msg>
+                  Réservé ! Confirmation envoyée par SMS. Table en terrasse ?
+                  <div class="meta">CRM mis à jour automatiquement</div>
+                </div>
+                <div class="typing" data-msg><span></span><span></span><span></span></div>
               </div>
-              <div class="typing" data-msg><span></span><span></span><span></span></div>
             </div>
           </div>
-        </div>
+        </article>
+
+        <!-- Pilier 02 — Automatisation -->
+        <article class="service-panel">
+          <div class="panel-num">02 / 03 — Workflows</div>
+          <div class="service-grid">
+            <div class="service-text">
+              <span class="pillar-num">PILIER 02</span>
+              <h3>Automatisation &amp; <span class="italic gradient-text">Workflows</span></h3>
+              <p class="lead">On connecte vos outils existants pour qu'ils travaillent ensemble. Plus de double saisie, plus d'oublis — juste des données qui circulent toutes seules.</p>
+              <ul>
+                <li>Automatisations Make / n8n sur mesure</li>
+                <li>Applications internes métier (no-code &amp; code)</li>
+                <li>Connexion CRM, ERP, facturation, agenda, comptabilité</li>
+                <li>Workflows intelligents qui éliminent les tâches manuelles</li>
+              </ul>
+            </div>
+            <div class="service-visual workflow-visual" data-visual="workflow">
+              <svg class="workflow-svg" viewBox="0 0 460 460">
+                <defs>
+                  <linearGradient id="flow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#4d7cff"/>
+                    <stop offset="50%" stop-color="#7c5cfc"/>
+                    <stop offset="100%" stop-color="#d63384"/>
+                  </linearGradient>
+                  <radialGradient id="node-w-grad">
+                    <stop offset="0%" stop-color="rgba(124,92,252,.25)"/>
+                    <stop offset="100%" stop-color="rgba(10,14,26,.95)"/>
+                  </radialGradient>
+                </defs>
+                <path class="conn-flow" d="M90,80 Q230,80 230,200" data-flow/>
+                <path class="conn-flow" d="M370,80 Q230,80 230,200" data-flow/>
+                <path class="conn-flow" d="M230,260 Q230,340 110,380" data-flow/>
+                <path class="conn-flow" d="M230,260 Q230,340 350,380" data-flow/>
+                <g data-node-w>
+                  <circle class="node-w" cx="90" cy="80" r="34" fill="url(#node-w-grad)"/>
+                  <text class="nicon" x="90" y="80">@</text>
+                  <text class="nlabel" x="90" y="130">Email</text>
+                </g>
+                <g data-node-w>
+                  <circle class="node-w" cx="370" cy="80" r="34" fill="url(#node-w-grad)"/>
+                  <text class="nicon" x="370" y="80">📅</text>
+                  <text class="nlabel" x="370" y="130">Calendar</text>
+                </g>
+                <g data-node-w>
+                  <circle class="node-w" cx="230" cy="230" r="44" fill="url(#node-w-grad)" stroke="url(#flow-grad)" stroke-width="1.5"/>
+                  <text class="nicon" x="230" y="226" style="font-size:16px;">⚡</text>
+                  <text class="nlabel" x="230" y="248" style="font-size:8px;">PROCESS</text>
+                </g>
+                <g data-node-w>
+                  <circle class="node-w" cx="110" cy="380" r="34" fill="url(#node-w-grad)"/>
+                  <text class="nicon" x="110" y="380">📊</text>
+                  <text class="nlabel" x="110" y="430">CRM</text>
+                </g>
+                <g data-node-w>
+                  <circle class="node-w" cx="350" cy="380" r="34" fill="url(#node-w-grad)"/>
+                  <text class="nicon" x="350" y="380">💬</text>
+                  <text class="nlabel" x="350" y="430">Slack</text>
+                </g>
+                <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" path="M90,80 Q230,80 230,200"/></circle>
+                <circle class="pulse" r="3.5"><animateMotion dur="3.5s" repeatCount="indefinite" begin="0.8s" path="M370,80 Q230,80 230,200"/></circle>
+                <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" begin="1.4s" path="M230,260 Q230,340 110,380"/></circle>
+                <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" begin="2s" path="M230,260 Q230,340 350,380"/></circle>
+              </svg>
+            </div>
+          </div>
+        </article>
+
+        <!-- Pilier 03 — Présence -->
+        <article class="service-panel">
+          <div class="panel-num">03 / 03 — Présence</div>
+          <div class="service-grid">
+            <div class="service-text">
+              <span class="pillar-num">PILIER 03</span>
+              <h3>Présence <span class="italic gradient-text">Digitale</span></h3>
+              <p class="lead">Un site qui convertit, du contenu qui engage, une visibilité qui dure. Votre marque mérite mieux qu'un template Wordpress de 2018.</p>
+              <ul>
+                <li>Sites web modernes, performants, optimisés conversion</li>
+                <li>Création de contenu (réseaux sociaux, blog, newsletters)</li>
+                <li>SEO &amp; stratégie de visibilité organique</li>
+                <li>Identité visuelle &amp; design system cohérent</li>
+              </ul>
+            </div>
+            <div class="service-visual code-visual" data-visual="code">
+              <div class="code-window-bar">
+                <div class="ddot"></div><div class="ddot"></div><div class="ddot"></div>
+                <div class="file">~/neexus/<span style="color:var(--text);">site-client.html</span></div>
+              </div>
+              <div class="code-content">
+                <div class="ln" data-line><span class="lnum">01</span><span><span class="kw">&lt;section</span> <span class="pr">class</span>=<span class="str">"hero"</span><span class="kw">&gt;</span></span></div>
+                <div class="ln" data-line><span class="lnum">02</span><span>&nbsp;&nbsp;<span class="kw">&lt;h1&gt;</span>Bienvenue chez <span class="str">{{client}}</span><span class="kw">&lt;/h1&gt;</span></span></div>
+                <div class="ln" data-line><span class="lnum">03</span><span>&nbsp;&nbsp;<span class="com">// Génération SEO automatique</span></span></div>
+                <div class="ln" data-line><span class="lnum">04</span><span>&nbsp;&nbsp;<span class="kw">&lt;p&gt;</span><span class="fn">{{tagline}}</span><span class="kw">&lt;/p&gt;</span></span></div>
+                <div class="ln" data-line><span class="lnum">05</span><span><span class="kw">&lt;/section&gt;</span><span class="typing-cursor"></span></span></div>
+              </div>
+              <div class="code-preview">
+                <div class="pv-bar" id="pv-bar"></div>
+                <div class="pv-block w-3" data-pv></div>
+                <div class="pv-block w-2" data-pv></div>
+                <div class="pv-block w-1" data-pv></div>
+                <div class="pv-block w-2" data-pv></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+      <div class="services-dots" id="services-dots">
+        <div class="ddot is-active"></div>
+        <div class="ddot"></div>
+        <div class="ddot"></div>
       </div>
     </div>
   </section>
 
-  <!-- ===== NODE 04 · AUTOMATISATION ===== -->
-  <section class="node-section" id="node-section-4" data-node="4" data-node-name="Automatisation">
+  <!-- ===== NODE 04 · MÉTHODE ===== -->
+  <section class="node-section" id="node-section-4" data-node="4" data-node-name="Méthode">
     <div class="node-content">
       <div class="node-card">
         <div class="section-tag">
           <span class="node-id">N04</span>
-          <span class="line"></span>
-          <span class="label">Pilier · Automatisation &amp; Workflows</span>
-        </div>
-        <div class="service-grid">
-          <div class="service-text">
-            <span class="pillar-num">PILIER 02</span>
-            <h3>Automatisation &amp; <span class="italic gradient-text">Workflows</span></h3>
-            <p class="lead">On connecte vos outils existants pour qu'ils travaillent ensemble. Plus de double saisie, plus d'oublis — juste des données qui circulent toutes seules.</p>
-            <ul>
-              <li>Automatisations Make / n8n sur mesure</li>
-              <li>Applications internes métier (no-code &amp; code)</li>
-              <li>Connexion CRM, ERP, facturation, agenda, comptabilité</li>
-              <li>Workflows intelligents qui éliminent les tâches manuelles</li>
-            </ul>
-          </div>
-          <div class="service-visual workflow-visual" data-visual="workflow">
-            <svg class="workflow-svg" viewBox="0 0 460 460">
-              <defs>
-                <linearGradient id="flow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#4d7cff"/>
-                  <stop offset="50%" stop-color="#7c5cfc"/>
-                  <stop offset="100%" stop-color="#d63384"/>
-                </linearGradient>
-                <radialGradient id="node-w-grad">
-                  <stop offset="0%" stop-color="rgba(124,92,252,.25)"/>
-                  <stop offset="100%" stop-color="rgba(10,14,26,.95)"/>
-                </radialGradient>
-              </defs>
-              <path class="conn-flow" d="M90,80 Q230,80 230,200" data-flow/>
-              <path class="conn-flow" d="M370,80 Q230,80 230,200" data-flow/>
-              <path class="conn-flow" d="M230,260 Q230,340 110,380" data-flow/>
-              <path class="conn-flow" d="M230,260 Q230,340 350,380" data-flow/>
-              <g data-node-w>
-                <circle class="node-w" cx="90" cy="80" r="34" fill="url(#node-w-grad)"/>
-                <text class="nicon" x="90" y="80">@</text>
-                <text class="nlabel" x="90" y="130">Email</text>
-              </g>
-              <g data-node-w>
-                <circle class="node-w" cx="370" cy="80" r="34" fill="url(#node-w-grad)"/>
-                <text class="nicon" x="370" y="80">📅</text>
-                <text class="nlabel" x="370" y="130">Calendar</text>
-              </g>
-              <g data-node-w>
-                <circle class="node-w" cx="230" cy="230" r="44" fill="url(#node-w-grad)" stroke="url(#flow-grad)" stroke-width="1.5"/>
-                <text class="nicon" x="230" y="226" style="font-size:16px;">⚡</text>
-                <text class="nlabel" x="230" y="248" style="font-size:8px;">PROCESS</text>
-              </g>
-              <g data-node-w>
-                <circle class="node-w" cx="110" cy="380" r="34" fill="url(#node-w-grad)"/>
-                <text class="nicon" x="110" y="380">📊</text>
-                <text class="nlabel" x="110" y="430">CRM</text>
-              </g>
-              <g data-node-w>
-                <circle class="node-w" cx="350" cy="380" r="34" fill="url(#node-w-grad)"/>
-                <text class="nicon" x="350" y="380">💬</text>
-                <text class="nlabel" x="350" y="430">Slack</text>
-              </g>
-              <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" path="M90,80 Q230,80 230,200"/></circle>
-              <circle class="pulse" r="3.5"><animateMotion dur="3.5s" repeatCount="indefinite" begin="0.8s" path="M370,80 Q230,80 230,200"/></circle>
-              <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" begin="1.4s" path="M230,260 Q230,340 110,380"/></circle>
-              <circle class="pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" begin="2s" path="M230,260 Q230,340 350,380"/></circle>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== NODE 05 · PRÉSENCE DIGITALE ===== -->
-  <section class="node-section" id="node-section-5" data-node="5" data-node-name="Présence Digitale">
-    <div class="node-content">
-      <div class="node-card">
-        <div class="section-tag">
-          <span class="node-id">N05</span>
-          <span class="line"></span>
-          <span class="label">Pilier · Présence Digitale</span>
-        </div>
-        <div class="service-grid">
-          <div class="service-text">
-            <span class="pillar-num">PILIER 03</span>
-            <h3>Présence <span class="italic gradient-text">Digitale</span></h3>
-            <p class="lead">Un site qui convertit, du contenu qui engage, une visibilité qui dure. Votre marque mérite mieux qu'un template Wordpress de 2018.</p>
-            <ul>
-              <li>Sites web modernes, performants, optimisés conversion</li>
-              <li>Création de contenu (réseaux sociaux, blog, newsletters)</li>
-              <li>SEO &amp; stratégie de visibilité organique</li>
-              <li>Identité visuelle &amp; design system cohérent</li>
-            </ul>
-          </div>
-          <div class="service-visual code-visual" data-visual="code">
-            <div class="code-window-bar">
-              <div class="ddot"></div><div class="ddot"></div><div class="ddot"></div>
-              <div class="file">~/neexus/<span style="color:var(--text);">site-client.html</span></div>
-            </div>
-            <div class="code-content">
-              <div class="ln" data-line><span class="lnum">01</span><span><span class="kw">&lt;section</span> <span class="pr">class</span>=<span class="str">"hero"</span><span class="kw">&gt;</span></span></div>
-              <div class="ln" data-line><span class="lnum">02</span><span>&nbsp;&nbsp;<span class="kw">&lt;h1&gt;</span>Bienvenue chez <span class="str">{{client}}</span><span class="kw">&lt;/h1&gt;</span></span></div>
-              <div class="ln" data-line><span class="lnum">03</span><span>&nbsp;&nbsp;<span class="com">// Génération SEO automatique</span></span></div>
-              <div class="ln" data-line><span class="lnum">04</span><span>&nbsp;&nbsp;<span class="kw">&lt;p&gt;</span><span class="fn">{{tagline}}</span><span class="kw">&lt;/p&gt;</span></span></div>
-              <div class="ln" data-line><span class="lnum">05</span><span><span class="kw">&lt;/section&gt;</span><span class="typing-cursor"></span></span></div>
-            </div>
-            <div class="code-preview">
-              <div class="pv-bar" id="pv-bar"></div>
-              <div class="pv-block w-3" data-pv></div>
-              <div class="pv-block w-2" data-pv></div>
-              <div class="pv-block w-1" data-pv></div>
-              <div class="pv-block w-2" data-pv></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== NODE 06 · MÉTHODE ===== -->
-  <section class="node-section" id="node-section-6" data-node="6" data-node-name="Méthode">
-    <div class="node-content">
-      <div class="node-card">
-        <div class="section-tag">
-          <span class="node-id">N06</span>
           <span class="line"></span>
           <span class="label">Méthode · 4 étapes</span>
         </div>
@@ -1860,12 +1543,12 @@ main{position:relative;z-index:5;}
     </div>
   </section>
 
-  <!-- ===== NODE 07 · RÉSULTATS ===== -->
-  <section class="node-section" id="node-section-7" data-node="7" data-node-name="Résultats">
+  <!-- ===== NODE 05 · RÉSULTATS ===== -->
+  <section class="node-section" id="node-section-5" data-node="5" data-node-name="Résultats">
     <div class="node-content">
       <div class="node-card">
         <div class="section-tag">
-          <span class="node-id">N07</span>
+          <span class="node-id">N05</span>
           <span class="line"></span>
           <span class="label">Output · Résultats Mesurés</span>
         </div>
@@ -1899,12 +1582,12 @@ main{position:relative;z-index:5;}
     </div>
   </section>
 
-  <!-- ===== NODE 08 · TÉMOIGNAGES ===== -->
-  <section class="node-section" id="node-section-8" data-node="8" data-node-name="Témoignages">
+  <!-- ===== NODE 06 · TÉMOIGNAGES ===== -->
+  <section class="node-section" id="node-section-6" data-node="6" data-node-name="Témoignages">
     <div class="node-content">
       <div class="node-card">
         <div class="section-tag">
-          <span class="node-id">N08</span>
+          <span class="node-id">N06</span>
           <span class="line"></span>
           <span class="label">Voix Clients · Témoignages</span>
         </div>
@@ -1952,8 +1635,8 @@ main{position:relative;z-index:5;}
     </div>
   </section>
 
-  <!-- ===== NODE 09 · CTA FINAL ===== -->
-  <section class="node-section cta-final" id="node-section-9" data-node="9" data-node-name="CTA · Audit">
+  <!-- ===== NODE 07 · CTA FINAL (CORE) ===== -->
+  <section class="node-section cta-final" id="node-section-7" data-node="7" data-node-name="CTA · Audit">
     <div class="node-content">
       <div class="node-card">
         <div class="section-tag" style="justify-content:center;display:flex;">
@@ -1973,7 +1656,7 @@ main{position:relative;z-index:5;}
             Réserver mon audit gratuit
             <span class="arrow">→</span>
           </a>
-          <a href="#node-section-8" class="btn btn-ghost" data-cursor data-magnetic>
+          <a href="#node-section-6" class="btn btn-ghost" data-cursor data-magnetic>
             Voir un cas client
             <span class="arrow">↗</span>
           </a>
@@ -2000,17 +1683,17 @@ main{position:relative;z-index:5;}
         <h4>Services</h4>
         <ul>
           <li><a href="#node-section-3">IA &amp; Agents</a></li>
-          <li><a href="#node-section-4">Automatisation</a></li>
-          <li><a href="#node-section-5">Présence digitale</a></li>
-          <li><a href="#node-section-6">Notre méthode</a></li>
+          <li><a href="#node-section-3">Automatisation</a></li>
+          <li><a href="#node-section-3">Présence digitale</a></li>
+          <li><a href="#node-section-4">Notre méthode</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Agence</h4>
         <ul>
-          <li><a href="#node-section-7">Résultats</a></li>
-          <li><a href="#node-section-8">Témoignages</a></li>
-          <li><a href="#node-section-9">Audit gratuit</a></li>
+          <li><a href="#node-section-5">Résultats</a></li>
+          <li><a href="#node-section-6">Témoignages</a></li>
+          <li><a href="#node-section-7">Audit gratuit</a></li>
           <li><a href="mailto:contact@neexusds.com">Contact</a></li>
         </ul>
       </div>
@@ -2041,32 +1724,39 @@ main{position:relative;z-index:5;}
 </footer>
 
 <!-- ============================================================
-     SCRIPTS
+     SCRIPTS — split desktop/mobile via gsap.matchMedia()
+     Mobile (≤1024px) gets fade-ins ONLY: no pin, no scrub, no
+     horizontal scroll, no camera, no Lenis, no cursor.
      ============================================================ -->
 <script>
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const isMobile = window.matchMedia('(max-width: 768px)').matches;
+const QUERY_DESKTOP = '(min-width: 1025px)';
+const QUERY_MOBILE  = '(max-width: 1024px)';
 
-/* ============================================================
-   NODE LAYOUT — coordinates in SVG viewBox (4000 x 3000)
-   ============================================================ */
+/* 7-node circuit map (SVG viewBox 4000 x 3000) */
 const NODES = [
-  { id: 1, x: 2000, y: 500,  scale: 1.0, name: 'Hero' },
-  { id: 2, x: 3200, y: 800,  scale: 1.0, name: 'Pain Points' },
-  { id: 3, x: 3500, y: 1500, scale: 1.0, name: 'IA & Agents' },
-  { id: 4, x: 3200, y: 2200, scale: 1.0, name: 'Automatisation' },
-  { id: 5, x: 2400, y: 2500, scale: 1.0, name: 'Présence Digitale' },
-  { id: 6, x: 1600, y: 2500, scale: 1.0, name: 'Méthode' },
-  { id: 7, x: 800,  y: 2200, scale: 1.0, name: 'Résultats' },
-  { id: 8, x: 500,  y: 1500, scale: 1.0, name: 'Témoignages' },
-  { id: 9, x: 2000, y: 1500, scale: 1.15, name: 'CORE · CTA' },
+  { id: 1, x: 2000, y: 500,  scale: 1.0,  name: 'Hero' },
+  { id: 2, x: 3300, y: 900,  scale: 1.0,  name: 'Pain Points' },
+  { id: 3, x: 3500, y: 1700, scale: 1.0,  name: 'Services · 3 piliers' },
+  { id: 4, x: 2800, y: 2500, scale: 1.0,  name: 'Méthode' },
+  { id: 5, x: 800,  y: 2200, scale: 1.0,  name: 'Résultats' },
+  { id: 6, x: 500,  y: 1300, scale: 1.0,  name: 'Témoignages' },
+  { id: 7, x: 2000, y: 1500, scale: 1.15, name: 'CORE · CTA' },
 ];
 const INTRO_VIEW = { x: 2000, y: 1500, scale: 0.42 };
 
+function cameraFor({ x, y, scale }) {
+  return {
+    x: window.innerWidth / 2 - x * scale,
+    y: window.innerHeight / 2 - y * scale,
+    scale,
+  };
+}
+
 /* ============================================================
-   PRELOADER
+   PRELOADER — runs once, identical on desktop and mobile
    ============================================================ */
 const preloader = document.getElementById('preloader');
 const preloaderLogo = document.getElementById('preloader-logo');
@@ -2075,10 +1765,8 @@ const preloaderTag = document.getElementById('preloader-tag');
 const preloaderLine = document.getElementById('preloader-line');
 
 gsap.set('.nav', { yPercent: -100, opacity: 0 });
-gsap.set('.hud', { opacity: 0 });
-gsap.set('.hud-right', { opacity: 0 });
 
-// Initialize circuit camera AT THE INTRO VIEW so it's not flashing wrong on first paint
+// Pre-position SVG to the intro view (matters on desktop, harmless on mobile)
 gsap.set('#circuit-svg', cameraFor(INTRO_VIEW));
 
 const counterObj = { val: 0 };
@@ -2109,60 +1797,73 @@ tlPre
   }, 2.1)
   .to(preloader, { clipPath: 'inset(100% 0 0 0)', duration: .95, ease: 'expo.inOut' }, 2.5)
   .to('.nav', { yPercent: 0, opacity: 1, duration: .9, ease: 'expo.out' }, 2.6)
-  .to(['.hud', '.hud-right'], { opacity: 1, duration: .6 }, 2.8)
   .set(preloader, { display: 'none' });
 
 /* ============================================================
-   CAMERA UTILITY — compute transform to center a given SVG point
-   ============================================================ */
-function cameraFor({ x, y, scale }) {
-  return {
-    x: window.innerWidth / 2 - x * scale,
-    y: window.innerHeight / 2 - y * scale,
-    scale,
-  };
-}
-function applyCameraTransform(el, { x, y, scale }) {
-  gsap.set(el, { x, y, scale });
-}
-
-/* ============================================================
-   INIT — runs after preloader completes
+   INIT — runs after preloader completes.
+   Animations are gated by gsap.matchMedia() so pinned/scrub-driven
+   effects only mount on desktop, and mobile gets simple fades.
    ============================================================ */
 function initSite(){
-  initLenis();
-  initCursor();
   initNav();
   initScrollProgress();
-  initCamera();
-  initHero();
-  initSplitTitles();
-  initFades();
-  initCards();
-  initSteps();
-  initResults();
-  initTesti();
-  initSplitCta();
   initServiceVisuals();
-  initMagnetic();
-  initTilt();
-  initHud();
+  initSplitTitles();
+  initSplitCta();
+
+  // Hero entry — runs once, same on both (cheap transforms)
+  initHero();
+
+  // ===== match media split =====
+  const mm = gsap.matchMedia();
+
+  /* ---------- DESKTOP (≥ 1025px) ---------- */
+  mm.add(QUERY_DESKTOP, () => {
+    document.body.classList.add('has-cursor');
+
+    initLenis();
+    initCursor();
+    initCamera();
+    initServicesHorizontal();   // pin + scrub horizontal scroll
+    initHud();
+    initMagnetic();
+    initTilt();
+    initFadesDesktop();         // scrub-tied results counters, etc.
+    initCardsDesktop();         // clip-path reveals
+
+    return () => {
+      // Cleanup if breakpoint changes (resize across 1024px boundary)
+      document.body.classList.remove('has-cursor');
+      if (window.__lenis) { window.__lenis.destroy(); window.__lenis = null; }
+    };
+  });
+
+  /* ---------- MOBILE / TABLET (≤ 1024px) ---------- */
+  mm.add(QUERY_MOBILE, () => {
+    // Lock circuit to static centered view (no camera animation)
+    gsap.set('#circuit-svg', cameraFor({ x: 2000, y: 1500, scale: 0.55 }));
+
+    initFadesMobile();   // simple onEnter fades — no scrub, no pin
+    initCardsMobile();
+    initResultsMobile(); // counters trigger once on enter, no scrub
+  });
+
   ScrollTrigger.refresh();
 }
 
 /* ============================================================
-   LENIS SMOOTH SCROLL — synced with GSAP ticker
+   LENIS — desktop only
    ============================================================ */
-let lenis;
 function initLenis(){
   if (reducedMotion) return;
-  lenis = new Lenis({
+  const lenis = new Lenis({
     duration: 1.15,
     easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
     wheelMultiplier: 1,
     touchMultiplier: 1.5,
   });
+  window.__lenis = lenis;
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add(time => { lenis.raf(time * 1000); });
   gsap.ticker.lagSmoothing(0);
@@ -2180,15 +1881,9 @@ function initLenis(){
 }
 
 /* ============================================================
-   CUSTOM CURSOR
+   CURSOR — desktop only
    ============================================================ */
 function initCursor(){
-  if (isMobile) {
-    document.body.classList.add('no-cursor');
-    document.getElementById('cursor')?.style.setProperty('display','none');
-    document.getElementById('cursor-glow')?.style.setProperty('display','none');
-    return;
-  }
   const cursor = document.getElementById('cursor');
   const glow = document.getElementById('cursor-glow');
   let mx = window.innerWidth/2, my = window.innerHeight/2;
@@ -2212,7 +1907,7 @@ function initCursor(){
 }
 
 /* ============================================================
-   NAV — scroll background blur
+   NAV — both
    ============================================================ */
 function initNav(){
   const nav = document.getElementById('nav');
@@ -2226,10 +1921,11 @@ function initNav(){
   mobileMenu?.querySelectorAll('a').forEach(a => {
     a.addEventListener('click', () => mobileMenu.classList.remove('is-open'));
   });
+  // On mobile, native anchor jump works since Lenis isn't loaded.
 }
 
 /* ============================================================
-   SCROLL PROGRESS BAR
+   SCROLL PROGRESS — both (very cheap)
    ============================================================ */
 function initScrollProgress(){
   gsap.to('#scroll-progress', {
@@ -2239,30 +1935,14 @@ function initScrollProgress(){
 }
 
 /* ============================================================
-   CAMERA SYSTEM — pan/zoom the circuit SVG to follow scroll
-   Master scrub timeline. Each node tween is placed at the
-   scroll progress matching its section center.
+   CAMERA — desktop only
    ============================================================ */
-let cameraTl;
 function initCamera(){
   const svg = document.getElementById('circuit-svg');
-
-  if (isMobile || reducedMotion) {
-    // On mobile: lock camera to intro view, static
-    applyCameraTransform(svg, cameraFor({ x: 2000, y: 1500, scale: .55 }));
-    return;
-  }
-
-  // Initial state — applied immediately
-  applyCameraTransform(svg, cameraFor(INTRO_VIEW));
+  gsap.set(svg, cameraFor(INTRO_VIEW));
 
   const sections = gsap.utils.toArray('.node-section');
 
-  // Each section owns exactly its own scroll range (top top → bottom top).
-  // The camera transitions from the previous node (or INTRO_VIEW for the
-  // first section) to this section's node while the user scrolls through it.
-  // Non-overlapping windows + immediateRender:false (except section 0)
-  // prevents the "competing fromTo" race that would otherwise snap the camera.
   sections.forEach((section, i) => {
     const fromView = i === 0 ? INTRO_VIEW : NODES[i - 1];
     const toView = NODES[i];
@@ -2283,7 +1963,6 @@ function initCamera(){
     );
   });
 
-  // Refresh on resize so cameraFor() can re-center on the new viewport
   let resizeT;
   window.addEventListener('resize', () => {
     clearTimeout(resizeT);
@@ -2292,19 +1971,61 @@ function initCamera(){
 }
 
 /* ============================================================
-   HERO — content reveal sequence (one-time on initSite)
+   SERVICES HORIZONTAL SCROLL — desktop only
+   ============================================================ */
+function initServicesHorizontal(){
+  const container = document.getElementById('horizontal-container');
+  const track = document.getElementById('horizontal-track');
+  const panels = gsap.utils.toArray('.service-panel');
+  const dots = gsap.utils.toArray('#services-dots .ddot');
+  if (!container || !track || panels.length === 0) return;
+
+  const totalScroll = () => track.scrollWidth - window.innerWidth;
+
+  const horizontalTween = gsap.to(track, {
+    x: () => -totalScroll(),
+    ease: 'none',
+    scrollTrigger: {
+      trigger: container,
+      pin: true,
+      scrub: 1,
+      start: 'top top',
+      end: () => '+=' + totalScroll(),
+      invalidateOnRefresh: true,
+      anticipatePin: 1,
+      onUpdate: self => {
+        const idx = Math.min(panels.length - 1, Math.round(self.progress * (panels.length - 1)));
+        dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
+      }
+    }
+  });
+
+  // Animate text inside each panel as it scrolls horizontally to center
+  panels.forEach(panel => {
+    const txt = panel.querySelector('.service-text');
+    if (txt) {
+      gsap.from(txt.children, {
+        y: 30, opacity: 0, stagger: .08, duration: .8, ease: 'power3.out',
+        scrollTrigger: {
+          trigger: panel,
+          containerAnimation: horizontalTween,
+          start: 'left 60%',
+        }
+      });
+    }
+  });
+}
+
+/* ============================================================
+   HERO — runs on both (one-time entry, no scroll-trigger)
    ============================================================ */
 function initHero(){
-  // Split title chars
   document.querySelectorAll('[data-hero-line]').forEach(line => {
     new SplitType(line, { types: 'chars' });
   });
 
-  // Counter setup
   const heroCounters = document.querySelectorAll('.hero-stat .counter');
-  const counterStates = Array.from(heroCounters).map(el => ({
-    el, target: +el.dataset.target, v: 0
-  }));
+  const counterStates = Array.from(heroCounters).map(el => ({ el, target: +el.dataset.target, v: 0 }));
   counterStates.forEach(c => c.el.textContent = '0');
 
   const tl = gsap.timeline({ delay: .15 });
@@ -2327,7 +2048,7 @@ function initHero(){
 }
 
 /* ============================================================
-   SPLIT TITLES — section titles + cta
+   SPLIT TITLES + CTA — both (cheap one-time animations)
    ============================================================ */
 function initSplitTitles(){
   document.querySelectorAll('[data-split]').forEach(el => {
@@ -2367,51 +2088,33 @@ function initSplitCta(){
 }
 
 /* ============================================================
-   FADES
+   FADES — desktop (richer)
    ============================================================ */
-function initFades(){
+function initFadesDesktop(){
   document.querySelectorAll('[data-fade]').forEach(el => {
     gsap.from(el, {
       y: 24, opacity: 0, duration: 1, ease: 'power3.out',
       scrollTrigger: { trigger: el, start: 'top 88%' }
     });
   });
-}
-
-/* ============================================================
-   CARDS — pain + service grids with clip-path reveal
-   ============================================================ */
-function initCards(){
-  gsap.utils.toArray('[data-card]').forEach((card, i) => {
-    gsap.from(card, {
-      y: 50, opacity: 0,
-      clipPath: 'inset(100% 0 0 0)',
-      duration: 1, delay: (i % 4) * .08,
-      ease: 'power4.out',
-      scrollTrigger: { trigger: card, start: 'top 88%' }
-    });
-  });
-}
-
-/* ============================================================
-   METHODE STEPS — clip-path reveal with back-out ease
-   ============================================================ */
-function initSteps(){
   gsap.utils.toArray('[data-step]').forEach((step, i) => {
     gsap.from(step, {
       y: 60, opacity: 0,
       clipPath: 'inset(0 0 100% 0)',
-      duration: 1.1, delay: i * .1,
-      ease: 'power4.out',
+      duration: 1.1, delay: i * .1, ease: 'power4.out',
       scrollTrigger: { trigger: step, start: 'top 85%' }
     });
   });
-}
-
-/* ============================================================
-   RESULTATS — scrubbed counters
-   ============================================================ */
-function initResults(){
+  gsap.utils.toArray('.testi-card').forEach((card, i) => {
+    gsap.from(card, {
+      y: 70, opacity: 0,
+      clipPath: 'inset(0 0 100% 0)',
+      rotate: i % 2 === 0 ? -.4 : .4,
+      duration: 1.1, delay: i * .12, ease: 'power4.out',
+      scrollTrigger: { trigger: '.testi-grid', start: 'top 80%' }
+    });
+  });
+  // Scrubbed result counters (desktop)
   document.querySelectorAll('.big-counter').forEach(el => {
     const target = +el.dataset.target;
     const obj = { v: 0 };
@@ -2422,32 +2125,63 @@ function initResults(){
     });
   });
 }
-
-/* ============================================================
-   TÉMOIGNAGES
-   ============================================================ */
-function initTesti(){
-  gsap.utils.toArray('.testi-card').forEach((card, i) => {
+function initCardsDesktop(){
+  gsap.utils.toArray('[data-card]').forEach((card, i) => {
     gsap.from(card, {
-      y: 70, opacity: 0,
-      clipPath: 'inset(0 0 100% 0)',
-      rotate: i % 2 === 0 ? -.4 : .4,
-      duration: 1.1, delay: i * .12,
-      ease: 'power4.out',
-      scrollTrigger: { trigger: '.testi-grid', start: 'top 80%' }
+      y: 50, opacity: 0,
+      clipPath: 'inset(100% 0 0 0)',
+      duration: 1, delay: (i % 4) * .08, ease: 'power4.out',
+      scrollTrigger: { trigger: card, start: 'top 88%' }
     });
   });
 }
 
 /* ============================================================
-   SERVICE VISUALS — chat / workflow / code
-   Trigger on section enter; each plays once.
+   FADES — mobile (lightweight: NO clip-path, NO scrub)
+   ============================================================ */
+function initFadesMobile(){
+  document.querySelectorAll('[data-fade], [data-step]').forEach(el => {
+    gsap.from(el, {
+      y: 20, opacity: 0, duration: .7, ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 90%', once: true }
+    });
+  });
+  gsap.utils.toArray('.testi-card').forEach((card, i) => {
+    gsap.from(card, {
+      y: 30, opacity: 0, duration: .7, delay: i * .08, ease: 'power2.out',
+      scrollTrigger: { trigger: card, start: 'top 90%', once: true }
+    });
+  });
+}
+function initCardsMobile(){
+  gsap.utils.toArray('[data-card]').forEach((card, i) => {
+    gsap.from(card, {
+      y: 24, opacity: 0,
+      duration: .65, delay: (i % 4) * .06, ease: 'power2.out',
+      scrollTrigger: { trigger: card, start: 'top 90%', once: true }
+    });
+  });
+}
+function initResultsMobile(){
+  document.querySelectorAll('.big-counter').forEach(el => {
+    const target = +el.dataset.target;
+    const obj = { v: 0 };
+    gsap.to(obj, {
+      v: target, duration: 1.4, ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+      onUpdate: () => { el.textContent = Math.round(obj.v); }
+    });
+  });
+}
+
+/* ============================================================
+   SERVICE VISUALS — chat / workflow / code (both)
    ============================================================ */
 function initServiceVisuals(){
   document.querySelectorAll('[data-visual]').forEach(visual => {
     ScrollTrigger.create({
       trigger: visual,
-      start: 'top 70%',
+      start: 'top 80%',
       once: true,
       onEnter: () => playVisual(visual)
     });
@@ -2482,10 +2216,9 @@ function playVisual(visual){
 }
 
 /* ============================================================
-   MAGNETIC BUTTONS
+   MAGNETIC BUTTONS — desktop only
    ============================================================ */
 function initMagnetic(){
-  if (isMobile) return;
   document.querySelectorAll('[data-magnetic]').forEach(btn => {
     let bb;
     btn.addEventListener('mouseenter', () => { bb = btn.getBoundingClientRect(); });
@@ -2502,10 +2235,9 @@ function initMagnetic(){
 }
 
 /* ============================================================
-   3D TILT ON CARDS
+   3D TILT — desktop only
    ============================================================ */
 function initTilt(){
-  if (isMobile) return;
   document.querySelectorAll('[data-tilt]').forEach(card => {
     card.addEventListener('mousemove', e => {
       const r = card.getBoundingClientRect();
@@ -2525,16 +2257,15 @@ function initTilt(){
 }
 
 /* ============================================================
-   HUD — current node indicator
-   Updates as user scrolls between sections, highlights active node + trace
+   HUD — desktop only
    ============================================================ */
 function initHud(){
   const hudLabel = document.getElementById('hud-label');
   const hudName = document.getElementById('hud-name');
-  const sections = gsap.utils.toArray('.node-section');
+  gsap.to(['.hud', '.hud-right'], { opacity: 1, duration: .6, delay: .3 });
 
+  const sections = gsap.utils.toArray('.node-section');
   sections.forEach((section, i) => {
-    const node = NODES[i];
     ScrollTrigger.create({
       trigger: section,
       start: 'top center',
@@ -2549,27 +2280,19 @@ function initHud(){
     hudLabel.textContent = 'N' + String(node.id).padStart(2, '0');
     hudName.textContent = node.name;
 
-    // Light up the corresponding node
     document.querySelectorAll('.node-g .core').forEach(c => c.style.filter = 'drop-shadow(0 0 8px rgba(214,51,132,.4))');
     const activeCore = document.querySelector(`#node-${node.id} .core`);
     if (activeCore) activeCore.style.filter = 'drop-shadow(0 0 22px rgba(214,51,132,1)) drop-shadow(0 0 40px rgba(124,92,252,.7))';
 
-    // Light up the trace leading INTO this node (from previous)
-    document.querySelectorAll('.tr-pulse').forEach(p => {
-      gsap.to(p, { opacity: .25, duration: .5 });
-    });
+    document.querySelectorAll('.tr-pulse').forEach(p => { gsap.to(p, { opacity: .25, duration: .5 }); });
     if (i > 0) {
       const trace = document.getElementById(`pulse-${i}-${i+1}`);
       if (trace) gsap.to(trace, { opacity: 1, duration: .5 });
     }
   }
-  // Initialize on N01
   activateNode(0);
 }
 
-/* ============================================================
-   REFRESH ON LOAD
-   ============================================================ */
 window.addEventListener('load', () => ScrollTrigger.refresh());
 </script>
 </body>
