@@ -9,6 +9,16 @@
 <meta property="og:title" content="NEEXUS — Smart Digital Solution Agency" />
 <meta property="og:description" content="Vos concurrents automatisent. Vous faites encore tout à la main ?" />
 <meta property="og:type" content="website" />
+<meta property="og:image" content="https://neexusds.com/logo.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://neexusds.com/logo.png" />
+
+<!-- Favicons -->
+<link rel="icon" type="image/png" href="logo.png" />
+<link rel="apple-touch-icon" href="logo.png" />
+
+<!-- Preload the logo so it's instant in the preloader -->
+<link rel="preload" as="image" href="logo.png" fetchpriority="high" />
 
 <!-- Preconnect / Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -180,49 +190,26 @@ html.lenis,html.lenis body{height:auto;}
   content:'';
   position:absolute;inset:0;
   background:
-    radial-gradient(ellipse 60% 50% at 50% 50%,rgba(124,92,252,.25) 0%,transparent 60%),
-    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(214,51,132,.15) 0%,transparent 70%);
+    radial-gradient(ellipse 60% 50% at 50% 50%,rgba(124,92,252,.35) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(214,51,132,.2) 0%,transparent 70%);
   opacity:0;
   pointer-events:none;
 }
 .preloader.is-glowing::before{opacity:1;transition:opacity .8s ease;}
 .preloader-logo{
-  font-family:'Syne',sans-serif;
-  font-weight:800;
-  font-size:clamp(56px,10vw,128px);
-  letter-spacing:-.04em;
-  line-height:1;
   position:relative;
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
   z-index:2;
-}
-.pl-char{
-  display:inline-block;
+  width:min(60vw,640px);
+  max-width:90vw;
   opacity:0;
-  transform:translateY(80px) rotateX(-90deg);
-  transform-origin:50% 50% -40px;
-  color:#fff;
-  text-shadow:0 0 0 rgba(124,92,252,0);
-  will-change:transform,opacity,text-shadow;
+  transform:scale(.78);
+  filter:drop-shadow(0 0 0 rgba(124,92,252,0));
+  will-change:transform,opacity,filter;
 }
-.pl-char.pl-ee{
-  background:var(--grad-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-.pl-dot{
-  display:inline-block;
-  width:.09em;height:.09em;
-  border-radius:50%;
-  background:var(--magenta);
-  margin-left:.08em;
-  margin-bottom:.08em;
-  opacity:0;
-  transform:scale(0);
-  box-shadow:0 0 30px var(--magenta);
+.preloader-logo img{
+  width:100%;
+  height:auto;
+  display:block;
 }
 .preloader-counter{
   position:absolute;
@@ -277,30 +264,27 @@ html.lenis,html.lenis body{height:auto;}
   border-bottom:1px solid var(--line);
 }
 .nav-logo{
-  font-family:'Syne',sans-serif;
-  font-weight:800;
-  font-size:22px;
-  letter-spacing:-.04em;
-  display:flex;
-  align-items:center;
-  gap:0;
+  display:block;
   position:relative;
+  height:38px;
+  aspect-ratio:3.4 / 1;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1), filter .35s, height .35s;
+  filter:drop-shadow(0 2px 14px rgba(124,92,252,.25));
 }
-.nav-logo .ee{
-  background:var(--grad-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  position:relative;
+.nav-logo img{
+  width:100%;
+  height:100%;
+  display:block;
+  /* Underlying image is 2:1 (wordmark + tagline). We crop bottom to keep
+     only the NEEXUS wordmark — container aspect 3.4:1 + cover from top. */
+  object-fit:cover;
+  object-position:top center;
 }
-.nav-logo .dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--magenta);
-  margin-left:6px;
-  margin-bottom:-2px;
-  align-self:flex-end;
-  box-shadow:0 0 12px var(--magenta);
+.nav-logo:hover{
+  transform:translateY(-1px);
+  filter:drop-shadow(0 4px 22px rgba(124,92,252,.55));
 }
+.nav.is-scrolled .nav-logo{height:32px;}
 .nav-links{
   display:flex;
   gap:34px;
@@ -1510,26 +1494,15 @@ html.lenis,html.lenis body{height:auto;}
   margin-bottom:80px;
 }
 .footer-brand .logo{
-  font-family:'Syne',sans-serif;
-  font-weight:800;
-  font-size:28px;
-  letter-spacing:-.04em;
-  margin-bottom:18px;
-  display:flex;align-items:center;
+  display:block;
+  margin-bottom:24px;
+  max-width:240px;
 }
-.footer-brand .logo .ee{
-  background:var(--grad-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-.footer-brand .logo .dot{
-  width:7px;height:7px;border-radius:50%;
-  background:var(--magenta);
-  margin-left:7px;
-  align-self:flex-end;
-  margin-bottom:5px;
-  box-shadow:0 0 12px var(--magenta);
+.footer-brand .logo img{
+  width:100%;
+  height:auto;
+  display:block;
+  filter:drop-shadow(0 0 18px rgba(124,92,252,.25));
 }
 .footer-brand p{
   color:var(--text-dim);
@@ -1670,22 +1643,16 @@ html.lenis,html.lenis body{height:auto;}
 <div class="preloader" id="preloader">
   <div class="preloader-line" id="preloader-line"></div>
   <div class="preloader-logo" id="preloader-logo" aria-label="NEEXUS">
-    <span class="pl-char">N</span>
-    <span class="pl-char pl-ee">E</span>
-    <span class="pl-char pl-ee">E</span>
-    <span class="pl-char">X</span>
-    <span class="pl-char">U</span>
-    <span class="pl-char">S</span>
-    <span class="pl-dot"></span>
+    <img src="logo.png" alt="NEEXUS — Smart Digital Solution Agency" fetchpriority="high" decoding="sync" />
   </div>
   <div class="preloader-counter" id="preloader-counter">000</div>
-  <div class="preloader-tag" id="preloader-tag">Smart Digital Solution</div>
+  <div class="preloader-tag" id="preloader-tag">Loading</div>
 </div>
 
 <!-- Navigation -->
 <nav class="nav" id="nav">
-  <a href="#" class="nav-logo" data-cursor>
-    N<span class="ee">EE</span>XUS<span class="dot"></span>
+  <a href="#" class="nav-logo" data-cursor aria-label="NEEXUS — accueil">
+    <img src="logo.png" alt="NEEXUS" fetchpriority="high" />
   </a>
   <div class="nav-links">
     <a href="#services" data-cursor>Services</a>
@@ -2226,8 +2193,10 @@ html.lenis,html.lenis body{height:auto;}
   <div class="footer-inner">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="logo">N<span class="ee">EE</span>XUS<span class="dot"></span></div>
-        <p>Smart Digital Solution Agency. On automatise ce qui freine votre croissance pour que vous puissiez vous concentrer sur ce qui compte vraiment.</p>
+        <a href="#" class="logo" aria-label="NEEXUS">
+          <img src="logo.png" alt="NEEXUS — Smart Digital Solution Agency" loading="lazy" />
+        </a>
+        <p>On automatise ce qui freine votre croissance pour que vous puissiez vous concentrer sur ce qui compte vraiment.</p>
       </div>
       <div class="footer-col">
         <h4>Services</h4>
@@ -2289,17 +2258,16 @@ const isMobile = window.matchMedia('(max-width: 768px)').matches;
 /* ============================================================
    PRELOADER — CINEMATIC 3s SEQUENCE
    1) Black screen
-   2) NEEXUS letters appear one by one with pulsing glow
-   3) Letters disperse upward → navbar position
-   4) Hero reveals via curtain clip-path (top → bottom)
+   2) Logo PNG fades in with scale-up + drop-shadow glow pulse
+   3) Counter ticks 0 → 100 while accent line draws
+   4) Logo gently lifts up and dissolves
+   5) Curtain clip-path retracts top-down, revealing the hero
    ============================================================ */
 const preloader = document.getElementById('preloader');
 const preloaderLogo = document.getElementById('preloader-logo');
 const preloaderCounter = document.getElementById('preloader-counter');
 const preloaderTag = document.getElementById('preloader-tag');
 const preloaderLine = document.getElementById('preloader-line');
-const plChars = preloaderLogo.querySelectorAll('.pl-char');
-const plDot = preloaderLogo.querySelector('.pl-dot');
 
 // Nav slides in only when curtain opens
 gsap.set('.nav', { yPercent: -100, opacity: 0 });
@@ -2311,28 +2279,24 @@ const tlPre = gsap.timeline({
 });
 
 tlPre
-  // 1) Subtle line accent draw (under the logo)
-  .to(preloaderLine, { width: '38vw', duration: .7, ease: 'expo.out' }, 0)
-  // 2) Letters rotate in 3D, one by one
-  .to(plChars, {
+  // 1) Accent line draws under the logo
+  .to(preloaderLine, { width: '38vw', duration: .8, ease: 'expo.out' }, 0)
+  // 2) Logo reveals: scale + opacity rise
+  .to(preloaderLogo, {
     opacity: 1,
-    y: 0,
-    rotateX: 0,
-    duration: .85,
-    stagger: .085,
-    ease: 'back.out(1.5)'
-  }, .15)
-  // 3) Pulsing glow on letters
-  .to(plChars, {
-    textShadow: '0 0 50px rgba(124,92,252,.95), 0 0 90px rgba(214,51,132,.55)',
-    duration: .45,
+    scale: 1,
+    duration: 1.1,
+    ease: 'expo.out'
+  }, .1)
+  // 3) Glow pulse via drop-shadow filter (yoyo)
+  .to(preloaderLogo, {
+    filter: 'drop-shadow(0 0 40px rgba(124,92,252,.85)) drop-shadow(0 0 80px rgba(214,51,132,.5))',
+    duration: .55,
     ease: 'sine.inOut',
     yoyo: true,
     repeat: 1
-  }, .9)
-  .call(() => preloader.classList.add('is-glowing'), null, .9)
-  // Dot pops in
-  .to(plDot, { opacity: 1, scale: 1, duration: .5, ease: 'back.out(2)' }, 1.1)
+  }, .8)
+  .call(() => preloader.classList.add('is-glowing'), null, .8)
   // 4) Counter runs in parallel
   .fromTo(counterObj,
     { val: 0 },
@@ -2348,23 +2312,23 @@ tlPre
   )
   .to(preloaderCounter, { opacity: 1, duration: .4 }, .25)
   .to(preloaderTag, { opacity: 1, duration: .4 }, .8)
-  // 5) Letters disperse upward (toward navbar) — staggered
+  // 5) Lift + dissolve the logo (it "departs" upward toward the nav)
   .to([preloaderCounter, preloaderTag, preloaderLine], { opacity: 0, duration: .35 }, 2.05)
-  .to(plChars, {
-    y: -120,
+  .to(preloaderLogo, {
+    y: -80,
+    scale: .92,
     opacity: 0,
-    stagger: { each: .035, from: 'center' },
-    duration: .6,
+    filter: 'drop-shadow(0 0 0 rgba(124,92,252,0)) blur(2px)',
+    duration: .7,
     ease: 'power3.in'
   }, 2.1)
-  .to(plDot, { y: -120, opacity: 0, duration: .5, ease: 'power3.in' }, 2.15)
   // 6) Curtain reveal: preloader clip-paths from the top downward,
   //    progressively revealing the hero that sits beneath it.
   .to(preloader, {
     clipPath: 'inset(100% 0 0 0)',
     duration: .95,
     ease: 'expo.inOut'
-  }, 2.45)
+  }, 2.5)
   // Navbar slides in alongside
   .to('.nav', { yPercent: 0, opacity: 1, duration: .9, ease: 'expo.out' }, 2.6)
   .set(preloader, { display: 'none' });
