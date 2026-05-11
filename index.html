@@ -604,18 +604,18 @@ main{position:relative;z-index:5;}
 }
 
 /* ============================================================
-   SERVICES (NODE 03) — HORIZONTAL SCROLL ON DESKTOP, STACK ON MOBILE
+   SERVICES (NODE 03) — VERTICAL STACK (horizontal scroll removed:
+   it was overlapping with subsequent sections, see commit log)
    ============================================================ */
 .services-section{
   position:relative;
-  padding:0;
+  padding:130px 36px 80px;
   z-index:5;
   min-height:auto;
 }
 .services-head{
   max-width:var(--container);
-  margin:0 auto;
-  padding:130px 36px 60px;
+  margin:0 auto 80px;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:80px;
@@ -628,29 +628,24 @@ main{position:relative;z-index:5;}
 }
 .services-head .intro b{color:var(--text);font-weight:500;}
 
-.horizontal-container{
-  position:relative;
-  height:100vh;
-  width:100%;
-  overflow:hidden;
-}
-.horizontal-track{
+.services-panels{
+  max-width:var(--container);
+  margin:0 auto;
   display:flex;
-  height:100%;
-  width:max-content;
-  will-change:transform;
+  flex-direction:column;
+  gap:80px;
 }
 .service-panel{
-  flex:0 0 100vw;
-  height:100%;
-  padding:60px 36px;
-  display:flex;align-items:center;justify-content:center;
   position:relative;
+  padding:60px 0;
+  border-top:1px solid var(--line);
 }
+.service-panel:first-child{border-top:0;padding-top:0;}
 .service-panel .panel-num{
-  position:absolute;top:60px;left:36px;
   font-family:'JetBrains Mono',monospace;
   font-size:13px;letter-spacing:.2em;color:var(--text-mute);
+  margin-bottom:24px;
+  display:block;
 }
 .service-grid{
   width:100%;max-width:var(--container);
@@ -697,23 +692,7 @@ main{position:relative;z-index:5;}
   pointer-events:none;
 }
 
-/* Service progress indicator (dots at bottom of horizontal container) */
-.services-dots{
-  position:absolute;bottom:40px;left:50%;
-  transform:translateX(-50%);
-  display:flex;gap:14px;z-index:6;
-}
-.services-dots .ddot{
-  width:24px;height:2px;background:var(--line-strong);
-  border-radius:100px;position:relative;overflow:hidden;
-}
-.services-dots .ddot::after{
-  content:'';position:absolute;inset:0;
-  background:var(--grad);
-  transform:scaleX(0);transform-origin:0;
-  transition:transform .4s ease;
-}
-.services-dots .ddot.is-active::after{transform:scaleX(1);}
+/* services-dots removed with horizontal scroll */
 
 /* Chat visual */
 .chat-visual{padding:22px;}
@@ -977,13 +956,9 @@ main{position:relative;z-index:5;}
   .methode-step::after{display:none;}
   .service-visual{height:380px;}
   .node-card{padding:40px;}
-  .services-head{padding:100px 36px 40px;}
-  /* SERVICES: collapse to stacked vertical layout */
-  .horizontal-container{height:auto;width:100%;overflow:visible;}
-  .horizontal-track{display:flex;flex-direction:column;width:100%;height:auto;transform:none!important;}
-  .service-panel{flex:0 0 auto;width:100%;height:auto;padding:60px 36px;}
-  .service-panel .panel-num{position:relative;top:auto;left:auto;margin-bottom:18px;}
-  .services-dots{display:none;}
+  .services-section{padding:100px 22px 60px;}
+  .services-head{margin:0 0 40px;}
+  .service-panel{padding:40px 0;}
 }
 @media (max-width:768px){
   .nav{padding:18px 22px;}
@@ -1351,7 +1326,7 @@ main{position:relative;z-index:5;}
     </div>
   </section>
 
-  <!-- ===== NODE 03 · SERVICES (HORIZONTAL SCROLL DESKTOP / STACK MOBILE) ===== -->
+  <!-- ===== NODE 03 · SERVICES (vertical stack — robust) ===== -->
   <section class="node-section services-section" id="node-section-3" data-node="3" data-node-name="Services · 3 piliers">
     <div class="services-head">
       <div>
@@ -1369,8 +1344,7 @@ main{position:relative;z-index:5;}
       </p>
     </div>
 
-    <div class="horizontal-container" id="horizontal-container">
-      <div class="horizontal-track" id="horizontal-track">
+    <div class="services-panels">
 
         <!-- Pilier 01 — IA -->
         <article class="service-panel">
@@ -1517,12 +1491,6 @@ main{position:relative;z-index:5;}
           </div>
         </article>
 
-      </div>
-      <div class="services-dots" id="services-dots">
-        <div class="ddot is-active"></div>
-        <div class="ddot"></div>
-        <div class="ddot"></div>
-      </div>
     </div>
   </section>
 
@@ -1831,6 +1799,9 @@ function initSite(){
   // Hero entry — runs once, same on both (cheap transforms)
   initHero();
 
+  // Service panels fade-in — runs on both (no pin, no scrub, lightweight)
+  initServicesHorizontal();
+
   // ===== match media split =====
   const mm = gsap.matchMedia();
 
@@ -1841,7 +1812,6 @@ function initSite(){
     initLenis();
     initCursor();
     initCamera();
-    initServicesHorizontal();   // pin + scrub horizontal scroll
     initHud();
     initMagnetic();
     initTilt();
@@ -1958,46 +1928,27 @@ function initScrollProgress(){
 function initCamera(){ /* intentionally no-op — kept for symmetry */ }
 
 /* ============================================================
-   SERVICES HORIZONTAL SCROLL — desktop only
+   SERVICES — vertical fade-in per panel (no pin, no scrub)
+   The previous horizontal-scroll pin was bleeding panels into the
+   following sections (Méthode / Résultats appeared while chat/workflow
+   visuals were still on screen) because body{overflow-x:hidden} forces
+   GSAP into pinType:transform and Lenis was interfering with that path.
+   Stacked layout removes the whole class of bugs.
    ============================================================ */
 function initServicesHorizontal(){
-  const container = document.getElementById('horizontal-container');
-  const track = document.getElementById('horizontal-track');
-  const panels = gsap.utils.toArray('.service-panel');
-  const dots = gsap.utils.toArray('#services-dots .ddot');
-  if (!container || !track || panels.length === 0) return;
-
-  const totalScroll = () => track.scrollWidth - window.innerWidth;
-
-  const horizontalTween = gsap.to(track, {
-    x: () => -totalScroll(),
-    ease: 'none',
-    scrollTrigger: {
-      trigger: container,
-      pin: true,
-      scrub: 1,
-      start: 'top top',
-      end: () => '+=' + totalScroll(),
-      invalidateOnRefresh: true,
-      anticipatePin: 1,
-      onUpdate: self => {
-        const idx = Math.min(panels.length - 1, Math.round(self.progress * (panels.length - 1)));
-        dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
-      }
-    }
-  });
-
-  // Animate text inside each panel as it scrolls horizontally to center
-  panels.forEach(panel => {
+  gsap.utils.toArray('.service-panel').forEach((panel, i) => {
     const txt = panel.querySelector('.service-text');
+    const visual = panel.querySelector('.service-visual');
     if (txt) {
       gsap.from(txt.children, {
         y: 30, opacity: 0, stagger: .08, duration: .8, ease: 'power3.out',
-        scrollTrigger: {
-          trigger: panel,
-          containerAnimation: horizontalTween,
-          start: 'left 60%',
-        }
+        scrollTrigger: { trigger: panel, start: 'top 80%', once: true }
+      });
+    }
+    if (visual) {
+      gsap.from(visual, {
+        y: 40, opacity: 0, duration: .9, ease: 'power3.out',
+        scrollTrigger: { trigger: panel, start: 'top 80%', once: true }
       });
     }
   });
