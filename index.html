@@ -484,11 +484,9 @@ body.has-cursor .cursor-glow{display:block;}
 .services-wrap{
   position:relative;
   background:var(--bg-0);
-  padding:140px 0 0;
-  overflow:hidden;
+  padding:140px 36px 100px;
 }
 .services-head{
-  padding:0 36px;
   max-width:var(--container);
   margin:0 auto 80px;
   display:grid;grid-template-columns:1fr 1fr;
@@ -499,24 +497,22 @@ body.has-cursor .cursor-glow{display:block;}
   font-size:16px;line-height:1.65;
 }
 .services-head p b{color:var(--text);font-weight:500;}
-.horizontal-container{
-  position:relative;
-  height:100vh;width:100%;overflow:hidden;
-}
-.horizontal-track{
-  display:flex;height:100%;
-  will-change:transform;
+.services-stack{
+  max-width:var(--container);
+  margin:0 auto;
+  display:flex;flex-direction:column;
+  gap:90px;
 }
 .service-panel{
-  flex:0 0 100vw;height:100%;
-  padding:60px 36px;
-  display:grid;align-items:center;
   position:relative;
+  padding:60px 0;
+  border-top:1px solid var(--line);
 }
+.service-panel:first-child{border-top:0;padding-top:0;}
 .service-panel .panel-num{
-  position:absolute;top:60px;left:36px;
   font-family:'JetBrains Mono',monospace;
   font-size:13px;letter-spacing:.2em;color:var(--text-mute);
+  display:block;margin-bottom:30px;
 }
 .service-content{
   max-width:var(--container);margin:0 auto;
@@ -631,21 +627,7 @@ body.has-cursor .cursor-glow{display:block;}
 .code-preview .pv-block.w-2{width:40%;}
 .code-preview .pv-block.w-1{width:80%;}
 
-.services-dots{
-  position:absolute;bottom:40px;left:50%;
-  transform:translateX(-50%);
-  display:flex;gap:14px;z-index:5;
-}
-.services-dots .ddot{
-  width:24px;height:2px;background:var(--line-strong);
-  border-radius:100px;position:relative;overflow:hidden;
-}
-.services-dots .ddot::after{
-  content:'';position:absolute;inset:0;background:var(--grad);
-  transform:scaleX(0);transform-origin:0;
-  transition:transform .4s ease;
-}
-.services-dots .ddot.is-active::after{transform:scaleX(1);}
+.services-dots{display:none;} /* unused — horizontal scroll removed */
 
 /* ============================================================
    METHODE
@@ -654,7 +636,7 @@ body.has-cursor .cursor-glow{display:block;}
   display:grid;grid-template-columns:1fr 1.2fr;
   gap:100px;align-items:start;
 }
-.methode-sticky{position:sticky;top:120px;}
+.methode-sticky{position:relative;}
 .methode-sticky h2{
   font-family:'Syne',sans-serif;font-weight:600;
   font-size:clamp(36px,5vw,72px);
@@ -729,9 +711,8 @@ body.has-cursor .cursor-glow{display:block;}
   padding:0;
 }
 .results-pin{
-  position:relative;min-height:100vh;
-  display:flex;align-items:center;
-  padding:120px 36px;
+  position:relative;
+  padding:140px 36px;
 }
 .results::before{
   content:'';position:absolute;inset:0;
@@ -994,12 +975,10 @@ body.has-cursor .cursor-glow{display:block;}
   .problems-grid,.results-grid{grid-template-columns:1fr;}
   .footer-top{grid-template-columns:1fr;}
   .footer-mega{font-size:80px;}
-  /* SERVICES: stack vertically on mobile */
-  .horizontal-container{height:auto;width:100%;overflow:visible;}
-  .horizontal-track{flex-direction:column;height:auto;transform:none!important;}
-  .service-panel{flex:0 0 auto;width:100%;height:auto;padding:60px 22px;}
-  .service-panel .panel-num{position:relative;top:auto;left:auto;margin-bottom:18px;}
-  .services-dots{display:none;}
+  /* Services stack — already vertical; just tighten the spacing */
+  .services-wrap{padding:90px 22px 60px;}
+  .services-stack{gap:60px;}
+  .service-panel{padding:50px 0;}
   .preloader-logo,.preloader-logo img{height:80px;}
 }
 </style>
@@ -1179,8 +1158,7 @@ body.has-cursor .cursor-glow{display:block;}
     </p>
   </div>
 
-  <div class="horizontal-container" id="horizontal-container">
-    <div class="horizontal-track" id="horizontal-track">
+  <div class="services-stack">
 
       <section class="service-panel">
         <div class="panel-num">01 / 03 — IA</div>
@@ -1324,12 +1302,6 @@ body.has-cursor .cursor-glow{display:block;}
         </div>
       </section>
 
-    </div>
-    <div class="services-dots" id="services-dots">
-      <div class="ddot is-active"></div>
-      <div class="ddot"></div>
-      <div class="ddot"></div>
-    </div>
   </div>
 </div>
 
@@ -1644,7 +1616,7 @@ tlPre
   .set(preloader, { display: 'none' });
 
 /* ============================================================
-   INIT — runs after preloader, splits by media query
+   INIT — same animations everywhere, desktop adds polish on top
    ============================================================ */
 function initSite(){
   initNav();
@@ -1654,37 +1626,26 @@ function initSite(){
   initFades();
   initServiceVisuals();
 
-  const mm = gsap.matchMedia();
+  /* Universal animations — identical on desktop and mobile */
+  initHero();
+  initProblems();
+  initServices();
+  initMethode();
+  initResults();
+  initTesti();
 
-  /* ---------- DESKTOP (≥ 1025px) ---------- */
-  mm.add(QUERY_DESKTOP, () => {
+  /* Desktop-only polish (smooth scroll, custom cursor, hover effects) */
+  gsap.matchMedia().add(QUERY_DESKTOP, () => {
     document.body.classList.add('has-cursor');
     initLenis();
     initCursor();
     initMagnetic();
     initTilt();
     initOrbsParallax();
-    initHeroPinned();
-    initProblemsDesktop();
-    initServicesHorizontal();
-    initMethodeDesktop();
-    initResultsPinned();
-    initTestiDesktop();
-    initFooterMega();
     return () => {
       document.body.classList.remove('has-cursor');
       if (window.__lenis) { window.__lenis.destroy(); window.__lenis = null; }
     };
-  });
-
-  /* ---------- MOBILE / TABLET (≤ 1024px) ---------- */
-  mm.add(QUERY_MOBILE, () => {
-    initHeroMobile();
-    initProblemsMobile();
-    initServicesMobile();
-    initMethodeMobile();
-    initResultsMobile();
-    initTestiMobile();
   });
 
   ScrollTrigger.refresh();
@@ -1904,251 +1865,133 @@ function initOrbsParallax(){
 }
 
 /* ============================================================
-   HERO — desktop pinned 150vh, 4 phases
+   HERO — entry timeline (runs once on page load, no pin, no scrub)
+   Same animation on desktop and mobile.
    ============================================================ */
-function initHeroPinned(){
+function initHero(){
   document.querySelectorAll('[data-hero-line]').forEach(line => new SplitType(line, { types: 'chars' }));
 
-  gsap.set('.hero-badge', { opacity: 1, y: 0 });
-  gsap.set('[data-hero-line] .char', { rotateX: -90, y: 90, opacity: 0 });
-  gsap.set('.hero-sub',     { opacity: 0, y: 36 });
-  gsap.set('.cta-row .btn', { opacity: 0, y: 36 });
-  gsap.set('.hero-stat',    { opacity: 0, y: 24 });
-
-  const heroCounters = document.querySelectorAll('.hero-stat .counter');
-  const counterStates = Array.from(heroCounters).map(el => ({ el, target: +el.dataset.target, v: 0 }));
-  counterStates.forEach(c => c.el.textContent = '0');
-
-  const heroTl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.hero',
-      start: 'top top',
-      end: '+=150%',
-      pin: true,
-      pinSpacing: true,
-      scrub: 1,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-    }
-  });
-
-  heroTl
-    // Phase 1: chars 3D rotate in
-    .to('[data-hero-line] .char', {
-      rotateX: 0, y: 0, opacity: 1,
+  const tl = gsap.timeline({ delay: .15 });
+  tl.from('.hero-badge', { y: 20, opacity: 0, duration: .8, ease: 'power3.out' })
+    .from('[data-hero-line] .char', {
+      rotateX: -90, y: 80, opacity: 0,
       stagger: { each: .012, from: 'start' },
-      duration: 1, ease: 'power3.out'
-    }, 0)
-    // Phase 2: subtitle + CTAs
-    .to('.hero-sub',     { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 1.1)
-    .to('.cta-row .btn', { opacity: 1, y: 0, stagger: .08, duration: .6, ease: 'back.out(1.4)' }, 1.25)
-    // Phase 3: stats counters scrub up
-    .to('.hero-stat', { opacity: 1, y: 0, stagger: .12, duration: .7, ease: 'power3.out' }, 2)
-    .to(counterStates, {
-      v: i => counterStates[i].target,
-      ease: 'none', duration: 1,
-      onUpdate: function(){
-        counterStates.forEach(c => c.el.textContent = Math.round(c.v));
-      }
-    }, 2.1)
-    // Phase 4: hero scales out + blur
-    .to('.hero-inner', { scale: .95, opacity: 0, filter: 'blur(2px)', duration: 1, ease: 'power2.in' }, 3.1)
-    .to('.hero-grid-bg', { opacity: 0, duration: 1, ease: 'power2.in' }, 3.1);
-}
+      duration: .9, ease: 'power3.out'
+    }, '-=.4')
+    .from('.hero-sub',     { opacity: 0, y: 26, duration: .7, ease: 'power3.out' }, '-=.5')
+    .from('.cta-row .btn', { opacity: 0, y: 26, stagger: .08, duration: .6, ease: 'back.out(1.4)' }, '-=.4')
+    .from('.hero-stat',    { opacity: 0, y: 22, stagger: .1, duration: .6, ease: 'power3.out' }, '-=.3');
 
-/* ============================================================
-   HERO — mobile simple entry
-   ============================================================ */
-function initHeroMobile(){
-  document.querySelectorAll('[data-hero-line]').forEach(line => new SplitType(line, { types: 'chars' }));
-  gsap.set('.hero-badge', { opacity: 1, y: 0 });
-
-  const tl = gsap.timeline({ delay: .2 });
-  tl.from('[data-hero-line] .char', {
-      rotateX: -90, y: 50, opacity: 0,
-      stagger: .012, duration: .8, ease: 'power3.out'
-    })
-    .from('.hero-sub',     { opacity: 0, y: 24, duration: .7, ease: 'power3.out' }, '-=.5')
-    .from('.cta-row .btn', { opacity: 0, y: 24, stagger: .08, duration: .6, ease: 'power3.out' }, '-=.4')
-    .from('.hero-stat',    { opacity: 0, y: 20, stagger: .1, duration: .6, ease: 'power3.out' }, '-=.3');
-
-  document.querySelectorAll('.hero-stat .counter').forEach(el => {
+  // Counters animate up once after entry
+  document.querySelectorAll('.hero-stat .counter').forEach((el, i) => {
     const target = +el.dataset.target;
     const obj = { v: 0 };
+    el.textContent = '0';
     gsap.to(obj, {
-      v: target, duration: 1.8, delay: 1.2, ease: 'power2.out',
+      v: target, duration: 1.8, delay: 1.4 + i * .08, ease: 'power2.out',
       onUpdate: () => el.textContent = Math.round(obj.v)
     });
   });
 }
 
 /* ============================================================
-   PROBLEMS — desktop clip-path reveal / mobile fade
+   PROBLEMS — fade-up + stagger
    ============================================================ */
-function initProblemsDesktop(){
+function initProblems(){
   gsap.utils.toArray('.problem-card').forEach((card, i) => {
     gsap.from(card, {
-      y: 60, opacity: 0,
-      clipPath: 'inset(100% 0 0 0)',
-      duration: 1.1, delay: i * .08, ease: 'power4.out',
-      scrollTrigger: { trigger: card, start: 'top 85%' }
-    });
-  });
-}
-function initProblemsMobile(){
-  gsap.utils.toArray('.problem-card').forEach((card, i) => {
-    gsap.from(card, {
-      y: 30, opacity: 0,
-      duration: .65, delay: i * .06, ease: 'power2.out',
-      scrollTrigger: { trigger: card, start: 'top 92%', once: true }
+      y: 36, opacity: 0,
+      duration: .8, delay: (i % 2) * .12, ease: 'power3.out',
+      scrollTrigger: { trigger: card, start: 'top 88%', once: true }
     });
   });
 }
 
 /* ============================================================
-   SERVICES — desktop horizontal scroll / mobile stack
+   SERVICES — vertical stack with fade-up per panel
    ============================================================ */
-function initServicesHorizontal(){
-  const container = document.getElementById('horizontal-container');
-  const track = document.getElementById('horizontal-track');
-  const panels = gsap.utils.toArray('.service-panel');
-  const dots = gsap.utils.toArray('#services-dots .ddot');
-  if (!container || !track || panels.length === 0) return;
-
-  const totalScroll = () => track.scrollWidth - window.innerWidth;
-
-  gsap.to(track, {
-    x: () => -totalScroll(),
-    ease: 'none',
-    scrollTrigger: {
-      trigger: container,
-      pin: true,
-      pinSpacing: true,
-      scrub: 1.2,
-      start: 'top top',
-      end: () => '+=' + totalScroll(),
-      invalidateOnRefresh: true,
-      anticipatePin: 1,
-      onUpdate: self => {
-        const idx = Math.min(panels.length - 1, Math.round(self.progress * (panels.length - 1)));
-        dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
-      }
+function initServices(){
+  gsap.utils.toArray('.service-panel').forEach((panel, i) => {
+    gsap.from(panel, {
+      y: 50, opacity: 0,
+      duration: .9, ease: 'power3.out',
+      scrollTrigger: { trigger: panel, start: 'top 85%', once: true }
+    });
+    // Service text + visual fade-in slightly staggered for a richer feel
+    const txt = panel.querySelector('.service-text');
+    const visual = panel.querySelector('.service-visual');
+    if (txt) {
+      gsap.from(txt.children, {
+        y: 24, opacity: 0, stagger: .07, duration: .65, ease: 'power3.out',
+        scrollTrigger: { trigger: panel, start: 'top 80%', once: true }
+      });
+    }
+    if (visual) {
+      gsap.from(visual, {
+        y: 30, opacity: 0, duration: .85, ease: 'power3.out',
+        scrollTrigger: { trigger: panel, start: 'top 80%', once: true }
+      });
     }
   });
 }
-function initServicesMobile(){
-  gsap.utils.toArray('.service-panel').forEach((p, i) => {
-    gsap.from(p, {
-      y: 30, opacity: 0, duration: .7, ease: 'power2.out',
-      scrollTrigger: { trigger: p, start: 'top 90%', once: true }
-    });
-  });
-}
 
 /* ============================================================
-   METHODE — desktop progress + clip-path reveals / mobile fade
+   METHODE — progress bar fills + per-step fade-up
    ============================================================ */
-function initMethodeDesktop(){
+function initMethode(){
   const steps = gsap.utils.toArray('[data-step]');
   const fill = document.getElementById('methode-fill');
   const stepLabel = document.getElementById('methode-step-label');
 
   steps.forEach((step, i) => {
     gsap.from(step, {
-      y: 80, opacity: 0,
-      clipPath: 'inset(0 0 100% 0)',
-      duration: 1.2, ease: 'power4.out',
-      scrollTrigger: { trigger: step, start: 'top 82%' }
+      y: 40, opacity: 0,
+      duration: .85, ease: 'power3.out',
+      scrollTrigger: { trigger: step, start: 'top 88%', once: true }
     });
+    // Progress bar fill updates as you scroll through each step
     ScrollTrigger.create({
       trigger: step,
-      start: 'top center',
-      end: 'bottom center',
+      start: 'top 70%',
+      end: 'bottom 70%',
       onEnter: () => {
-        gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
+        if (fill) gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
         if (stepLabel) stepLabel.textContent = String(i + 1).padStart(2, '0');
       },
       onEnterBack: () => {
-        gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
+        if (fill) gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
         if (stepLabel) stepLabel.textContent = String(i + 1).padStart(2, '0');
       },
-      onLeaveBack: () => {
-        if (i === 0) {
-          gsap.to(fill, { scaleX: 0, duration: .6 });
-          if (stepLabel) stepLabel.textContent = '00';
-        }
-      }
-    });
-  });
-}
-function initMethodeMobile(){
-  gsap.utils.toArray('[data-step]').forEach((step, i) => {
-    gsap.from(step, {
-      y: 30, opacity: 0,
-      duration: .65, delay: i * .06, ease: 'power2.out',
-      scrollTrigger: { trigger: step, start: 'top 92%', once: true }
     });
   });
 }
 
 /* ============================================================
-   RESULTATS — desktop pinned scrubbed counters / mobile simple
+   RESULTATS — fade-up cards + animated counters (one-shot)
    ============================================================ */
-function initResultsPinned(){
-  const pin = document.getElementById('results-pin');
-  if (!pin) return;
-  const counters = gsap.utils.toArray('.big-counter');
-  const counterStates = counters.map(el => ({ el, target: +el.dataset.target, v: 0 }));
-  counters.forEach(el => el.textContent = '0');
+function initResults(){
   const cards = gsap.utils.toArray('.result-card');
-
-  gsap.set(cards, { y: 70, opacity: 0, scale: .95 });
-  gsap.set('.results-text', { opacity: 0, y: 30 });
-
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: pin,
-      start: 'top top',
-      end: '+=120%',
-      pin: true,
-      scrub: 1,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-    }
+  gsap.from('.results-text', {
+    y: 24, opacity: 0, duration: .8, ease: 'power3.out',
+    scrollTrigger: { trigger: '.results', start: 'top 80%', once: true }
   });
-
-  tl.to('.results-text', { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 0)
-    .to(cards, {
-      y: 0, opacity: 1, scale: 1,
-      stagger: .12, duration: .9, ease: 'power3.out'
-    }, .3)
-    .to(counterStates, {
-      v: i => counterStates[i].target,
-      ease: 'none', duration: 1.4,
-      onUpdate: function(){
-        counterStates.forEach(c => c.el.textContent = Math.round(c.v));
-      }
-    }, .6);
-}
-function initResultsMobile(){
-  const pin = document.getElementById('results-pin');
-  if (!pin) return;
-  const cards = gsap.utils.toArray('.result-card');
-
   gsap.from(cards, {
-    y: 30, opacity: 0, stagger: .1, duration: .65, ease: 'power2.out',
-    scrollTrigger: { trigger: pin, start: 'top 85%', once: true }
+    y: 36, opacity: 0, stagger: .1, duration: .75, ease: 'power3.out',
+    scrollTrigger: { trigger: '.results-grid', start: 'top 85%', once: true }
   });
 
+  // Counters mount once when results enter view
   const counters = document.querySelectorAll('.big-counter');
   ScrollTrigger.create({
-    trigger: pin, start: 'top 75%', once: true,
+    trigger: '.results-grid',
+    start: 'top 80%',
+    once: true,
     onEnter: () => {
       counters.forEach(el => {
         const target = +el.dataset.target;
         const obj = { v: 0 };
         gsap.to(obj, {
-          v: target, duration: 1.6, ease: 'power2.out',
+          v: target, duration: 1.7, ease: 'power2.out',
           onUpdate: () => el.textContent = Math.round(obj.v)
         });
       });
@@ -2157,36 +2000,15 @@ function initResultsMobile(){
 }
 
 /* ============================================================
-   TEMOIGNAGES — desktop clip-path / mobile fade
+   TEMOIGNAGES — fade-up cards stagger
    ============================================================ */
-function initTestiDesktop(){
+function initTesti(){
   gsap.utils.toArray('.testi-card').forEach((card, i) => {
     gsap.from(card, {
-      y: 70, opacity: 0,
-      clipPath: 'inset(0 0 100% 0)',
-      rotate: i % 2 === 0 ? -.4 : .4,
-      duration: 1.1, delay: i * .12, ease: 'power4.out',
-      scrollTrigger: { trigger: '.testi-grid', start: 'top 80%' }
+      y: 40, opacity: 0,
+      duration: .85, delay: i * .1, ease: 'power3.out',
+      scrollTrigger: { trigger: '.testi-grid', start: 'top 82%', once: true }
     });
-  });
-}
-function initTestiMobile(){
-  gsap.utils.toArray('.testi-card').forEach((card, i) => {
-    gsap.from(card, {
-      y: 30, opacity: 0,
-      duration: .65, delay: i * .06, ease: 'power2.out',
-      scrollTrigger: { trigger: card, start: 'top 92%', once: true }
-    });
-  });
-}
-
-/* ============================================================
-   FOOTER MEGA — desktop only
-   ============================================================ */
-function initFooterMega(){
-  gsap.from('.footer-mega', {
-    yPercent: 30, opacity: 0, ease: 'none',
-    scrollTrigger: { trigger: '.footer', start: 'top 80%', end: 'bottom bottom', scrub: 1 }
   });
 }
 
