@@ -577,8 +577,10 @@ button{font:inherit;color:inherit;background:none;border:0;}
   .bg-video,.video-overlay,.video-vignette,.hud-progress{display:none!important;}
   .content-block{
     position:relative;inset:auto;
-    /* opacity controlled by gsap.from() — must NOT use !important here,
-       otherwise it overrides the inline opacity GSAP needs to set */
+    /* Override the desktop base opacity:0 (used for overlay fade-in).
+       Use a plain rule (no !important) so gsap.from() can still set
+       inline opacity:0 for its fade-in animation. */
+    opacity:1;
     padding:90px 22px;
     min-height:auto;
     text-shadow:none;
@@ -1171,59 +1173,72 @@ function initDesktopVideoScene(){
    MOBILE — simple stacked sections with fade-ins
    ============================================================ */
 function initMobileSections(){
-  /* Clear any inline opacity that might persist from a desktop->mobile
-     resize transition. After this, gsap.from() can freely animate. */
+  /* 1) Wipe any lingering inline styles from a desktop->mobile resize */
   document.querySelectorAll('.content-block, .service-item').forEach(el => {
     el.style.removeProperty('opacity');
     el.style.removeProperty('transform');
   });
 
-  document.querySelectorAll('.content-block').forEach(el => {
-    gsap.from(el, {
-      y: 30, opacity: 0, duration: .7, ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 90%', once: true }
-    });
-  });
-
-  document.querySelectorAll('.service-item').forEach((el, i) => {
-    gsap.from(el, {
-      y: 24, opacity: 0, duration: .6, delay: i * .08, ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 92%', once: true }
-    });
-  });
-
-  document.querySelectorAll('.methode-step, .result-item, .testi-item').forEach((el, i) => {
-    gsap.from(el, {
-      y: 20, opacity: 0, duration: .55, delay: (i % 4) * .06, ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 92%', once: true }
-    });
-  });
-
-  /* Counters fire when results block enters viewport */
-  const resultsBlock = document.querySelector('.block-results');
-  if (resultsBlock) {
-    ScrollTrigger.create({
-      trigger: resultsBlock,
-      start: 'top 80%',
-      once: true,
-      onEnter: () => {
-        document.querySelectorAll('.counter').forEach(el => {
-          const target = +el.dataset.target;
-          const obj = { v: 0 };
-          gsap.to(obj, {
-            v: target, duration: 1.6, ease: 'power2.out',
-            onUpdate: () => { el.textContent = Math.round(obj.v); }
-          });
-        });
-      }
-    });
+  /* 2) Helper: ScrollTrigger does NOT retroactively fire onEnter for
+        elements that are already in viewport at setup. So if an element
+        is already visible (e.g. the first content block right under the
+        nav), we run the animation immediately. Otherwise we attach a
+        scroll-trigger. This guarantees nothing stays stuck at opacity:0. */
+  function fadeUp(el, opts){
+    const vh = window.innerHeight || 1;
+    const rect = el.getBoundingClientRect();
+    const alreadyVisible = rect.top < vh * 0.9 && rect.bottom > 0;
+    const base = { y: 30, opacity: 0, ease: 'power2.out', duration: .7, ...opts };
+    if (alreadyVisible) {
+      gsap.from(el, base);
+    } else {
+      gsap.from(el, {
+        ...base,
+        scrollTrigger: { trigger: el, start: 'top 92%', once: true }
+      });
+    }
   }
 
-  /* Native anchor scrolling on mobile — close the menu when a link is clicked */
+  document.querySelectorAll('.content-block').forEach(el => fadeUp(el, { y: 28, duration: .7 }));
+  document.querySelectorAll('.service-item').forEach((el, i) => fadeUp(el, { y: 22, delay: i * .08, duration: .6 }));
+  document.querySelectorAll('.methode-step, .result-item, .testi-item').forEach((el, i) => fadeUp(el, { y: 18, delay: (i % 4) * .06, duration: .55 }));
+
+  /* 3) Counters fire when results block enters viewport */
+  const resultsBlock = document.querySelector('.block-results');
+  if (resultsBlock) {
+    const fire = () => {
+      document.querySelectorAll('.counter').forEach(el => {
+        const target = +el.dataset.target;
+        const obj = { v: 0 };
+        gsap.to(obj, {
+          v: target, duration: 1.6, ease: 'power2.out',
+          onUpdate: () => { el.textContent = Math.round(obj.v); }
+        });
+      });
+    };
+    const rect = resultsBlock.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) fire();
+    else ScrollTrigger.create({ trigger: resultsBlock, start: 'top 80%', once: true, onEnter: fire });
+  }
+
+  /* 4) Close mobile menu on anchor click — native browser scroll handles the jump */
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', () => {
       document.getElementById('mobile-menu')?.classList.remove('is-open');
     });
+  });
+
+  /* 5) Safety net: after the next frame, force any block that ended up at
+        opacity:0 (because no animation fired) back to opacity:1. */
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      document.querySelectorAll('.content-block, .service-item, .methode-step, .result-item, .testi-item').forEach(el => {
+        if (parseFloat(getComputedStyle(el).opacity) === 0) {
+          el.style.opacity = '1';
+          el.style.transform = 'none';
+        }
+      });
+    }, 1500);
   });
 }
 
