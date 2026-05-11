@@ -1,0 +1,2716 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0e1a" />
+<title>NEEXUS — Smart Digital Solution Agency</title>
+<meta name="description" content="NEEXUS — Agence d'IA, automatisation et solutions digitales. On automatise ce qui freine votre croissance pour que vous puissiez vous concentrer sur ce qui compte." />
+<meta property="og:title" content="NEEXUS — Smart Digital Solution Agency" />
+<meta property="og:description" content="Vos concurrents automatisent. Vous faites encore tout à la main ?" />
+<meta property="og:type" content="website" />
+
+<!-- Preconnect / Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<!-- Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+<script src="https://unpkg.com/split-type@0.3.4/umd/index.min.js"></script>
+
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --bg-0:#070a14;
+  --bg-1:#0a0e1a;
+  --bg-2:#0f1424;
+  --bg-3:#131830;
+  --line:rgba(255,255,255,.06);
+  --line-strong:rgba(255,255,255,.12);
+  --text:#e8eaf0;
+  --text-dim:#8b90a5;
+  --text-mute:#5b607a;
+  --blue:#4d7cff;
+  --purple:#7c5cfc;
+  --magenta:#d63384;
+  --pink:#e8548e;
+  --grad: linear-gradient(135deg, #4d7cff 0%, #7c5cfc 40%, #d63384 100%);
+  --grad-text: linear-gradient(90deg, #4d7cff 0%, #9b6dff 50%, #e8548e 100%);
+  --grad-soft: linear-gradient(135deg, rgba(77,124,255,.14) 0%, rgba(124,92,252,.10) 50%, rgba(214,51,132,.14) 100%);
+  --glass: rgba(255,255,255,.025);
+  --glass-strong: rgba(255,255,255,.045);
+  --r-sm:10px;
+  --r-md:18px;
+  --r-lg:28px;
+  --r-xl:40px;
+  --shadow-glow: 0 0 60px rgba(124,92,252,.35);
+  --container: 1340px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg-1);color:var(--text);}
+html{scroll-behavior:auto;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-weight:400;
+  line-height:1.55;
+  font-size:clamp(15px,1vw,17px);
+  overflow-x:hidden;
+  cursor:none;
+}
+body.no-cursor{cursor:auto;}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+button{font:inherit;color:inherit;background:none;border:0;cursor:none;}
+::selection{background:rgba(124,92,252,.45);color:#fff;}
+
+/* Lenis */
+html.lenis,html.lenis body{height:auto;}
+.lenis.lenis-smooth{scroll-behavior:auto!important;}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain;}
+.lenis.lenis-stopped{overflow:hidden;}
+
+/* ============================================================
+   TYPO
+   ============================================================ */
+.display{font-family:'Syne',sans-serif;font-weight:700;letter-spacing:-.02em;line-height:.96;}
+.display-sm{font-family:'Syne',sans-serif;font-weight:600;letter-spacing:-.01em;line-height:1.05;}
+.eyebrow{
+  font-family:'DM Sans',sans-serif;
+  font-size:11px;
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:.22em;
+  color:var(--text-dim);
+}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.78em;letter-spacing:0;}
+.gradient-text{
+  background:var(--grad-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.italic{font-style:italic;font-family:'Syne',sans-serif;font-weight:500;}
+
+/* ============================================================
+   GLOBAL FX (cursor, noise, orbs, progress)
+   ============================================================ */
+.cursor{
+  position:fixed;top:0;left:0;
+  width:14px;height:14px;
+  border-radius:50%;
+  background:#fff;
+  mix-blend-mode:difference;
+  pointer-events:none;
+  z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:width .25s ease, height .25s ease, background-color .25s ease;
+}
+.cursor-glow{
+  position:fixed;top:0;left:0;
+  width:380px;height:380px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(124,92,252,.18) 0%,rgba(214,51,132,.05) 40%,transparent 70%);
+  filter:blur(40px);
+  pointer-events:none;
+  z-index:1;
+  transform:translate(-50%,-50%);
+  mix-blend-mode:screen;
+}
+.cursor.is-hover{width:54px;height:54px;background:transparent;border:1px solid #fff;}
+
+.noise{
+  position:fixed;inset:0;
+  pointer-events:none;
+  z-index:9998;
+  opacity:.04;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.orb{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(120px);
+  opacity:.55;
+  will-change:transform;
+}
+.orb-1{width:520px;height:520px;background:#4d7cff;top:-120px;left:-160px;}
+.orb-2{width:620px;height:620px;background:#7c5cfc;top:30%;right:-200px;}
+.orb-3{width:480px;height:480px;background:#d63384;bottom:-160px;left:30%;opacity:.45;}
+.orb-4{width:380px;height:380px;background:#4d7cff;bottom:10%;right:10%;opacity:.35;}
+
+.scroll-progress{
+  position:fixed;top:0;left:0;right:0;
+  height:2px;
+  background:var(--grad);
+  transform:scaleX(0);
+  transform-origin:0 0;
+  z-index:9997;
+  pointer-events:none;
+}
+
+/* ============================================================
+   PRELOADER
+   ============================================================ */
+.preloader{
+  position:fixed;inset:0;
+  background:#000;
+  z-index:10000;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
+.preloader-logo{
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:clamp(48px,8vw,92px);
+  letter-spacing:-.04em;
+  line-height:1;
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+.preloader-logo .ee{
+  position:relative;
+  display:inline-block;
+  background:var(--grad-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.preloader-counter{
+  position:absolute;
+  bottom:48px;
+  left:48px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  letter-spacing:.04em;
+  color:var(--text-dim);
+}
+.preloader-tag{
+  position:absolute;
+  bottom:48px;
+  right:48px;
+  font-family:'DM Sans',sans-serif;
+  font-size:11px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  opacity:0;
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{
+  position:fixed;top:0;left:0;right:0;
+  z-index:1000;
+  padding:22px 36px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  transition:padding .35s ease, background-color .35s ease, border-color .35s ease, backdrop-filter .35s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.is-scrolled{
+  padding:14px 36px;
+  background:rgba(10,14,26,.62);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  border-bottom:1px solid var(--line);
+}
+.nav-logo{
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:22px;
+  letter-spacing:-.04em;
+  display:flex;
+  align-items:center;
+  gap:0;
+  position:relative;
+}
+.nav-logo .ee{
+  background:var(--grad-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  position:relative;
+}
+.nav-logo .dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--magenta);
+  margin-left:6px;
+  margin-bottom:-2px;
+  align-self:flex-end;
+  box-shadow:0 0 12px var(--magenta);
+}
+.nav-links{
+  display:flex;
+  gap:34px;
+  align-items:center;
+}
+.nav-links a{
+  font-size:13px;
+  letter-spacing:.02em;
+  color:var(--text-dim);
+  position:relative;
+  padding:6px 0;
+  transition:color .25s;
+}
+.nav-links a::after{
+  content:'';
+  position:absolute;left:0;bottom:0;
+  width:100%;height:1px;
+  background:var(--grad-text);
+  transform:scaleX(0);
+  transform-origin:0;
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+.nav-links a:hover{color:var(--text);}
+.nav-links a:hover::after{transform:scaleX(1);}
+
+.nav-cta{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+  font-weight:500;
+  padding:11px 20px;
+  border-radius:100px;
+  border:1px solid var(--line-strong);
+  background:rgba(255,255,255,.02);
+  backdrop-filter:blur(12px);
+  transition:transform .35s, border-color .35s, background-color .35s;
+}
+.nav-cta:hover{
+  border-color:rgba(255,255,255,.25);
+  background:rgba(255,255,255,.05);
+}
+.nav-cta .arrow{
+  display:inline-block;
+  transition:transform .35s;
+}
+.nav-cta:hover .arrow{transform:translateX(4px);}
+
+.nav-burger{
+  display:none;
+  width:40px;height:40px;
+  border-radius:50%;
+  border:1px solid var(--line-strong);
+  background:rgba(255,255,255,.03);
+  align-items:center;justify-content:center;
+  flex-direction:column;gap:4px;
+}
+.nav-burger span{
+  display:block;width:16px;height:1px;background:#fff;
+  transition:transform .3s, opacity .3s;
+}
+
+/* Mobile menu overlay */
+.mobile-menu{
+  position:fixed;inset:0;
+  background:rgba(7,10,20,.96);
+  backdrop-filter:blur(24px);
+  z-index:999;
+  display:none;
+  flex-direction:column;
+  padding:120px 36px 60px;
+  transform:translateY(-100%);
+  transition:transform .55s cubic-bezier(.7,0,.3,1);
+}
+.mobile-menu.is-open{transform:translateY(0);}
+.mobile-menu a{
+  font-family:'Syne',sans-serif;
+  font-size:38px;
+  font-weight:600;
+  letter-spacing:-.02em;
+  padding:18px 0;
+  border-bottom:1px solid var(--line);
+}
+
+/* ============================================================
+   LAYOUT HELPERS
+   ============================================================ */
+.section{
+  position:relative;
+  padding:140px 36px;
+  z-index:2;
+}
+.container{
+  max-width:var(--container);
+  margin:0 auto;
+  position:relative;
+}
+.section-eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:28px;
+}
+.section-eyebrow .num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--text-mute);
+  letter-spacing:.05em;
+}
+.section-eyebrow .label{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.22em;
+  color:var(--text-dim);
+}
+.section-eyebrow .line{
+  width:48px;height:1px;
+  background:var(--line-strong);
+}
+.section-title{
+  font-family:'Syne',sans-serif;
+  font-weight:600;
+  font-size:clamp(36px,5.4vw,80px);
+  line-height:1;
+  letter-spacing:-.025em;
+  max-width:18ch;
+}
+
+/* ============================================================
+   HERO (PINNED)
+   ============================================================ */
+.hero{
+  position:relative;
+  min-height:100vh;
+  padding:0 36px;
+  overflow:hidden;
+  z-index:2;
+}
+.hero-grid-bg{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(ellipse 80% 60% at 50% 40%,#000 30%,transparent 80%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 40%,#000 30%,transparent 80%);
+  pointer-events:none;
+}
+.hero-inner{
+  max-width:var(--container);
+  margin:0 auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  position:relative;
+  padding-top:80px;
+}
+.hero-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 16px 8px 12px;
+  border:1px solid var(--line-strong);
+  background:rgba(255,255,255,.025);
+  backdrop-filter:blur(10px);
+  border-radius:100px;
+  font-size:12px;
+  letter-spacing:.05em;
+  width:fit-content;
+  margin-bottom:36px;
+}
+.hero-badge .pulse-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--blue);
+  position:relative;
+  box-shadow:0 0 10px var(--blue);
+}
+.hero-badge .pulse-dot::after{
+  content:'';
+  position:absolute;inset:-4px;
+  border-radius:50%;
+  border:1px solid var(--blue);
+  animation:pulse 2.4s infinite;
+}
+@keyframes pulse{
+  0%{transform:scale(1);opacity:.8;}
+  100%{transform:scale(2.2);opacity:0;}
+}
+.hero-title{
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:clamp(48px,8.4vw,140px);
+  line-height:.92;
+  letter-spacing:-.035em;
+  margin-bottom:32px;
+}
+.hero-title .line{
+  display:block;
+  overflow:hidden;
+}
+.hero-title .line-2{
+  background:var(--grad-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.hero-sub{
+  font-size:clamp(15px,1.2vw,19px);
+  color:var(--text-dim);
+  max-width:54ch;
+  line-height:1.55;
+  margin-bottom:48px;
+  font-weight:400;
+}
+.hero-sub b{color:var(--text);font-weight:500;}
+
+.cta-row{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-bottom:80px;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  padding:18px 28px;
+  border-radius:100px;
+  font-size:14px;
+  font-weight:500;
+  letter-spacing:.01em;
+  position:relative;
+  transition:transform .4s cubic-bezier(.2,.8,.2,1);
+  will-change:transform;
+}
+.btn-primary{
+  background:var(--grad);
+  color:#fff;
+  box-shadow:0 12px 40px rgba(124,92,252,.35);
+}
+.btn-primary::before{
+  content:'';
+  position:absolute;inset:0;
+  border-radius:inherit;
+  background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 50%);
+  pointer-events:none;
+}
+.btn-primary:hover{
+  box-shadow:0 18px 50px rgba(124,92,252,.55);
+}
+.btn-ghost{
+  background:rgba(255,255,255,.025);
+  color:var(--text);
+  border:1px solid var(--line-strong);
+  position:relative;
+}
+.btn-ghost::before{
+  content:'';
+  position:absolute;inset:-1px;
+  border-radius:inherit;
+  background:var(--grad);
+  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  padding:1px;
+  opacity:0;
+  transition:opacity .35s;
+}
+.btn-ghost:hover::before{opacity:1;}
+.btn .arrow{transition:transform .35s;}
+.btn:hover .arrow{transform:translate(2px,-2px);}
+
+.hero-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:48px;
+  max-width:760px;
+  border-top:1px solid var(--line);
+  padding-top:40px;
+}
+.hero-stat .num{
+  font-family:'Syne',sans-serif;
+  font-weight:600;
+  font-size:clamp(28px,3vw,42px);
+  line-height:1;
+  background:var(--grad-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  margin-bottom:8px;
+  letter-spacing:-.02em;
+}
+.hero-stat .lbl{
+  font-size:12px;
+  color:var(--text-dim);
+  letter-spacing:.04em;
+  line-height:1.4;
+}
+
+.hero-scroll-hint{
+  position:absolute;
+  bottom:40px;right:36px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  font-size:11px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--text-mute);
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+}
+.hero-scroll-hint .bar{
+  width:1px;height:48px;
+  background:linear-gradient(to bottom,var(--text-mute),transparent);
+  animation:scrollLine 2s ease-in-out infinite;
+}
+@keyframes scrollLine{
+  0%,100%{transform:scaleY(.4);transform-origin:top;}
+  50%{transform:scaleY(1);transform-origin:top;}
+}
+
+/* Hero floating side numbers */
+.hero-side{
+  position:absolute;
+  top:50%;
+  right:-10px;
+  transform:translateY(-50%) rotate(-90deg);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:.4em;
+  color:var(--text-mute);
+  text-transform:uppercase;
+}
+
+/* ============================================================
+   PROBLEMS
+   ============================================================ */
+.problems{
+  background:var(--bg-1);
+}
+.problems-head{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:80px;
+  align-items:end;
+  margin-bottom:80px;
+}
+.problems-intro{
+  font-size:16px;
+  color:var(--text-dim);
+  max-width:42ch;
+  line-height:1.65;
+}
+.problems-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:24px;
+}
+.problem-card{
+  position:relative;
+  padding:40px;
+  border-radius:var(--r-lg);
+  background:var(--glass);
+  border:1px solid var(--line);
+  backdrop-filter:blur(10px);
+  overflow:hidden;
+  transition:transform .5s cubic-bezier(.2,.8,.2,1),background-color .35s, border-color .35s;
+}
+.problem-card::before{
+  content:'';
+  position:absolute;inset:-1px;
+  border-radius:inherit;
+  background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.5) 25%,transparent 50%,rgba(214,51,132,.5) 75%,transparent 100%);
+  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  padding:1px;
+  opacity:0;
+  transition:opacity .5s;
+  animation:rotateBorder 6s linear infinite;
+}
+@property --rot{syntax:'<angle>';initial-value:0deg;inherits:false;}
+@keyframes rotateBorder{to{--rot:360deg;}}
+.problem-card:hover{transform:translateY(-4px);background:var(--glass-strong);}
+.problem-card:hover::before{opacity:1;}
+.problem-card .icon{
+  width:54px;height:54px;
+  border-radius:14px;
+  background:var(--grad-soft);
+  border:1px solid var(--line);
+  display:grid;place-items:center;
+  margin-bottom:28px;
+  font-size:24px;
+}
+.problem-card h3{
+  font-family:'Syne',sans-serif;
+  font-weight:600;
+  font-size:24px;
+  letter-spacing:-.01em;
+  margin-bottom:14px;
+}
+.problem-card p{
+  color:var(--text-dim);
+  font-size:15px;
+  line-height:1.6;
+}
+.problem-card .tag{
+  position:absolute;
+  top:24px;right:28px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:.1em;
+  color:var(--text-mute);
+}
+
+/* ============================================================
+   SERVICES (HORIZONTAL SCROLL)
+   ============================================================ */
+.services-wrap{
+  position:relative;
+  background:var(--bg-0);
+  padding:140px 0 0;
+  overflow:hidden;
+}
+.services-head{
+  padding:0 36px;
+  max-width:var(--container);
+  margin:0 auto 80px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:80px;
+  align-items:end;
+}
+.services-head p{
+  color:var(--text-dim);
+  max-width:42ch;
+  font-size:16px;
+  line-height:1.65;
+}
+.horizontal-container{
+  position:relative;
+  height:100vh;
+  width:100%;
+  overflow:hidden;
+}
+.horizontal-track{
+  display:flex;
+  height:100%;
+  will-change:transform;
+}
+.service-panel{
+  flex:0 0 100vw;
+  height:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:60px;
+  padding:60px 36px;
+  align-items:center;
+  position:relative;
+}
+.service-panel .panel-num{
+  position:absolute;
+  top:60px;left:36px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  letter-spacing:.2em;
+  color:var(--text-mute);
+}
+.service-content{
+  max-width:var(--container);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:80px;
+  align-items:center;
+  width:100%;
+}
+.service-text .pillar-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  color:var(--magenta);
+  letter-spacing:.2em;
+  margin-bottom:20px;
+  display:block;
+}
+.service-text h3{
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:clamp(32px,4.4vw,64px);
+  line-height:1;
+  letter-spacing:-.025em;
+  margin-bottom:24px;
+}
+.service-text .lead{
+  font-size:16px;
+  color:var(--text-dim);
+  line-height:1.65;
+  margin-bottom:32px;
+  max-width:46ch;
+}
+.service-text ul{
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.service-text li{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  font-size:15px;
+  color:var(--text);
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+}
+.service-text li::before{
+  content:'';
+  flex:0 0 6px;
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--grad);
+  margin-top:8px;
+  box-shadow:0 0 10px rgba(124,92,252,.6);
+}
+
+/* Service visuals */
+.service-visual{
+  position:relative;
+  height:520px;
+  border-radius:var(--r-lg);
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+  border:1px solid var(--line);
+  overflow:hidden;
+  backdrop-filter:blur(14px);
+}
+.service-visual::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 20% 0%,rgba(77,124,255,.18),transparent 60%),
+             radial-gradient(circle at 100% 100%,rgba(214,51,132,.18),transparent 60%);
+  pointer-events:none;
+}
+
+/* Visual 01: Chat */
+.chat-visual{padding:24px;}
+.chat-header{
+  display:flex;align-items:center;gap:10px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:24px;
+}
+.chat-header .av{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--grad);
+  display:grid;place-items:center;
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:14px;
+  color:#fff;
+}
+.chat-header .meta{flex:1;}
+.chat-header .meta .name{font-size:13px;font-weight:500;}
+.chat-header .meta .status{font-size:11px;color:#4ade80;display:flex;align-items:center;gap:6px;margin-top:2px;}
+.chat-header .meta .status::before{content:'';width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80;}
+.chat-header .ch-btn{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  color:var(--text-mute);
+  padding:4px 8px;
+  border:1px solid var(--line);
+  border-radius:6px;
+}
+.chat-msgs{display:flex;flex-direction:column;gap:12px;padding:0 4px;}
+.msg{
+  max-width:78%;
+  padding:12px 16px;
+  border-radius:18px;
+  font-size:13.5px;
+  line-height:1.45;
+  opacity:0;
+  transform:translateY(12px);
+}
+.msg.user{
+  align-self:flex-end;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--line);
+  border-bottom-right-radius:6px;
+}
+.msg.ai{
+  align-self:flex-start;
+  background:var(--grad-soft);
+  border:1px solid rgba(124,92,252,.25);
+  border-bottom-left-radius:6px;
+}
+.msg .meta{font-size:10px;color:var(--text-mute);margin-top:4px;font-family:'JetBrains Mono',monospace;}
+.typing{
+  align-self:flex-start;
+  display:flex;align-items:center;gap:4px;
+  padding:12px 16px;
+  background:var(--glass);
+  border:1px solid var(--line);
+  border-radius:18px;
+  border-bottom-left-radius:6px;
+  opacity:0;
+}
+.typing span{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--text-dim);
+  animation:typingDot 1.2s ease-in-out infinite;
+}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes typingDot{
+  0%,60%,100%{opacity:.3;transform:translateY(0);}
+  30%{opacity:1;transform:translateY(-3px);}
+}
+
+/* Visual 02: Workflow */
+.workflow-visual{padding:30px;display:grid;place-items:center;}
+.workflow-svg{width:100%;height:100%;max-width:460px;}
+.workflow-svg .node{
+  fill:rgba(10,14,26,.9);
+  stroke:rgba(255,255,255,.18);
+  stroke-width:1;
+}
+.workflow-svg .node-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;
+  fill:var(--text);
+  text-anchor:middle;
+  dominant-baseline:central;
+  font-weight:500;
+}
+.workflow-svg .node-icon{
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  fill:#fff;
+  text-anchor:middle;
+  dominant-baseline:central;
+}
+.workflow-svg .conn{
+  fill:none;
+  stroke:rgba(124,92,252,.35);
+  stroke-width:1.2;
+  stroke-dasharray:2 4;
+}
+.workflow-svg .conn-flow{
+  fill:none;
+  stroke:url(#flow-grad);
+  stroke-width:2;
+  stroke-linecap:round;
+}
+.workflow-svg .pulse{
+  fill:url(#flow-grad);
+}
+
+/* Visual 03: Code */
+.code-visual{
+  padding:24px;
+  font-family:'JetBrains Mono',monospace;
+}
+.code-window-bar{
+  display:flex;align-items:center;gap:8px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:18px;
+}
+.code-window-bar .dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.15);}
+.code-window-bar .file{
+  margin-left:14px;
+  font-size:11px;
+  color:var(--text-dim);
+}
+.code-content{
+  font-size:12.5px;
+  line-height:1.85;
+  color:var(--text);
+}
+.code-content .ln{display:flex;gap:18px;opacity:0;}
+.code-content .num{
+  color:var(--text-mute);
+  width:20px;text-align:right;
+  user-select:none;
+}
+.code-content .kw{color:#c084fc;}
+.code-content .fn{color:#60a5fa;}
+.code-content .str{color:#86efac;}
+.code-content .com{color:var(--text-mute);font-style:italic;}
+.code-content .pr{color:#fbbf24;}
+.code-content .typing-cursor{
+  display:inline-block;
+  width:6px;height:14px;
+  background:var(--grad);
+  animation:blink 1s infinite;
+  margin-left:2px;
+  vertical-align:middle;
+}
+@keyframes blink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
+
+.code-preview{
+  margin-top:20px;
+  padding:18px;
+  border-radius:12px;
+  background:var(--bg-2);
+  border:1px solid var(--line);
+}
+.code-preview .pv-bar{
+  height:4px;
+  background:var(--grad);
+  border-radius:100px;
+  margin-bottom:14px;
+  width:0;
+}
+.code-preview .pv-block{
+  height:8px;
+  background:rgba(255,255,255,.08);
+  border-radius:4px;
+  margin-bottom:8px;
+  opacity:0;
+}
+.code-preview .pv-block.w-3{width:60%;}
+.code-preview .pv-block.w-2{width:40%;}
+.code-preview .pv-block.w-1{width:80%;}
+
+/* Service progress dots */
+.services-dots{
+  position:absolute;
+  bottom:40px;left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:14px;
+  z-index:5;
+}
+.services-dots .dot{
+  width:24px;height:2px;
+  background:var(--line-strong);
+  border-radius:100px;
+  position:relative;
+  overflow:hidden;
+}
+.services-dots .dot::after{
+  content:'';
+  position:absolute;inset:0;
+  background:var(--grad);
+  transform:scaleX(0);
+  transform-origin:0;
+  transition:transform .4s ease;
+}
+.services-dots .dot.is-active::after{transform:scaleX(1);}
+
+/* ============================================================
+   METHODE
+   ============================================================ */
+.methode{
+  position:relative;
+  background:var(--bg-1);
+}
+.methode-inner{
+  display:grid;
+  grid-template-columns:1fr 1.2fr;
+  gap:100px;
+  align-items:start;
+}
+.methode-sticky{
+  position:sticky;
+  top:120px;
+}
+.methode-sticky h2{
+  font-family:'Syne',sans-serif;
+  font-weight:600;
+  font-size:clamp(36px,5vw,72px);
+  letter-spacing:-.025em;
+  line-height:1;
+  margin-bottom:32px;
+}
+.methode-sticky p{
+  color:var(--text-dim);
+  font-size:16px;
+  max-width:38ch;
+  line-height:1.65;
+  margin-bottom:48px;
+}
+.methode-progress{
+  position:relative;
+  width:100%;
+  max-width:280px;
+  height:4px;
+  background:var(--line);
+  border-radius:100px;
+  overflow:hidden;
+}
+.methode-progress .fill{
+  position:absolute;inset:0;
+  background:var(--grad);
+  transform-origin:0;
+  transform:scaleX(0);
+}
+.methode-progress-label{
+  display:flex;
+  justify-content:space-between;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--text-mute);
+  letter-spacing:.05em;
+  margin-top:10px;
+  max-width:280px;
+}
+
+.methode-steps{
+  display:flex;
+  flex-direction:column;
+  gap:80px;
+}
+.methode-step{
+  position:relative;
+  padding:40px;
+  border-radius:var(--r-lg);
+  background:var(--glass);
+  border:1px solid var(--line);
+  backdrop-filter:blur(10px);
+}
+.methode-step .step-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:28px;
+  padding-bottom:24px;
+  border-bottom:1px solid var(--line);
+}
+.methode-step .step-num{
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:clamp(48px,7vw,96px);
+  line-height:1;
+  background:var(--grad-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  letter-spacing:-.04em;
+}
+.methode-step .step-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--text-mute);
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:6px 12px;
+  border:1px solid var(--line);
+  border-radius:100px;
+}
+.methode-step h3{
+  font-family:'Syne',sans-serif;
+  font-weight:600;
+  font-size:28px;
+  letter-spacing:-.01em;
+  margin-bottom:14px;
+}
+.methode-step p{
+  color:var(--text-dim);
+  font-size:15px;
+  line-height:1.6;
+}
+.methode-step .step-deliverables{
+  margin-top:24px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.methode-step .step-deliverables span{
+  font-size:11px;
+  color:var(--text-dim);
+  padding:6px 12px;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--line);
+  border-radius:100px;
+}
+
+/* ============================================================
+   RESULTATS (PINNED COUNTERS)
+   ============================================================ */
+.results{
+  position:relative;
+  background:var(--bg-0);
+  overflow:hidden;
+}
+.results::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 50% at 50% 50%,#000 30%,transparent 90%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 50% at 50% 50%,#000 30%,transparent 90%);
+  pointer-events:none;
+}
+.results-inner{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:80px;
+  align-items:start;
+}
+.results-text h2{
+  font-family:'Syne',sans-serif;
+  font-weight:600;
+  font-size:clamp(36px,5vw,72px);
+  line-height:1;
+  letter-spacing:-.025em;
+  margin-bottom:32px;
+}
+.results-text p{
+  color:var(--text-dim);
+  font-size:16px;
+  max-width:38ch;
+  line-height:1.65;
+}
+.results-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+}
+.result-card{
+  position:relative;
+  padding:40px 32px;
+  border-radius:var(--r-lg);
+  background:var(--glass);
+  border:1px solid var(--line);
+  backdrop-filter:blur(14px);
+  overflow:hidden;
+}
+.result-card::before{
+  content:'';
+  position:absolute;
+  top:-50%;left:-50%;
+  width:200%;height:200%;
+  background:radial-gradient(circle at center,rgba(124,92,252,.12),transparent 60%);
+  opacity:0;
+  transition:opacity .5s;
+}
+.result-card:hover::before{opacity:1;}
+.result-card .num{
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:clamp(48px,6vw,80px);
+  line-height:1;
+  letter-spacing:-.04em;
+  background:var(--grad-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  margin-bottom:8px;
+  display:flex;align-items:baseline;
+}
+.result-card .unit{
+  font-size:.5em;
+  margin-left:4px;
+  opacity:.85;
+}
+.result-card .lbl{
+  font-size:14px;
+  color:var(--text);
+  font-weight:500;
+  margin-bottom:6px;
+}
+.result-card .desc{
+  font-size:13px;
+  color:var(--text-mute);
+  line-height:1.5;
+}
+
+/* ============================================================
+   TEMOIGNAGES
+   ============================================================ */
+.testi{
+  background:var(--bg-1);
+  position:relative;
+}
+.testi-head{
+  text-align:center;
+  margin-bottom:80px;
+}
+.testi-head h2{
+  font-family:'Syne',sans-serif;
+  font-weight:600;
+  font-size:clamp(36px,5vw,72px);
+  letter-spacing:-.025em;
+  line-height:1;
+  margin-bottom:20px;
+  max-width:18ch;
+  margin-inline:auto;
+}
+.testi-head p{
+  color:var(--text-dim);
+  max-width:48ch;
+  margin-inline:auto;
+}
+.testi-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+}
+.testi-card{
+  position:relative;
+  padding:36px;
+  border-radius:var(--r-lg);
+  background:var(--glass);
+  border:1px solid var(--line);
+  backdrop-filter:blur(10px);
+  transition:transform .55s cubic-bezier(.2,.8,.2,1);
+  transform-style:preserve-3d;
+  perspective:1000px;
+}
+.testi-card .quote-mark{
+  font-family:'Syne',sans-serif;
+  font-size:64px;
+  line-height:.5;
+  background:var(--grad-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  margin-bottom:18px;
+}
+.testi-card .quote{
+  font-size:15.5px;
+  line-height:1.6;
+  color:var(--text);
+  margin-bottom:32px;
+  min-height:120px;
+}
+.testi-card .author{
+  display:flex;align-items:center;gap:14px;
+  padding-top:24px;
+  border-top:1px solid var(--line);
+}
+.testi-card .av{
+  width:44px;height:44px;
+  border-radius:50%;
+  background:var(--grad);
+  display:grid;place-items:center;
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:14px;
+  color:#fff;
+  flex:0 0 44px;
+}
+.testi-card .author-meta .name{font-size:14px;font-weight:500;}
+.testi-card .author-meta .role{font-size:12px;color:var(--text-dim);margin-top:2px;}
+.testi-card .city{
+  position:absolute;
+  top:24px;right:28px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:.1em;
+  color:var(--text-mute);
+}
+
+/* ============================================================
+   CTA FINAL
+   ============================================================ */
+.cta-final{
+  position:relative;
+  padding:180px 36px;
+  text-align:center;
+  overflow:hidden;
+  background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(124,92,252,.18),rgba(214,51,132,.05) 40%,transparent 70%),var(--bg-0);
+}
+.cta-final::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(ellipse 70% 50% at 50% 50%,#000,transparent 90%);
+  -webkit-mask-image:radial-gradient(ellipse 70% 50% at 50% 50%,#000,transparent 90%);
+}
+.cta-final h2{
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:clamp(48px,8vw,128px);
+  letter-spacing:-.035em;
+  line-height:.95;
+  max-width:14ch;
+  margin:0 auto 36px;
+}
+.cta-final h2 .grad{
+  background:var(--grad-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.cta-final p{
+  color:var(--text-dim);
+  font-size:18px;
+  max-width:54ch;
+  margin:0 auto 56px;
+  line-height:1.55;
+}
+.cta-final .cta-row{
+  justify-content:center;
+  margin-bottom:0;
+}
+.cta-final .btn-primary{
+  padding:22px 36px;
+  font-size:15px;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer{
+  position:relative;
+  padding:80px 36px 40px;
+  background:var(--bg-0);
+  border-top:1px solid var(--line);
+}
+.footer-inner{
+  max-width:var(--container);
+  margin:0 auto;
+}
+.footer-top{
+  display:grid;
+  grid-template-columns:1.5fr 1fr 1fr 1fr;
+  gap:60px;
+  margin-bottom:80px;
+}
+.footer-brand .logo{
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:28px;
+  letter-spacing:-.04em;
+  margin-bottom:18px;
+  display:flex;align-items:center;
+}
+.footer-brand .logo .ee{
+  background:var(--grad-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.footer-brand .logo .dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--magenta);
+  margin-left:7px;
+  align-self:flex-end;
+  margin-bottom:5px;
+  box-shadow:0 0 12px var(--magenta);
+}
+.footer-brand p{
+  color:var(--text-dim);
+  font-size:14px;
+  line-height:1.6;
+  max-width:34ch;
+}
+.footer-col h4{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.22em;
+  color:var(--text-mute);
+  margin-bottom:20px;
+  font-weight:500;
+}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:14px;}
+.footer-col a{
+  font-size:14px;
+  color:var(--text-dim);
+  transition:color .25s;
+}
+.footer-col a:hover{color:var(--text);}
+.footer-bottom{
+  padding-top:32px;
+  border-top:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:20px;
+  font-size:12px;
+  color:var(--text-mute);
+}
+.footer-socials{display:flex;gap:14px;}
+.footer-socials a{
+  width:38px;height:38px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  display:grid;place-items:center;
+  transition:border-color .35s,background-color .35s,transform .35s;
+}
+.footer-socials a:hover{
+  border-color:rgba(255,255,255,.3);
+  background:rgba(255,255,255,.04);
+  transform:translateY(-2px);
+}
+.footer-socials svg{width:14px;height:14px;}
+
+.footer-mega{
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:clamp(80px,18vw,260px);
+  line-height:.85;
+  letter-spacing:-.05em;
+  margin-top:40px;
+  background:linear-gradient(180deg,rgba(255,255,255,.06) 0%,transparent 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-align:center;
+  user-select:none;
+  white-space:nowrap;
+  overflow:hidden;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:1024px){
+  .problems-head,.services-head,.methode-inner,.results-inner,.footer-top{
+    grid-template-columns:1fr;
+    gap:40px;
+  }
+  .problems-grid,.results-grid{grid-template-columns:1fr;}
+  .testi-grid{grid-template-columns:1fr;}
+  .service-content{grid-template-columns:1fr;}
+  .service-visual{height:380px;}
+  .methode-sticky{position:relative;top:0;}
+  .methode-steps{gap:24px;}
+}
+@media (max-width:768px){
+  body{cursor:auto;}
+  .cursor,.cursor-glow{display:none;}
+  .nav{padding:18px 22px;}
+  .nav.is-scrolled{padding:12px 22px;}
+  .nav-links{display:none;}
+  .nav-cta{display:none;}
+  .nav-burger{display:flex;}
+  .mobile-menu{display:flex;}
+  .section{padding:90px 22px;}
+  .hero{padding:0 22px;}
+  .hero-stats{
+    grid-template-columns:1fr;
+    gap:24px;
+    padding-top:32px;
+  }
+  .cta-final{padding:120px 22px;}
+  .hero-side,.hero-scroll-hint{display:none;}
+  .horizontal-container{height:auto;}
+  .horizontal-track{flex-direction:column;}
+  .service-panel{flex:0 0 auto;height:auto;padding:60px 22px;}
+  .services-dots{display:none;}
+  .footer-top{grid-template-columns:1fr;}
+  .footer-mega{font-size:80px;}
+}
+</style>
+</head>
+<body class="lenis lenis-smooth">
+
+<!-- Noise overlay -->
+<div class="noise"></div>
+
+<!-- Scroll progress -->
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<!-- Cursor -->
+<div class="cursor-glow" id="cursor-glow"></div>
+<div class="cursor" id="cursor"></div>
+
+<!-- Background orbs -->
+<div class="orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+</div>
+
+<!-- Preloader -->
+<div class="preloader" id="preloader">
+  <div class="preloader-logo" id="preloader-logo">
+    N<span class="ee">EE</span>XUS<span style="background:var(--magenta);width:8px;height:8px;border-radius:50%;display:inline-block;align-self:flex-end;margin-bottom:8px;margin-left:6px;box-shadow:0 0 14px var(--magenta);"></span>
+  </div>
+  <div class="preloader-counter" id="preloader-counter">000</div>
+  <div class="preloader-tag" id="preloader-tag">Smart Digital Solution</div>
+</div>
+
+<!-- Navigation -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo" data-cursor>
+    N<span class="ee">EE</span>XUS<span class="dot"></span>
+  </a>
+  <div class="nav-links">
+    <a href="#services" data-cursor>Services</a>
+    <a href="#methode" data-cursor>Méthode</a>
+    <a href="#resultats" data-cursor>Résultats</a>
+    <a href="#temoignages" data-cursor>Témoignages</a>
+  </div>
+  <a href="#cta" class="nav-cta" data-cursor data-magnetic>
+    Audit gratuit <span class="arrow">→</span>
+  </a>
+  <button class="nav-burger" id="nav-burger" aria-label="Menu">
+    <span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#services">Services</a>
+  <a href="#methode">Méthode</a>
+  <a href="#resultats">Résultats</a>
+  <a href="#temoignages">Témoignages</a>
+  <a href="#cta" class="gradient-text">Audit gratuit →</a>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero" id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-side">N° 001 — SDS LLC</div>
+  <div class="hero-inner">
+    <div class="hero-badge" data-hero-fade>
+      <span class="pulse-dot"></span>
+      Smart Digital Solution Agency
+    </div>
+
+    <h1 class="hero-title">
+      <span class="line"><span class="line-inner" data-hero-line>Vos concurrents</span></span>
+      <span class="line"><span class="line-inner" data-hero-line>automatisent.</span></span>
+      <span class="line line-2"><span class="line-inner italic" data-hero-line>Vous faites encore</span></span>
+      <span class="line line-2"><span class="line-inner italic" data-hero-line>tout à la main ?</span></span>
+    </h1>
+
+    <p class="hero-sub" data-hero-fade>
+      On automatise ce qui vous freine pour que vous puissiez vous concentrer sur
+      <b>ce qui fait vraiment grandir votre business</b>. IA, workflows, présence digitale —
+      les outils des grandes entreprises, pour la vôtre.
+    </p>
+
+    <div class="cta-row" data-hero-fade>
+      <a href="#cta" class="btn btn-primary" data-cursor data-magnetic>
+        Réserver mon audit gratuit
+        <span class="arrow">→</span>
+      </a>
+      <a href="#services" class="btn btn-ghost" data-cursor data-magnetic>
+        Découvrir nos solutions
+        <span class="arrow">↓</span>
+      </a>
+    </div>
+
+    <div class="hero-stats" data-hero-fade>
+      <div class="hero-stat">
+        <div class="num"><span class="counter" data-target="150">0</span>+</div>
+        <div class="lbl">Automatisations<br/>déployées</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num"><span class="counter" data-target="98">0</span>%</div>
+        <div class="lbl">Satisfaction<br/>client</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num"><span class="counter" data-target="10">0</span>x</div>
+        <div class="lbl">ROI moyen<br/>constaté</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint" data-hero-fade>
+    <div class="bar"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- ============================================================
+     PROBLEMS
+     ============================================================ -->
+<section class="section problems" id="problems">
+  <div class="container">
+    <div class="problems-head">
+      <div>
+        <div class="section-eyebrow">
+          <span class="num">01</span>
+          <span class="line"></span>
+          <span class="label">Pain Points</span>
+        </div>
+        <h2 class="section-title" data-split>
+          Si vous reconnaissez ces situations, on peut vous aider.
+        </h2>
+      </div>
+      <p class="problems-intro" data-fade>
+        Ces frictions coûtent en moyenne <b style="color:var(--text);">28h par semaine</b>
+        à une PME. Le pire : la plupart des dirigeants ne réalisent même pas qu'elles existent.
+      </p>
+    </div>
+
+    <div class="problems-grid">
+      <article class="problem-card" data-card>
+        <div class="tag">P-01</div>
+        <div class="icon">🔄</div>
+        <h3>Tâches répétitives</h3>
+        <p>Votre équipe passe <b style="color:var(--text);">60% de son temps</b> sur des tâches qui ne génèrent aucun chiffre d'affaires. Saisie manuelle, copier-coller entre outils, relances, devis…</p>
+      </article>
+      <article class="problem-card" data-card>
+        <div class="tag">P-02</div>
+        <div class="icon">📞</div>
+        <h3>Clients perdus</h3>
+        <p>Un prospect qui attend <b style="color:var(--text);">5 minutes sans réponse</b> a 80% de chances de partir chez le concurrent. Les leads qualifiés s'évaporent pendant la pause déjeuner.</p>
+      </article>
+      <article class="problem-card" data-card>
+        <div class="tag">P-03</div>
+        <div class="icon">🔧</div>
+        <h3>Outils déconnectés</h3>
+        <p>CRM, facturation, emails, planning, comptabilité — vos outils ne se parlent pas. Résultat : double saisie, erreurs, et une vue partielle de votre business.</p>
+      </article>
+      <article class="problem-card" data-card>
+        <div class="tag">P-04</div>
+        <div class="icon">⏰</div>
+        <h3>Pas le temps</h3>
+        <p>Trop occupé à faire tourner le quotidien pour penser à demain. La transformation digitale reste un projet "qu'on lancera bientôt"… depuis trois ans.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SERVICES (Horizontal Scroll)
+     ============================================================ -->
+<div class="services-wrap" id="services">
+  <div class="services-head">
+    <div>
+      <div class="section-eyebrow">
+        <span class="num">02</span>
+        <span class="line"></span>
+        <span class="label">Services</span>
+      </div>
+      <h2 class="section-title" data-split>
+        Trois piliers pour digitaliser votre entreprise.
+      </h2>
+    </div>
+    <p data-fade>
+      On ne fait pas tout. On fait <b style="color:var(--text);">trois choses, mais on les fait
+      mieux que les autres</b>. Chaque pilier est conçu pour générer un ROI mesurable
+      dès les premières semaines.
+    </p>
+  </div>
+
+  <div class="horizontal-container" id="horizontal-container">
+    <div class="horizontal-track" id="horizontal-track">
+
+      <!-- Pilier 01 -->
+      <section class="service-panel">
+        <div class="panel-num">01 / 03 — IA</div>
+        <div class="service-content">
+          <div class="service-text">
+            <span class="pillar-num">PILIER 01</span>
+            <h3>IA &amp; Agents<br/><span class="italic gradient-text">Intelligents</span></h3>
+            <p class="lead">Des agents conversationnels qui répondent, qualifient, vendent et planifient — 24h/24, dans toutes les langues, sans pause café.</p>
+            <ul>
+              <li>Chatbots intelligents multi-canaux (site, WhatsApp, Instagram)</li>
+              <li>Secrétaire IA — gestion d'appels et prise de RDV automatique</li>
+              <li>SAV automatisé avec escalade intelligente vers l'humain</li>
+              <li>Répondeurs IA pour emails et messages entrants</li>
+            </ul>
+          </div>
+          <div class="service-visual chat-visual" data-visual="chat">
+            <div class="chat-header">
+              <div class="av">N</div>
+              <div class="meta">
+                <div class="name">Assistant Neexus</div>
+                <div class="status">En ligne · répond instantanément</div>
+              </div>
+              <div class="ch-btn">AI ↗</div>
+            </div>
+            <div class="chat-msgs" id="chat-msgs">
+              <div class="msg user" data-msg>Bonjour, je voudrais réserver une table pour 4 ce vendredi soir.</div>
+              <div class="msg ai" data-msg>
+                Bonsoir ! Avec plaisir 🌿 Pour vendredi 22h ou 20h, j'ai des disponibilités. Vous préférez quel créneau ?
+                <div class="meta">Répondu en 0.4s</div>
+              </div>
+              <div class="msg user" data-msg>20h c'est parfait.</div>
+              <div class="msg ai" data-msg>
+                Réservé ! Je viens d'envoyer la confirmation à votre numéro. Voulez-vous une table en terrasse ?
+                <div class="meta">CRM mis à jour automatiquement</div>
+              </div>
+              <div class="typing" data-msg><span></span><span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pilier 02 -->
+      <section class="service-panel">
+        <div class="panel-num">02 / 03 — Workflows</div>
+        <div class="service-content">
+          <div class="service-text">
+            <span class="pillar-num">PILIER 02</span>
+            <h3>Automatisation &amp; <span class="italic gradient-text">Workflows</span></h3>
+            <p class="lead">On connecte vos outils existants pour qu'ils travaillent ensemble. Plus de double saisie, plus d'oublis — juste des données qui circulent toutes seules.</p>
+            <ul>
+              <li>Automatisations Make / n8n sur mesure</li>
+              <li>Applications internes métier (no-code & code)</li>
+              <li>Connexion CRM, ERP, facturation, agenda, comptabilité</li>
+              <li>Workflows intelligents qui éliminent les tâches manuelles</li>
+            </ul>
+          </div>
+          <div class="service-visual workflow-visual" data-visual="workflow">
+            <svg class="workflow-svg" viewBox="0 0 460 460" id="workflow-svg">
+              <defs>
+                <linearGradient id="flow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#4d7cff"/>
+                  <stop offset="50%" stop-color="#7c5cfc"/>
+                  <stop offset="100%" stop-color="#d63384"/>
+                </linearGradient>
+                <radialGradient id="node-grad">
+                  <stop offset="0%" stop-color="rgba(124,92,252,.2)"/>
+                  <stop offset="100%" stop-color="rgba(10,14,26,.95)"/>
+                </radialGradient>
+              </defs>
+              <!-- Connections (drawn first so they appear behind nodes) -->
+              <path class="conn-flow" d="M90,80 Q230,80 230,200" data-flow/>
+              <path class="conn-flow" d="M370,80 Q230,80 230,200" data-flow/>
+              <path class="conn-flow" d="M230,260 Q230,340 110,380" data-flow/>
+              <path class="conn-flow" d="M230,260 Q230,340 350,380" data-flow/>
+
+              <!-- Source nodes -->
+              <g data-node>
+                <circle class="node" cx="90" cy="80" r="34" fill="url(#node-grad)"/>
+                <text class="node-icon" x="90" y="80">@</text>
+                <text class="node-label" x="90" y="130">Email</text>
+              </g>
+              <g data-node>
+                <circle class="node" cx="370" cy="80" r="34" fill="url(#node-grad)"/>
+                <text class="node-icon" x="370" y="80">📅</text>
+                <text class="node-label" x="370" y="130">Calendar</text>
+              </g>
+
+              <!-- Center processing -->
+              <g data-node>
+                <circle class="node" cx="230" cy="230" r="44" fill="url(#node-grad)" stroke="url(#flow-grad)" stroke-width="1.5"/>
+                <text class="node-icon" x="230" y="226" style="font-size:16px;">⚡</text>
+                <text class="node-label" x="230" y="248" style="font-size:8px;">PROCESS</text>
+              </g>
+
+              <!-- Output nodes -->
+              <g data-node>
+                <circle class="node" cx="110" cy="380" r="34" fill="url(#node-grad)"/>
+                <text class="node-icon" x="110" y="380">📊</text>
+                <text class="node-label" x="110" y="430">CRM</text>
+              </g>
+              <g data-node>
+                <circle class="node" cx="350" cy="380" r="34" fill="url(#node-grad)"/>
+                <text class="node-icon" x="350" y="380">💬</text>
+                <text class="node-label" x="350" y="430">Slack</text>
+              </g>
+
+              <!-- Pulses -->
+              <circle class="pulse" r="3.5" data-pulse="1"><animateMotion dur="3s" repeatCount="indefinite" path="M90,80 Q230,80 230,200"/></circle>
+              <circle class="pulse" r="3.5" data-pulse="2"><animateMotion dur="3.5s" repeatCount="indefinite" begin="0.8s" path="M370,80 Q230,80 230,200"/></circle>
+              <circle class="pulse" r="3.5" data-pulse="3"><animateMotion dur="3s" repeatCount="indefinite" begin="1.4s" path="M230,260 Q230,340 110,380"/></circle>
+              <circle class="pulse" r="3.5" data-pulse="4"><animateMotion dur="3s" repeatCount="indefinite" begin="2s" path="M230,260 Q230,340 350,380"/></circle>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pilier 03 -->
+      <section class="service-panel">
+        <div class="panel-num">03 / 03 — Présence</div>
+        <div class="service-content">
+          <div class="service-text">
+            <span class="pillar-num">PILIER 03</span>
+            <h3>Présence <span class="italic gradient-text">Digitale</span></h3>
+            <p class="lead">Un site qui convertit, du contenu qui engage, une visibilité qui dure. Votre marque mérite mieux qu'un template Wordpress de 2018.</p>
+            <ul>
+              <li>Sites web modernes, performants, optimisés conversion</li>
+              <li>Création de contenu (réseaux sociaux, blog, newsletters)</li>
+              <li>SEO &amp; stratégie de visibilité organique</li>
+              <li>Identité visuelle &amp; design system cohérent</li>
+            </ul>
+          </div>
+          <div class="service-visual code-visual" data-visual="code">
+            <div class="code-window-bar">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              <div class="file">~/neexus/<span style="color:var(--text);">site-client.html</span></div>
+            </div>
+            <div class="code-content" id="code-content">
+              <div class="ln" data-line><span class="num">01</span><span><span class="kw">&lt;section</span> <span class="pr">class</span>=<span class="str">"hero"</span><span class="kw">&gt;</span></span></div>
+              <div class="ln" data-line><span class="num">02</span><span>&nbsp;&nbsp;<span class="kw">&lt;h1&gt;</span>Bienvenue chez <span class="str">{{client}}</span><span class="kw">&lt;/h1&gt;</span></span></div>
+              <div class="ln" data-line><span class="num">03</span><span>&nbsp;&nbsp;<span class="com">// Génération SEO automatique</span></span></div>
+              <div class="ln" data-line><span class="num">04</span><span>&nbsp;&nbsp;<span class="kw">&lt;p&gt;</span><span class="fn">{{tagline}}</span><span class="kw">&lt;/p&gt;</span></span></div>
+              <div class="ln" data-line><span class="num">05</span><span><span class="kw">&lt;/section&gt;</span><span class="typing-cursor"></span></span></div>
+            </div>
+            <div class="code-preview">
+              <div class="pv-bar" id="pv-bar"></div>
+              <div class="pv-block w-3" data-pv></div>
+              <div class="pv-block w-2" data-pv></div>
+              <div class="pv-block w-1" data-pv></div>
+              <div class="pv-block w-2" data-pv></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <div class="services-dots" id="services-dots">
+      <div class="dot is-active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     METHODE
+     ============================================================ -->
+<section class="section methode" id="methode">
+  <div class="container">
+    <div class="methode-inner">
+      <div class="methode-sticky">
+        <div class="section-eyebrow">
+          <span class="num">03</span>
+          <span class="line"></span>
+          <span class="label">Méthode</span>
+        </div>
+        <h2 data-split>Notre méthode en 4 étapes.</h2>
+        <p>Une approche éprouvée, transparente, sans surprise. De l'audit gratuit au déploiement, vous savez toujours où vous en êtes.</p>
+        <div class="methode-progress">
+          <div class="fill" id="methode-fill"></div>
+        </div>
+        <div class="methode-progress-label">
+          <span>00</span>
+          <span id="methode-step-label">/04</span>
+        </div>
+      </div>
+
+      <div class="methode-steps" id="methode-steps">
+        <article class="methode-step" data-step>
+          <div class="step-head">
+            <div class="step-num">01</div>
+            <div class="step-tag">Semaine 1 · Gratuit</div>
+          </div>
+          <h3>Audit gratuit</h3>
+          <p>On analyse vos process actuels, on identifie les goulots d'étranglement, et on chiffre les <b style="color:var(--text);">3 quick-wins</b> qui auront le plus d'impact sur votre business.</p>
+          <div class="step-deliverables">
+            <span>Cartographie process</span>
+            <span>Calcul ROI</span>
+            <span>Roadmap 90j</span>
+          </div>
+        </article>
+
+        <article class="methode-step" data-step>
+          <div class="step-head">
+            <div class="step-num">02</div>
+            <div class="step-tag">Semaine 2-3</div>
+          </div>
+          <h3>Stratégie</h3>
+          <p>On conçoit la solution sur mesure. Architecture, choix techniques, planning précis — vous validez chaque étape avant qu'on touche à quoi que ce soit.</p>
+          <div class="step-deliverables">
+            <span>Architecture</span>
+            <span>Maquettes</span>
+            <span>Specs techniques</span>
+          </div>
+        </article>
+
+        <article class="methode-step" data-step>
+          <div class="step-head">
+            <div class="step-num">03</div>
+            <div class="step-tag">Semaine 4-8</div>
+          </div>
+          <h3>Déploiement</h3>
+          <p>On construit, on intègre, on teste, on forme vos équipes. <b style="color:var(--text);">Zéro perturbation</b> de votre activité — la bascule se fait quand vous êtes prêt.</p>
+          <div class="step-deliverables">
+            <span>Build & tests</span>
+            <span>Formation équipes</span>
+            <span>Mise en prod</span>
+          </div>
+        </article>
+
+        <article class="methode-step" data-step>
+          <div class="step-head">
+            <div class="step-num">04</div>
+            <div class="step-tag">En continu</div>
+          </div>
+          <h3>Optimisation</h3>
+          <p>On mesure, on ajuste, on scale. Vos workflows évoluent avec votre business. Maintenance, support, et nouvelles itérations basées sur les données réelles.</p>
+          <div class="step-deliverables">
+            <span>Monitoring</span>
+            <span>A/B testing</span>
+            <span>Évolutions</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     RESULTATS
+     ============================================================ -->
+<section class="section results" id="resultats">
+  <div class="container">
+    <div class="results-inner">
+      <div class="results-text">
+        <div class="section-eyebrow">
+          <span class="num">04</span>
+          <span class="line"></span>
+          <span class="label">Résultats</span>
+        </div>
+        <h2 data-split>Des chiffres, pas des promesses.</h2>
+        <p>Voici ce que nos clients constatent en moyenne dans les <b style="color:var(--text);">90 jours</b> qui suivent le déploiement. Mesurés, vérifiés, reproductibles.</p>
+      </div>
+
+      <div class="results-grid">
+        <div class="result-card" data-card>
+          <div class="num"><span class="big-counter" data-target="47">0</span><span class="unit">h</span></div>
+          <div class="lbl">Économisées par mois</div>
+          <div class="desc">en moyenne, et par collaborateur impliqué dans les workflows automatisés</div>
+        </div>
+        <div class="result-card" data-card>
+          <div class="num"><span class="big-counter" data-target="3">0</span><span class="unit">x</span></div>
+          <div class="lbl">Plus de leads qualifiés</div>
+          <div class="desc">grâce à la qualification automatique et au temps de réponse immédiat</div>
+        </div>
+        <div class="result-card" data-card>
+          <div class="num"><span class="big-counter" data-target="98">0</span><span class="unit">%</span></div>
+          <div class="lbl">Satisfaction client</div>
+          <div class="desc">mesurée sur les 12 derniers mois, sur l'ensemble des projets livrés</div>
+        </div>
+        <div class="result-card" data-card>
+          <div class="num">&lt;<span class="big-counter" data-target="24">0</span><span class="unit">h</span></div>
+          <div class="lbl">Temps de réponse moyen</div>
+          <div class="desc">aux demandes entrantes — chatbot, email, formulaire, WhatsApp</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TEMOIGNAGES
+     ============================================================ -->
+<section class="section testi" id="temoignages">
+  <div class="container">
+    <div class="testi-head">
+      <div class="section-eyebrow" style="justify-content:center;">
+        <span class="num">05</span>
+        <span class="line"></span>
+        <span class="label">Témoignages</span>
+      </div>
+      <h2 data-split>Ce qu'ils en disent.</h2>
+      <p data-fade>Trois clients, trois secteurs, trois pays. Une seule conviction : on ne perd plus son temps sur ce qu'une machine peut faire.</p>
+    </div>
+
+    <div class="testi-grid">
+      <article class="testi-card" data-tilt data-card>
+        <div class="city">GE · CH</div>
+        <div class="quote-mark">"</div>
+        <p class="quote">NEEXUS a automatisé nos réservations et notre SAV. On a récupéré 20h par semaine. Mon équipe s'est remise à sourire — ça vaut tous les ROI du monde.</p>
+        <div class="author">
+          <div class="av">MD</div>
+          <div class="author-meta">
+            <div class="name">Marc Dubois</div>
+            <div class="role">CEO · Restaurant Le Comptoir</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="testi-card" data-tilt data-card>
+        <div class="city">LY · FR</div>
+        <div class="quote-mark">"</div>
+        <p class="quote">Leur chatbot gère 70% de nos demandes de premier contact. Mon équipe peut enfin se concentrer sur les dossiers — ceux qui paient nos factures.</p>
+        <div class="author">
+          <div class="av">SM</div>
+          <div class="author-meta">
+            <div class="name">Sophie Martin</div>
+            <div class="role">Directrice · Cabinet Martin &amp; Associés</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="testi-card" data-tilt data-card>
+        <div class="city">ZH · CH</div>
+        <div class="quote-mark">"</div>
+        <p class="quote">Le ROI a été visible dès le premier mois. Les automatisations Make ont changé notre façon de travailler. Sincèrement, on aurait dû le faire trois ans plus tôt.</p>
+        <div class="author">
+          <div class="av">TK</div>
+          <div class="author-meta">
+            <div class="name">Thomas Keller</div>
+            <div class="role">Fondateur · TK Immobilier</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CTA FINAL
+     ============================================================ -->
+<section class="cta-final" id="cta">
+  <div class="section-eyebrow" style="justify-content:center;margin-bottom:40px;">
+    <span class="num">06</span>
+    <span class="line"></span>
+    <span class="label">Et maintenant ?</span>
+  </div>
+  <h2 data-split-cta>
+    Prêt à automatiser <span class="grad italic">votre croissance</span> ?
+  </h2>
+  <p data-fade>
+    On identifie ensemble les <b style="color:var(--text);">3 quick-wins</b> qui auront le plus
+    d'impact sur votre business. 30 minutes, en visio, gratuit, sans engagement.
+  </p>
+  <div class="cta-row" data-fade>
+    <a href="mailto:contact@neexusds.com" class="btn btn-primary" data-cursor data-magnetic>
+      Réserver mon audit gratuit
+      <span class="arrow">→</span>
+    </a>
+    <a href="#temoignages" class="btn btn-ghost" data-cursor data-magnetic>
+      Voir un cas client
+      <span class="arrow">↗</span>
+    </a>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">N<span class="ee">EE</span>XUS<span class="dot"></span></div>
+        <p>Smart Digital Solution Agency. On automatise ce qui freine votre croissance pour que vous puissiez vous concentrer sur ce qui compte vraiment.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#services">IA &amp; Agents</a></li>
+          <li><a href="#services">Automatisation</a></li>
+          <li><a href="#services">Présence digitale</a></li>
+          <li><a href="#methode">Notre méthode</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Agence</h4>
+        <ul>
+          <li><a href="#resultats">Résultats</a></li>
+          <li><a href="#temoignages">Témoignages</a></li>
+          <li><a href="#cta">Audit gratuit</a></li>
+          <li><a href="mailto:contact@neexusds.com">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:contact@neexusds.com">contact@neexusds.com</a></li>
+          <li><a href="https://neexusds.com">neexusds.com</a></li>
+          <li style="color:var(--text-mute);font-size:13px;">SDS Smart Digital<br/>Solution LLC</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-mega">NEEXUS</div>
+
+    <div class="footer-bottom">
+      <div>© 2026 SDS Smart Digital Solution LLC — Tous droits réservés</div>
+      <div class="footer-socials">
+        <a href="#" aria-label="LinkedIn" data-cursor>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8.5 10.5h-3v8h3zm-1.5-4a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3M18.5 13.7c0-2.5-1.6-3.4-3-3.4-.7 0-1.6.4-2 .9v-.7h-3v8h3v-4.4c0-.7.5-1.4 1.3-1.4s1.2.7 1.2 1.4v4.4h2.5z"/></svg>
+        </a>
+        <a href="#" aria-label="Instagram" data-cursor>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+        </a>
+        <a href="#" aria-label="X" data-cursor>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2H21l-7.06 8.07L22 22h-6.59l-4.61-6.04L5.5 22H2.74l7.55-8.63L2 2h6.74l4.16 5.5z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script>
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+/* -------------- Reduced motion guard -------------- */
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+/* ============================================================
+   PRELOADER SEQUENCE
+   ============================================================ */
+const preloader = document.getElementById('preloader');
+const preloaderLogo = document.getElementById('preloader-logo');
+const preloaderCounter = document.getElementById('preloader-counter');
+const preloaderTag = document.getElementById('preloader-tag');
+
+// Counter animation
+const counterObj = { val: 0 };
+const tlPre = gsap.timeline({ onComplete: () => initSite() });
+
+tlPre
+  .from(preloaderLogo, { opacity: 0, scale: .8, duration: .8, ease: 'power3.out' })
+  .to(counterObj, {
+    val: 100,
+    duration: 1.6,
+    ease: 'power2.inOut',
+    onUpdate: () => {
+      preloaderCounter.textContent = String(Math.round(counterObj.val)).padStart(3, '0');
+    }
+  }, '-=.4')
+  .to(preloaderTag, { opacity: 1, duration: .4 }, '-=.6')
+  .to(preloaderLogo, { scale: 1.05, duration: .35, ease: 'power2.out' }, '+=.1')
+  .to([preloaderLogo, preloaderCounter, preloaderTag], { opacity: 0, duration: .5, ease: 'power2.out' })
+  .to(preloader, { yPercent: -100, duration: 1.1, ease: 'expo.inOut', delay: -.2 })
+  .set(preloader, { display: 'none' });
+
+/* ============================================================
+   INIT SITE (after preloader)
+   ============================================================ */
+function initSite(){
+  initLenis();
+  initCursor();
+  initNav();
+  initHeroLoad();
+  initParallax();
+  initOrbsParallax();
+  initScrollProgress();
+  initProblems();
+  initServices();
+  initMethode();
+  initResults();
+  initTesti();
+  initCtaFinal();
+  initSplitTitles();
+  initFades();
+  initMagnetic();
+  initTilt();
+  initFooterMega();
+  ScrollTrigger.refresh();
+}
+
+/* ============================================================
+   LENIS SMOOTH SCROLL
+   ============================================================ */
+let lenis;
+function initLenis(){
+  if (reducedMotion) return;
+  lenis = new Lenis({
+    duration: 1.15,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothWheel: true,
+    wheelMultiplier: 1,
+    touchMultiplier: 1.5,
+  });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+  gsap.ticker.lagSmoothing(0);
+
+  // Smooth anchor scrolling
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      if (id.length > 1 && document.querySelector(id)) {
+        e.preventDefault();
+        lenis.scrollTo(id, { offset: -40, duration: 1.4 });
+        document.getElementById('mobile-menu')?.classList.remove('is-open');
+      }
+    });
+  });
+}
+
+/* ============================================================
+   CUSTOM CURSOR + GLOW
+   ============================================================ */
+function initCursor(){
+  if (isMobile) {
+    document.body.classList.add('no-cursor');
+    return;
+  }
+  const cursor = document.getElementById('cursor');
+  const glow = document.getElementById('cursor-glow');
+
+  let mx = window.innerWidth/2, my = window.innerHeight/2;
+  let cx = mx, cy = my, gx = mx, gy = my;
+
+  window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+  gsap.ticker.add(() => {
+    cx += (mx - cx) * 0.5;
+    cy += (my - cy) * 0.5;
+    gx += (mx - gx) * 0.08;
+    gy += (my - gy) * 0.08;
+    cursor.style.transform = `translate(${cx}px,${cy}px) translate(-50%,-50%)`;
+    glow.style.transform = `translate(${gx}px,${gy}px) translate(-50%,-50%)`;
+  });
+
+  document.querySelectorAll('[data-cursor], a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
+  });
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+function initNav(){
+  const nav = document.getElementById('nav');
+  ScrollTrigger.create({
+    start: 'top -50',
+    end: 99999,
+    onUpdate: self => {
+      nav.classList.toggle('is-scrolled', self.scroll() > 50);
+    }
+  });
+
+  const burger = document.getElementById('nav-burger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  burger?.addEventListener('click', () => {
+    mobileMenu.classList.toggle('is-open');
+  });
+  mobileMenu?.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => mobileMenu.classList.remove('is-open'));
+  });
+}
+
+/* ============================================================
+   SCROLL PROGRESS
+   ============================================================ */
+function initScrollProgress(){
+  const bar = document.getElementById('scroll-progress');
+  gsap.to(bar, {
+    scaleX: 1,
+    ease: 'none',
+    scrollTrigger: { start: 0, end: 'max', scrub: 0 }
+  });
+}
+
+/* ============================================================
+   HERO LOAD SEQUENCE
+   ============================================================ */
+function initHeroLoad(){
+  const tl = gsap.timeline({ delay: .15 });
+
+  // Split hero title chars
+  const lines = document.querySelectorAll('[data-hero-line]');
+  lines.forEach(line => {
+    const split = new SplitType(line, { types: 'chars' });
+  });
+
+  tl.from('.hero-badge', { y: 20, opacity: 0, duration: .8, ease: 'power3.out' })
+    .from('[data-hero-line] .char', {
+      yPercent: 110,
+      opacity: 0,
+      stagger: .015,
+      duration: 1,
+      ease: 'power4.out'
+    }, '-=.5')
+    .from('.hero-sub', { y: 20, opacity: 0, duration: .8, ease: 'power3.out' }, '-=.6')
+    .from('.cta-row .btn', { y: 20, opacity: 0, stagger: .08, duration: .7, ease: 'power3.out' }, '-=.5')
+    .from('.hero-stat', { y: 24, opacity: 0, stagger: .1, duration: .7, ease: 'power3.out' }, '-=.4')
+    .from('.hero-scroll-hint', { opacity: 0, duration: .6 }, '-=.3');
+
+  // Animate hero stat counters
+  document.querySelectorAll('.counter').forEach(el => {
+    const target = +el.dataset.target;
+    const obj = { v: 0 };
+    gsap.to(obj, {
+      v: target,
+      duration: 2,
+      delay: 1.4,
+      ease: 'power2.out',
+      onUpdate: () => { el.textContent = Math.round(obj.v); }
+    });
+  });
+}
+
+/* ============================================================
+   HERO PARALLAX (subtle pin-like effect via transform)
+   ============================================================ */
+function initParallax(){
+  if (reducedMotion) return;
+
+  // Hero content slight rise + fade as user scrolls past
+  gsap.to('.hero-inner', {
+    yPercent: -10,
+    opacity: .35,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '.hero',
+      start: 'top top',
+      end: 'bottom top',
+      scrub: 1
+    }
+  });
+
+  // Grid bg parallax
+  gsap.to('.hero-grid-bg', {
+    yPercent: 30,
+    ease: 'none',
+    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 }
+  });
+}
+
+/* ============================================================
+   ORBS PARALLAX
+   ============================================================ */
+function initOrbsParallax(){
+  if (reducedMotion) return;
+  gsap.to('.orb-1', { y: -240, scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 1 } });
+  gsap.to('.orb-2', { y: -480, scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: .6 } });
+  gsap.to('.orb-3', { y: -360, scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: .8 } });
+  gsap.to('.orb-4', { y: -200, scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 1.2 } });
+}
+
+/* ============================================================
+   SPLIT TITLES (section titles)
+   ============================================================ */
+function initSplitTitles(){
+  document.querySelectorAll('[data-split]').forEach(el => {
+    const split = new SplitType(el, { types: 'lines, words', tagName: 'span' });
+    // Wrap each word for overflow
+    el.querySelectorAll('.word').forEach(w => {
+      w.style.display = 'inline-block';
+      w.style.overflow = 'hidden';
+      const inner = document.createElement('span');
+      inner.style.display = 'inline-block';
+      inner.innerHTML = w.innerHTML;
+      w.innerHTML = '';
+      w.appendChild(inner);
+    });
+
+    gsap.from(el.querySelectorAll('.word > span'), {
+      yPercent: 110,
+      stagger: .04,
+      duration: 1,
+      ease: 'power4.out',
+      scrollTrigger: { trigger: el, start: 'top 85%' }
+    });
+  });
+
+  // Special CTA title
+  document.querySelectorAll('[data-split-cta]').forEach(el => {
+    const split = new SplitType(el, { types: 'words' });
+    el.querySelectorAll('.word').forEach(w => {
+      w.style.display = 'inline-block';
+      w.style.overflow = 'hidden';
+      const inner = document.createElement('span');
+      inner.style.display = 'inline-block';
+      inner.innerHTML = w.innerHTML;
+      w.innerHTML = '';
+      w.appendChild(inner);
+    });
+    gsap.from(el.querySelectorAll('.word > span'), {
+      yPercent: 110,
+      rotate: 6,
+      stagger: .06,
+      duration: 1.2,
+      ease: 'power4.out',
+      scrollTrigger: { trigger: el, start: 'top 80%' }
+    });
+  });
+}
+
+/* ============================================================
+   FADES
+   ============================================================ */
+function initFades(){
+  document.querySelectorAll('[data-fade]').forEach(el => {
+    gsap.from(el, {
+      y: 24,
+      opacity: 0,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 88%' }
+    });
+  });
+}
+
+/* ============================================================
+   PROBLEMS CARDS
+   ============================================================ */
+function initProblems(){
+  gsap.utils.toArray('.problems .problem-card').forEach((card, i) => {
+    gsap.from(card, {
+      y: 60,
+      opacity: 0,
+      clipPath: 'inset(100% 0 0 0)',
+      duration: 1.1,
+      delay: i * .08,
+      ease: 'power4.out',
+      scrollTrigger: { trigger: card, start: 'top 85%' }
+    });
+  });
+}
+
+/* ============================================================
+   SERVICES (HORIZONTAL SCROLL)
+   ============================================================ */
+function initServices(){
+  if (isMobile) {
+    // On mobile, services panels stack vertically — animate in on scroll
+    gsap.utils.toArray('.service-panel').forEach((p, i) => {
+      gsap.from(p, {
+        opacity: 0, y: 40,
+        scrollTrigger: { trigger: p, start: 'top 80%' }
+      });
+      animateServiceVisual(p.querySelector('[data-visual]'), p);
+    });
+    return;
+  }
+
+  const container = document.getElementById('horizontal-container');
+  const track = document.getElementById('horizontal-track');
+  const panels = gsap.utils.toArray('.service-panel');
+  const dots = gsap.utils.toArray('#services-dots .dot');
+
+  const totalScroll = () => track.scrollWidth - window.innerWidth;
+
+  const horizontalTween = gsap.to(track, {
+    x: () => -totalScroll(),
+    ease: 'none',
+    scrollTrigger: {
+      trigger: container,
+      start: 'top top',
+      end: () => '+=' + totalScroll(),
+      pin: true,
+      scrub: 1,
+      invalidateOnRefresh: true,
+      anticipatePin: 1,
+      onUpdate: self => {
+        const idx = Math.min(panels.length - 1, Math.round(self.progress * (panels.length - 1)));
+        dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
+      }
+    }
+  });
+
+  // Animate each panel's visual when entering view
+  panels.forEach(panel => {
+    const visual = panel.querySelector('[data-visual]');
+    ScrollTrigger.create({
+      trigger: panel,
+      containerAnimation: horizontalTween,
+      start: 'left center',
+      end: 'right center',
+      onEnter: () => animateServiceVisual(visual, panel),
+      onEnterBack: () => animateServiceVisual(visual, panel),
+    });
+
+    // Animate text in each panel
+    const txt = panel.querySelector('.service-text');
+    if (txt) {
+      gsap.from(txt.children, {
+        y: 30, opacity: 0, stagger: .08, duration: .8, ease: 'power3.out',
+        scrollTrigger: {
+          trigger: panel,
+          containerAnimation: horizontalTween,
+          start: 'left 60%',
+        }
+      });
+    }
+  });
+}
+
+function animateServiceVisual(visual, panel){
+  if (!visual || visual.dataset.played) return;
+  visual.dataset.played = 'true';
+  const type = visual.dataset.visual;
+
+  if (type === 'chat'){
+    const msgs = visual.querySelectorAll('[data-msg]');
+    gsap.to(msgs, { y: 0, opacity: 1, stagger: .35, duration: .6, ease: 'power2.out', delay: .2 });
+  }
+  if (type === 'workflow'){
+    const flows = visual.querySelectorAll('[data-flow]');
+    flows.forEach(f => {
+      const len = f.getTotalLength();
+      f.style.strokeDasharray = len;
+      f.style.strokeDashoffset = len;
+    });
+    gsap.to(flows, { strokeDashoffset: 0, duration: 1.4, stagger: .15, ease: 'power2.inOut', delay: .3 });
+    gsap.from(visual.querySelectorAll('[data-node]'), { scale: 0, transformOrigin: 'center', stagger: .08, duration: .8, ease: 'back.out(1.7)' });
+  }
+  if (type === 'code'){
+    const lines = visual.querySelectorAll('[data-line]');
+    gsap.to(lines, { opacity: 1, stagger: .25, duration: .3, delay: .2 });
+    const blocks = visual.querySelectorAll('[data-pv]');
+    gsap.to(blocks, { opacity: 1, stagger: .15, duration: .4, delay: 1.4 });
+    gsap.to('#pv-bar', { width: '100%', duration: 1.2, ease: 'power2.inOut', delay: 1.2 });
+  }
+}
+
+/* ============================================================
+   METHODE — PROGRESS + STEPS
+   ============================================================ */
+function initMethode(){
+  const steps = gsap.utils.toArray('[data-step]');
+  const fill = document.getElementById('methode-fill');
+  const stepLabel = document.querySelector('.methode-progress-label span:first-child');
+
+  // Each step reveal
+  steps.forEach((step, i) => {
+    gsap.from(step, {
+      y: 60, opacity: 0,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: step,
+        start: 'top 80%',
+      }
+    });
+
+    ScrollTrigger.create({
+      trigger: step,
+      start: 'top center',
+      end: 'bottom center',
+      onEnter: () => {
+        gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
+        if (stepLabel) stepLabel.textContent = String(i + 1).padStart(2, '0');
+      },
+      onEnterBack: () => {
+        gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
+        if (stepLabel) stepLabel.textContent = String(i + 1).padStart(2, '0');
+      },
+      onLeaveBack: () => {
+        if (i === 0) {
+          gsap.to(fill, { scaleX: 0, duration: .6 });
+          if (stepLabel) stepLabel.textContent = '00';
+        }
+      }
+    });
+  });
+}
+
+/* ============================================================
+   RESULTATS — SCRUBBED COUNTERS
+   ============================================================ */
+function initResults(){
+  document.querySelectorAll('.big-counter').forEach(el => {
+    const target = +el.dataset.target;
+    const obj = { v: 0 };
+    gsap.to(obj, {
+      v: target,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 80%',
+        end: 'top 30%',
+        scrub: 1
+      },
+      onUpdate: () => { el.textContent = Math.round(obj.v); }
+    });
+  });
+
+  gsap.utils.toArray('.result-card').forEach((card, i) => {
+    gsap.from(card, {
+      y: 50, opacity: 0,
+      duration: .9,
+      delay: i * .08,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: card, start: 'top 88%' }
+    });
+  });
+}
+
+/* ============================================================
+   TEMOIGNAGES — STAGGER
+   ============================================================ */
+function initTesti(){
+  gsap.utils.toArray('.testi-card').forEach((card, i) => {
+    gsap.from(card, {
+      y: 60,
+      opacity: 0,
+      duration: 1,
+      delay: i * .12,
+      ease: 'power4.out',
+      scrollTrigger: { trigger: card, start: 'top 88%' }
+    });
+  });
+}
+
+/* ============================================================
+   CTA FINAL
+   ============================================================ */
+function initCtaFinal(){
+  // Intensify orb glow as CTA section enters
+  gsap.from('.cta-final p', {
+    y: 24, opacity: 0, duration: 1,
+    scrollTrigger: { trigger: '.cta-final', start: 'top 75%' }
+  });
+}
+
+/* ============================================================
+   MAGNETIC BUTTONS
+   ============================================================ */
+function initMagnetic(){
+  if (isMobile) return;
+  document.querySelectorAll('[data-magnetic]').forEach(btn => {
+    let bb;
+    btn.addEventListener('mouseenter', () => { bb = btn.getBoundingClientRect(); });
+    btn.addEventListener('mousemove', (e) => {
+      if (!bb) bb = btn.getBoundingClientRect();
+      const relX = e.clientX - bb.left - bb.width / 2;
+      const relY = e.clientY - bb.top - bb.height / 2;
+      gsap.to(btn, { x: relX * 0.25, y: relY * 0.35, duration: .5, ease: 'power3.out' });
+    });
+    btn.addEventListener('mouseleave', () => {
+      gsap.to(btn, { x: 0, y: 0, duration: .8, ease: 'elastic.out(1,.4)' });
+    });
+  });
+}
+
+/* ============================================================
+   3D TILT ON TESTIMONIAL CARDS
+   ============================================================ */
+function initTilt(){
+  if (isMobile) return;
+  document.querySelectorAll('[data-tilt]').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - .5;
+      const y = (e.clientY - r.top) / r.height - .5;
+      gsap.to(card, {
+        rotationY: x * 8,
+        rotationX: -y * 8,
+        transformPerspective: 800,
+        duration: .5,
+        ease: 'power2.out'
+      });
+    });
+    card.addEventListener('mouseleave', () => {
+      gsap.to(card, { rotationY: 0, rotationX: 0, duration: .8, ease: 'power3.out' });
+    });
+  });
+}
+
+/* ============================================================
+   FOOTER MEGA TYPE PARALLAX
+   ============================================================ */
+function initFooterMega(){
+  if (reducedMotion) return;
+  gsap.from('.footer-mega', {
+    yPercent: 30,
+    opacity: 0,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '.footer',
+      start: 'top 80%',
+      end: 'bottom bottom',
+      scrub: 1
+    }
+  });
+}
+
+/* ============================================================
+   REFRESH ON LOAD
+   ============================================================ */
+window.addEventListener('load', () => ScrollTrigger.refresh());
+
+</script>
+</body>
+</html>
