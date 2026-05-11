@@ -231,14 +231,16 @@ body.has-cursor .cursor-glow{display:block;}
   pointer-events:none;
   overflow:hidden;
   background:
+    radial-gradient(ellipse 70% 50% at 30% 25%, rgba(77,124,255,.10), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 75% 85%, rgba(214,51,132,.12), transparent 60%),
     radial-gradient(ellipse 90% 70% at 50% 50%, rgba(13,18,36,1) 0%, rgba(7,10,20,1) 60%, #050810 100%);
 }
 .circuit-bg svg{
   position:absolute;
-  top:0;left:0;
-  width:4000px;height:3000px;
-  transform-origin:0 0;
+  top:-15%;left:-15%;
+  width:130%;height:130%;
   will-change:transform;
+  opacity:.5;
 }
 .tr{
   fill:none;
@@ -943,6 +945,33 @@ main{position:relative;z-index:5;}
    On tablet+mobile: stack everything, NO horizontal scroll, NO pin
    ============================================================ */
 @media (max-width:1024px){
+  /* === PERF: kill heavy effects below 1025px === */
+  /* Hide the 4000x3000 circuit SVG — replaced by simple gradient on .circuit-bg */
+  .circuit-bg svg{display:none;}
+  /* Strip backdrop-filter from all glass surfaces (mobile GPU killer) */
+  .node-card,
+  .pain-card,
+  .testi-card,
+  .result-card,
+  .nav.is-scrolled,
+  .nav-cta,
+  .btn-ghost,
+  .footer,
+  .mobile-menu,
+  .service-visual,
+  .hero-badge{
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  .node-card{background:rgba(10,14,26,.85);}
+  .pain-card,.testi-card,.result-card{background:rgba(13,18,36,.85);}
+  /* Disable animated conic-gradient borders (continuous repaints) */
+  .node-card::before,
+  .pain-card::before,
+  .testi-card::before{display:none!important;}
+  /* Static box-shadow stand-in for "premium border" feel */
+  .node-card{border:1px solid rgba(124,92,252,.18);}
+
   .pain-grid,.methode-steps,.results-grid,.testi-grid,.footer-top,.services-head,.service-grid{
     grid-template-columns:1fr;gap:24px;
   }
@@ -1745,15 +1774,9 @@ const NODES = [
   { id: 6, x: 500,  y: 1300, scale: 1.0,  name: 'Témoignages' },
   { id: 7, x: 2000, y: 1500, scale: 1.15, name: 'CORE · CTA' },
 ];
-const INTRO_VIEW = { x: 2000, y: 1500, scale: 0.42 };
-
-function cameraFor({ x, y, scale }) {
-  return {
-    x: window.innerWidth / 2 - x * scale,
-    y: window.innerHeight / 2 - y * scale,
-    scale,
-  };
-}
+/* (Per-node camera transforms were removed — the circuit is now static
+   with a subtle Y parallax. NODES is still used by initHud() to update
+   the HUD label as the user scrolls between sections.) */
 
 /* ============================================================
    PRELOADER — runs once, identical on desktop and mobile
@@ -1765,9 +1788,6 @@ const preloaderTag = document.getElementById('preloader-tag');
 const preloaderLine = document.getElementById('preloader-line');
 
 gsap.set('.nav', { yPercent: -100, opacity: 0 });
-
-// Pre-position SVG to the intro view (matters on desktop, harmless on mobile)
-gsap.set('#circuit-svg', cameraFor(INTRO_VIEW));
 
 const counterObj = { val: 0 };
 const tlPre = gsap.timeline({
@@ -1840,9 +1860,7 @@ function initSite(){
 
   /* ---------- MOBILE / TABLET (≤ 1024px) ---------- */
   mm.add(QUERY_MOBILE, () => {
-    // Lock circuit to static centered view (no camera animation)
-    gsap.set('#circuit-svg', cameraFor({ x: 2000, y: 1500, scale: 0.55 }));
-
+    // Circuit SVG is hidden via CSS at this breakpoint — no JS transform needed.
     initFadesMobile();   // simple onEnter fades — no scrub, no pin
     initCardsMobile();
     initResultsMobile(); // counters trigger once on enter, no scrub
@@ -1935,38 +1953,25 @@ function initScrollProgress(){
 }
 
 /* ============================================================
-   CAMERA — desktop only
+   CIRCUIT PARALLAX — desktop only
+   The previous per-section scrub-camera on the 4000x3000 SVG was
+   creating a visually disjoint "two pages" effect and stressing the
+   GPU. We now keep the circuit STATIC with a single tiny Y parallax
+   (~5%) over the whole page so it feels alive without competing
+   with the scrolling content.
    ============================================================ */
 function initCamera(){
   const svg = document.getElementById('circuit-svg');
-  gsap.set(svg, cameraFor(INTRO_VIEW));
-
-  const sections = gsap.utils.toArray('.node-section');
-
-  sections.forEach((section, i) => {
-    const fromView = i === 0 ? INTRO_VIEW : NODES[i - 1];
-    const toView = NODES[i];
-    gsap.fromTo(svg,
-      cameraFor(fromView),
-      {
-        ...cameraFor(toView),
-        ease: 'none',
-        immediateRender: i === 0,
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1.4,
-          invalidateOnRefresh: true,
-        }
-      }
-    );
-  });
-
-  let resizeT;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeT);
-    resizeT = setTimeout(() => ScrollTrigger.refresh(), 200);
+  if (!svg) return;
+  gsap.to(svg, {
+    yPercent: -6,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: 'body',
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 2,
+    }
   });
 }
 
