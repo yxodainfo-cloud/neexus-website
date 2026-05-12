@@ -676,11 +676,18 @@ body.has-cursor .cursor-glow{display:block;}
 .mission-card p{color:var(--text);font-size:15px;line-height:1.6;}
 @media(max-width:1024px){ .mission-card{--mission-r:240px;} }
 @media(max-width:640px){
-  .mission-card{--mission-r:215px;padding:32px 24px;}
-  .mission-card h3{font-size:26px;}
-  .mission-card p{font-size:14px;}
+  /* fix : cartes coupees en bas -> reduit stage / platter + sub-titre desormais court */
+  .mission-pin{padding:24px 0;}
+  .mission-head{margin-bottom:22px;}
+  .mission-head p{font-size:13.5px;margin-top:12px;}
+  .mission-stage{height:clamp(360px,44vh,420px);}
+  .mission-platter{height:clamp(320px,40vh,380px);}
+  .mission-card{--mission-r:205px;padding:26px 22px;}
+  .mission-card h3{font-size:24px;margin-bottom:14px;}
+  .mission-card p{font-size:13.5px;line-height:1.55;}
+  .mission-card .m-num{margin-bottom:16px;}
 }
-@media(max-width:380px){ .mission-card{--mission-r:195px;} }
+@media(max-width:380px){ .mission-card{--mission-r:185px;} }
 
 /* ============================================================
    SERVICES — PHASE 3
@@ -2170,7 +2177,7 @@ body.has-cursor .cursor-glow{display:block;}
           <span class="label">Notre Mission</span>
         </div>
         <h2 data-split>On ne vend pas de l'IA. On rend du temps, du chiffre, et de la sérénité.</h2>
-        <p>Neexus propulse les entreprises — petites, moyennes, grandes, tous secteurs — vers le niveau supérieur, grâce à des solutions IA et des automatisations sur mesure. La technologie n'est pas là pour remplacer vos équipes, elle est là pour les augmenter. Elle prend en charge le répétitif, le pénible, le chronophage. Vos collaborateurs reviennent sur l'intelligence humaine, la relation client, la stratégie, la créativité.</p>
+        <p>Neexus propulse les entreprises — petites, moyennes, grandes, tous secteurs — vers le niveau supérieur, grâce à des solutions IA et des automatisations sur mesure.</p>
       </div>
       <div class="mission-stage">
         <div class="mission-platter" id="mission-platter">
@@ -2182,7 +2189,7 @@ body.has-cursor .cursor-glow{display:block;}
           <article class="mission-card" style="--i:120deg">
             <span class="m-num">02 · Principe</span>
             <h3>Mesurable</h3>
-            <p>Si on ne peut pas chiffrer le gain — en heures, en euros, en satisfaction — on ne le déploie pas. Point.</p>
+            <p>Si on ne peut pas chiffrer le gain — en heures, en argent, en satisfaction — on ne le déploie pas. Point.</p>
           </article>
           <article class="mission-card" style="--i:240deg">
             <span class="m-num">03 · Principe</span>
