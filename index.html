@@ -1996,6 +1996,8 @@ body.has-cursor .cursor-glow{display:block;}
     overflow-y:visible !important;
     scroll-snap-type:none !important;
     -webkit-overflow-scrolling:auto;
+    perspective:1400px;                /* 3D : pour le tilted card drop */
+    perspective-origin:50% 30%;
   }
   .services-stack{
     display:flex !important;
@@ -2003,6 +2005,7 @@ body.has-cursor .cursor-glow{display:block;}
     width:auto !important;
     gap:0 !important;
     padding:0 22px !important;
+    transform-style:preserve-3d;
   }
   .service-panel{
     flex:1 1 auto !important;
@@ -2011,6 +2014,9 @@ body.has-cursor .cursor-glow{display:block;}
     padding:32px 0 !important;
     border-top:1px solid var(--line);
     scroll-snap-align:none !important;
+    transform-style:preserve-3d;
+    will-change:transform,opacity;     /* perf hint pour l'animation 3D */
+    backface-visibility:hidden;
   }
   .service-panel:first-of-type{border-top:none;padding-top:8px !important;}
   .service-panel .panel-num{font-size:10px;margin-bottom:10px;letter-spacing:.16em;}
@@ -3832,22 +3838,45 @@ function initServices(){
       });
     })
     .add(QUERY_MOBILE, () => {
-      // Mobile: native swipe carousel (CSS does the work).
-      // We just animate each panel's internals when it enters viewport.
-      gsap.utils.toArray('.service-panel').forEach((panel) => {
+      /* Mobile vertical stack : TILTED CARD DROP 3D
+         Chaque pilier arrive incline (rotateX:-30deg + y:80px) au-dessus de
+         sa position et 'tombe a plat' au scroll, comme on poserait une carte
+         sur une table. transformOrigin:50% 100% = pivot au bas pour effet
+         'depose'. Scrub: 1 pour suivre le scroll precisement. */
+      const panels = gsap.utils.toArray('.service-panel');
+
+      /* Etat initial : toutes les cartes inclinees vers l'arriere */
+      gsap.set(panels, {
+        rotationX: -30,
+        y: 80,
+        opacity: 0,
+        transformOrigin: '50% 100%',
+        transformPerspective: 1200,
+      });
+
+      /* Anim 'drop flat' au scroll */
+      panels.forEach(panel => {
+        gsap.to(panel, {
+          rotationX: 0,
+          y: 0,
+          opacity: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: panel,
+            start: 'top 88%',
+            end: 'top 45%',
+            scrub: 1,
+            invalidateOnRefresh: true,
+          }
+        });
+
+        /* Bonus : visual clip-path reveal interne quand le panel est presque pose */
         const visual = panel.querySelector('.service-visual');
-        const txtKids = panel.querySelectorAll('.service-text > *');
         if (visual) {
           gsap.from(visual, {
-            clipPath: 'inset(0% 100% 0% 0%)',
-            duration: 1.2, ease: 'power4.inOut',
-            scrollTrigger: { trigger: panel, start: 'top 70%', once: true }
-          });
-        }
-        if (txtKids.length) {
-          gsap.from(txtKids, {
-            y: 40, opacity: 0, stagger: .08, duration: .8, ease: 'back.out(1.2)',
-            scrollTrigger: { trigger: panel, start: 'top 75%', once: true }
+            clipPath: 'inset(0% 0% 0% 100%)',   /* slide from right */
+            duration: 1, ease: 'power4.inOut',
+            scrollTrigger: { trigger: panel, start: 'top 65%', once: true }
           });
         }
       });
