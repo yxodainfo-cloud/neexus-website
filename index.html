@@ -1910,8 +1910,10 @@ body.has-cursor .cursor-glow{display:block;}
 .cta-form-rassurance{
   text-align:center;
   font-size:13px;color:var(--text-dim);
-  /* fix : margin-top 4 -> 28 — espace propre entre bouton et reassurance */
-  max-width:54ch;margin:28px auto 0;line-height:1.5;
+  /* fix : margin-top 28 -> 56 — le bouton a box-shadow 0 12px 40px
+     qui projette un halo violet ~50-60px sous le bouton. Le texte etait
+     DANS le halo. 56px + flex-gap 18px = 74px total = bien clear. */
+  max-width:54ch;margin:56px auto 0;line-height:1.5;
 }
 @media(max-width:640px){
   .cta-form-grid{grid-template-columns:1fr;}
