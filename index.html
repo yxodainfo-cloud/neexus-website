@@ -1698,13 +1698,19 @@ body.has-cursor .cursor-glow{display:block;}
    sur scroll vers le bas, amenant les cartes de la droite vers le centre.
    backface-visibility:hidden masque naturellement les cartes au dos.
    ============================================================ */
-.testi{background:var(--bg-1);position:relative;overflow:hidden;}
+.testi{
+  background:var(--bg-1);position:relative;overflow:hidden;
+  /* override .section padding (etait 140px top+bottom) — kill l'espace
+     enorme au-dessus du titre. */
+  padding-top:60px !important;padding-bottom:0 !important;
+}
 .testi-pin{
   min-height:100svh;
-  display:flex;flex-direction:column;justify-content:center;
-  padding:80px 0;
+  display:flex;flex-direction:column;
+  justify-content:flex-start;     /* was center — head pres du top, plus de vide */
+  padding:20px 0 0;                /* was 80px 0 */
 }
-.testi-head{text-align:center;margin-bottom:48px;padding:0 24px;}
+.testi-head{text-align:center;margin-bottom:32px;padding:0 24px;}    /* was 48 */
 .testi-head h2{
   font-family:'Syne',sans-serif;font-weight:600;
   font-size:clamp(26px,3.8vw,52px);     /* fix : -28% */
@@ -1802,6 +1808,10 @@ body.has-cursor .cursor-glow{display:block;}
   .testi-card{ --testi-r:280px; padding:28px 22px 22px; }
   .testi-card .quote{font-size:13.5px;}
   .testi-card .kpi{font-size:24px;}
+  /* mobile : encore moins de gap au-dessus du titre + tres peu sous le titre */
+  .testi{padding-top:30px !important;}
+  .testi-pin{padding-top:0;}
+  .testi-head{margin-bottom:18px;}
 }
 @media (max-width:380px){ .testi-card{ --testi-r:255px; } }
 
@@ -1833,8 +1843,12 @@ body.has-cursor .cursor-glow{display:block;}
   max-width:24ch;margin:0 auto 28px;
 }
 .cta-final h2 .grad{
-  background:var(--grad-text);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
+  /* fix : etait bg-clip:text + transparent — invisible (meme cause que
+     italic-glow sur Resultats). Solid white = visible cross-browser. */
+  background:none;
+  -webkit-background-clip:initial;background-clip:initial;
+  color:#fff;
+  -webkit-text-fill-color:#fff;
 }
 .cta-final p{
   color:var(--text-dim);font-size:17px;
@@ -1896,7 +1910,8 @@ body.has-cursor .cursor-glow{display:block;}
 .cta-form-rassurance{
   text-align:center;
   font-size:13px;color:var(--text-dim);
-  max-width:54ch;margin:4px auto 0;line-height:1.5;
+  /* fix : margin-top 4 -> 28 — espace propre entre bouton et reassurance */
+  max-width:54ch;margin:28px auto 0;line-height:1.5;
 }
 @media(max-width:640px){
   .cta-form-grid{grid-template-columns:1fr;}
@@ -1946,16 +1961,7 @@ body.has-cursor .cursor-glow{display:block;}
   transform:translateY(-2px);
 }
 .footer-socials svg{width:14px;height:14px;}
-.footer-mega{
-  font-family:'Syne',sans-serif;font-weight:800;
-  font-size:clamp(80px,18vw,260px);
-  line-height:.85;letter-spacing:-.05em;
-  margin-top:40px;
-  background:linear-gradient(180deg,rgba(255,255,255,.06) 0%,transparent 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  text-align:center;user-select:none;
-  white-space:nowrap;overflow:hidden;
-}
+/* .footer-mega supprime — l'ancien logo geant NEEXUS au fond du footer */
 
 /* ============================================================
    RESPONSIVE — Tablet (≤1024) + Mobile (≤768) cut down hard
@@ -2032,7 +2038,6 @@ body.has-cursor .cursor-glow{display:block;}
   .hero-scroll-hint{display:none;}
   .problems-grid{grid-template-columns:1fr;}
   .footer-top{grid-template-columns:1fr;}
-  .footer-mega{font-size:80px;}
   /* Services mobile = VERTICAL STACK (abandon du carousel horizontal qui ne marchait pas)
      fix user : 9 screens pour passer une carte = carousel cassé sur son mobile.
      Maintenant : 5 piliers stackes verticalement, scroll natif. */
@@ -3202,7 +3207,6 @@ body.has-cursor .cursor-glow{display:block;}
         </ul>
       </div>
     </div>
-    <div class="footer-mega">NEEXUS</div>
     <div class="footer-bottom">
       <div>Mentions légales · Politique de confidentialité · CGV</div>
       <div>© 2026 — NEEXUS AGENCY by SDS Smart Digital Solution LLC</div>
