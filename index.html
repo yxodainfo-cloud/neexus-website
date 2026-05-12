@@ -532,26 +532,28 @@ body.has-cursor .cursor-glow{display:block;}
    d'une track de 4 blocs. La carte centrée prend le focus (scale+couleur).
    À l'arrivée : blocs 1-2 visibles, 3-4 débordants à droite (teaser).
    ============================================================ */
-.constat{background:var(--bg-1);overflow:hidden;position:relative;}
+.constat{background:var(--bg-1);overflow:hidden;position:relative;padding:0 !important;}   /* fix : kill padding section (etait 140px). Le constat-pin gere son propre espace interne. */
 .constat-pin{
   min-height:100svh;
   display:flex;flex-direction:column;justify-content:center;
-  padding:60px 0;
+  padding:40px 0;
 }
-.constat-head{text-align:center;margin-bottom:40px;padding:0 24px;}
+.constat-head{text-align:center;margin-bottom:32px;padding:0 24px;}
 .constat-head h2{
   font-family:'Syne',sans-serif;font-weight:600;
-  font-size:clamp(24px,3.4vw,46px);     /* fix : -25% */
-  letter-spacing:-.025em;line-height:1.1;
-  max-width:22ch;margin-inline:auto;
+  font-size:clamp(20px,2.8vw,38px);     /* fix : -20% supplementaire (user demande) */
+  letter-spacing:-.025em;line-height:1.12;
+  max-width:24ch;margin-inline:auto;
 }
 .constat-head p{
-  color:var(--text-dim);max-width:62ch;margin-inline:auto;
-  margin-top:18px;line-height:1.6;font-size:15px;
+  color:#ffffff;max-width:62ch;margin-inline:auto;       /* fix : sous-titre blanc + text-shadow comme hero-sub */
+  margin-top:16px;line-height:1.6;font-size:14.5px;
+  text-shadow:0 1px 12px rgba(0,0,0,.5);
+  opacity:.88;
 }
 .constat-stage{
   width:100%;overflow:hidden;
-  padding:30px max(24px,4vw);
+  padding:24px max(24px,4vw);
 }
 .constat-track{
   display:flex;gap:24px;
@@ -579,10 +581,10 @@ body.has-cursor .cursor-glow{display:block;}
 .constat-card:not(.is-focus){opacity:.5;}
 .constat-card .c-num{
   font-family:'Syne',sans-serif;font-weight:800;
-  font-size:clamp(48px,7vw,80px);line-height:1;letter-spacing:-.03em;
+  font-size:clamp(24px,3.5vw,40px);line-height:1;letter-spacing:-.03em;   /* fix : -50% (user demande, 48->24 / 80->40) */
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
-  margin-bottom:18px;
+  margin-bottom:14px;
 }
 .constat-card h3{
   font-family:'Syne',sans-serif;font-weight:600;
@@ -594,8 +596,19 @@ body.has-cursor .cursor-glow{display:block;}
   color:var(--text-dim);font-size:14.5px;line-height:1.6;
 }
 @media(max-width:640px){
-  .constat-card{flex-basis:min(78vw,320px);padding:28px 22px;}
-  .constat-card p{font-size:13.5px;}
+  .constat-pin{padding:24px 0;}                        /* fix : reduit padding pour faire tenir card en viewport */
+  .constat-head{margin-bottom:22px;}
+  .constat-head h2{font-size:clamp(18px,5.2vw,26px);}
+  .constat-head p{font-size:13px;margin-top:12px;}
+  .constat-stage{padding:18px max(20px,4vw);}
+  .constat-card{
+    flex-basis:min(82vw,320px);
+    min-height:auto;          /* fix : laisse la card s'ajuster a son contenu, pas de min-height force qui couperait */
+    padding:22px 20px;
+  }
+  .constat-card .c-num{font-size:26px;margin-bottom:10px;}
+  .constat-card h3{font-size:18px;margin-bottom:10px;}
+  .constat-card p{font-size:13px;line-height:1.55;}
 }
 
 /* ============================================================
@@ -604,7 +617,7 @@ body.has-cursor .cursor-glow{display:block;}
    Pin pendant la rotation. Cartes à 0°/120°/240°, backface-hidden masque
    celles au dos. Rotation -240° pour finir face à la 3e carte.
    ============================================================ */
-.mission{background:var(--bg-0);position:relative;overflow:hidden;}
+.mission{background:var(--bg-0);position:relative;overflow:hidden;padding:0 !important;}   /* fix : kill padding section (etait 140px). Le mission-pin gere son propre espace. */
 .mission-pin{
   min-height:100svh;
   display:flex;flex-direction:column;justify-content:center;
@@ -3558,16 +3571,12 @@ function initConstat(){
     onUpdate: self => {
       const x = -distance() * self.progress;
       gsap.set(track, { x });
-      // Détecte la carte la plus proche du centre viewport
-      const vc = window.innerWidth / 2;
-      let best = 0, bestDist = Infinity;
-      cards.forEach((c, i) => {
-        const r = c.getBoundingClientRect();
-        const center = r.left + r.width / 2;
-        const d = Math.abs(center - vc);
-        if (d < bestDist){ bestDist = d; best = i; }
-      });
-      cards.forEach((c, i) => c.classList.toggle('is-focus', i === best));
+      /* fix : focus base sur le PROGRESS (pas sur la position viewport).
+         Garantit que ca demarre TOUJOURS sur carte 1, puis 2, 3, 4 dans l'ordre.
+         Avant la detection viewport-center demarrait sur carte 3 (centre du track au load). */
+      const N = cards.length;          // 4
+      const activeIdx = Math.min(N - 1, Math.floor(self.progress * N + 0.0001));
+      cards.forEach((c, i) => c.classList.toggle('is-focus', i === activeIdx));
     }
   });
 }
