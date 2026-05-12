@@ -1536,39 +1536,34 @@ body.has-cursor .cursor-glow{display:block;}
   max-width:var(--container);
   margin:0 auto;
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-  gap:16px;
-  perspective:1000px;  /* PHASE 3: enables 3D hover on tiles */
+  /* Phase 4.6 : grid resserre — minmax 120->100, gap 16->8
+     "cloud rapproche" au lieu de tableau bien range */
+  grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+  gap:8px;
+  perspective:1000px;
   will-change:transform;
 }
 .stack-tile{
+  /* Phase 4.6 : plus de carre autour des logos —
+     background/border/aspect-ratio/padding-box supprimes.
+     Le .stack-tile devient juste un container flex transparent
+     pour positionner le mark + label, avec assez d'air pour
+     que le zoom amplifie (0.78-1.30) ne deborde pas. */
   position:relative;
-  aspect-ratio:1 / 1;
-  border-radius:var(--r-lg);
-  background:var(--glass);
-  border:1px solid var(--line);
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  gap:10px;
-  padding:18px 12px;
+  gap:8px;
+  padding:14px 6px;
   cursor:default;
   transform-origin:center;
-  transform-style:preserve-3d;  /* PHASE 3: 3D hover */
+  transform-style:preserve-3d;
   will-change:transform;
-  transition:border-color .35s,background-color .35s;
-  overflow:hidden;
+  overflow:visible;          /* on autorise le zoom out-of-box */
 }
-.stack-tile::before{
-  content:'';position:absolute;inset:-1px;border-radius:inherit;
-  padding:1px;opacity:0;
-  background:var(--grad);
-  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-  transition:opacity .35s;
-  pointer-events:none;
-}
-.stack-tile:hover::before{opacity:.85;}
-.stack-tile:hover{background:var(--glass-strong);}
+.stack-tile::before{display:none;}   /* kill l'ancien conic border */
+.stack-tile:hover{background:none;}  /* kill hover bg change */
+/* glow leger sur le mark au hover (remplace le conic border) */
+.stack-tile:hover .mark{filter:drop-shadow(0 0 14px rgba(124,92,252,.5));}
 .stack-tile .mark{
   width:46px;height:46px;
   display:grid;place-items:center;
@@ -2100,15 +2095,16 @@ body.has-cursor .cursor-glow{display:block;}
   .profile-card::before{display:none;}
   .profiles-bridge{margin-top:40px;padding:0 22px;}
 
-  /* Stack: tighten + 3 cols + remove backdrop-filter */
+  /* Stack mobile : 3 cols + gap serre + pas de carre (idem desktop) */
   .stack-section{padding:90px 22px;}
   .stack-head{margin-bottom:40px;}
-  .stack-grid{grid-template-columns:repeat(3,1fr);gap:10px;}
+  .stack-grid{grid-template-columns:repeat(3,1fr);gap:6px;}
   .stack-tile{
-    padding:14px 8px;gap:8px;
+    padding:10px 4px;gap:6px;
+    /* fix Phase 4.6 : pas de background (les carres autour sont supprimes) */
+    background:none;
     backdrop-filter:none;
     -webkit-backdrop-filter:none;
-    background:rgba(15,20,36,.85);
   }
   .stack-tile .mark{width:38px;height:38px;font-size:15px;}
   .stack-tile .label{font-size:9.5px;}
@@ -4227,25 +4223,44 @@ function initStack(){
   const tiles = gsap.utils.toArray('.stack-tile');
   if (tiles.length === 0) return;
 
-  // PHASE 3: clip-path circle entry — universel mobile + desktop
+  /* Phase 4.6 : SCATTER RANDOM applique AVANT l'entry.
+     Chaque tile recoit un offset x/y et une rotation Z leger pour
+     casser la regularite du grid (cloud "desordonne mais rapproche").
+     gsap.from ne touche que clipPath/scale/opacity dans l'entry, donc
+     ces transforms persistent. */
+  tiles.forEach(tile => {
+    gsap.set(tile, {
+      x:        (Math.random() - 0.5) * 24,    // -12 a +12 px
+      y:        (Math.random() - 0.5) * 28,    // -14 a +14 px
+      rotation: (Math.random() - 0.5) * 14     // -7 a +7 deg
+    });
+  });
+
+  // Entry : clip-path circle reveal universel
   gsap.from(tiles, {
     clipPath: 'circle(0% at 50% 50%)',
-    scale: 0.6,
+    scale: 0.5,
     opacity: 0,
     stagger: { each: 0.04, from: 'random' },
     duration: 0.9,
     ease: 'back.out(1.6)',
-    scrollTrigger: { trigger: '.stack-grid', start: 'top 80%', once: true }
+    scrollTrigger: { trigger: '.stack-grid', start: 'top 80%', once: true },
+    onComplete: () => {
+      /* Demarre breathing APRES l'entry pour eviter conflit de scale */
+      if (!reducedMotion) tiles.forEach(t => startBreathing(t));
+    }
   });
 
-  // prefers-reduced-motion: stop here, no infinite loops
+  // prefers-reduced-motion: pas de loops infinies
   if (reducedMotion) return;
 
-  // Helper: redémarre le cycle de respiration pour une tuile
+  /* Phase 4.6 : breathing AMPLIFIE — amplitude 0.78-1.30 (au lieu de
+     0.92-1.10) pour zoom in/out beaucoup plus marque. Le scale tween
+     ne touche pas x/y/rotation, donc le scatter persiste. */
   function startBreathing(tile){
-    const minScale = 0.92 + Math.random() * 0.02;
-    const maxScale = 1.04 + Math.random() * 0.06;
-    const duration = 3 + Math.random() * 4;
+    const minScale = 0.78 + Math.random() * 0.07;   // 0.78 - 0.85
+    const maxScale = 1.20 + Math.random() * 0.12;   // 1.20 - 1.32
+    const duration = 2.5 + Math.random() * 4;        // 2.5 - 6.5s
     const delay    = Math.random() * 2;
     gsap.fromTo(tile,
       { scale: minScale },
@@ -4253,15 +4268,13 @@ function initStack(){
     );
   }
 
-  tiles.forEach(tile => startBreathing(tile));
-
-  // Hover 3D — desktop only (no hover on touch)
+  // Hover 3D — desktop only (scale ELARGI a 1.5 puisqu'il n'y a plus de card)
   gsap.matchMedia().add(QUERY_DESKTOP, () => {
     tiles.forEach(tile => {
       const onEnter = () => {
         gsap.killTweensOf(tile, 'scale,rotationX,rotationY');
         gsap.to(tile, {
-          scale: 1.18, rotationY: 8, rotationX: -4,
+          scale: 1.5, rotationY: 6, rotationX: -3,
           duration: 0.4, ease: 'power3.out'
         });
       };
