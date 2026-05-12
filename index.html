@@ -1019,12 +1019,46 @@ body.has-cursor .cursor-glow{display:block;}
   color:var(--text-dim);font-size:16px;
   max-width:54ch;line-height:1.65;margin-inline:auto;
 }
+/* PHASE 4 — Carousel horizontal snap pour les 3 chiffres */
+.results-carousel{
+  position:relative;
+  margin:0 -36px;
+}
+.results-track{
+  display:flex;
+  gap:24px;
+  padding:20px 36px 36px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.results-track::-webkit-scrollbar{display:none;}
+.results-dots{
+  display:flex;align-items:center;justify-content:center;
+  gap:10px;
+  margin-top:8px;
+}
+.rdot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(255,255,255,.15);
+  transition:background .35s,transform .35s,box-shadow .35s;
+}
+.rdot.is-active{
+  background:var(--magenta);
+  transform:scale(1.4);
+  box-shadow:0 0 12px var(--magenta);
+}
+/* Anciennes règles results-grid restent pour compat éventuelle */
 .results-grid{
   display:grid;grid-template-columns:repeat(4,1fr);gap:20px;
 }
 .result-card{
+  flex:0 0 min(540px, 88vw);
+  scroll-snap-align:center;
   position:relative;
-  padding:48px 28px 36px;
+  padding:48px 32px 38px;
   border-radius:var(--r-lg);
   background:var(--glass);border:1px solid var(--line);
   backdrop-filter:blur(14px);
@@ -2205,7 +2239,7 @@ body.has-cursor .cursor-glow{display:block;}
 </section>
 
 <!-- ============================================================
-     RESULTATS (PINNED, SCRUB-DRIVEN COUNTERS)
+     RESULTATS — PHASE 4 : 3 chiffres en carousel horizontal + phrase finale
      ============================================================ -->
 <section class="results" id="resultats">
   <div class="results-pin" id="results-pin">
@@ -2216,32 +2250,30 @@ body.has-cursor .cursor-glow{display:block;}
           <span class="line"></span>
           <span class="label">Résultats</span>
         </div>
-        <h2 data-split>Des chiffres, <span class="gradient-text italic">pas des promesses.</span></h2>
-        <p>Voici ce que nos clients constatent en moyenne dans les <b style="color:var(--text);">90 jours</b> qui suivent le déploiement. Mesurés, vérifiés, reproductibles.</p>
+        <h2 data-split>Les chiffres qu'on défend devant <span class="gradient-text italic">n'importe qui</span>.</h2>
       </div>
-      <div class="results-grid">
-        <div class="result-card" data-card data-result>
-          <div class="num"><span class="big-counter" data-target="47">0</span><span class="unit">h</span></div>
-          <div class="lbl">Heures rendues par mois aux équipes</div>
-          <div class="desc">en moyenne, et par collaborateur impliqué dans les workflows automatisés</div>
+      <div class="results-carousel" id="results-carousel">
+        <div class="results-track" id="results-track">
+          <article class="result-card" data-card data-result>
+            <div class="num"><span class="big-counter" data-target="1800" data-format="thousand">0</span><span class="unit">+</span></div>
+            <div class="lbl">heures de tâches répétitives économisées chaque mois pour nos clients</div>
+          </article>
+          <article class="result-card" data-card data-result>
+            <div class="num"><span class="big-counter" data-target="70">0</span><span class="unit">+</span></div>
+            <div class="lbl">solutions digitales déployées en production</div>
+          </article>
+          <article class="result-card" data-card data-result>
+            <div class="num"><span class="big-counter" data-target="96">0</span><span class="unit">%</span></div>
+            <div class="lbl">de satisfaction client sur l'ensemble de nos missions</div>
+          </article>
         </div>
-        <div class="result-card" data-card data-result>
-          <div class="num"><span class="big-counter" data-target="3">0</span><span class="unit">x</span></div>
-          <div class="lbl">Plus de leads qualifiés</div>
-          <div class="desc">grâce à la qualification automatique et au temps de réponse immédiat</div>
-        </div>
-        <div class="result-card" data-card data-result>
-          <div class="num"><span class="big-counter" data-target="98">0</span><span class="unit">%</span></div>
-          <div class="lbl">Satisfaction client</div>
-          <div class="desc">mesurée sur les 12 derniers mois, sur l'ensemble des projets livrés</div>
-        </div>
-        <div class="result-card" data-card data-result>
-          <div class="num"><span class="prefix">&lt;</span><span class="big-counter" data-target="24">0</span><span class="unit">h</span></div>
-          <div class="lbl">Temps de première réponse, tous canaux</div>
-          <div class="desc">aux demandes entrantes — chatbot, email, formulaire, WhatsApp</div>
+        <div class="results-dots" id="results-dots" aria-hidden="true">
+          <span class="rdot is-active"></span>
+          <span class="rdot"></span>
+          <span class="rdot"></span>
         </div>
       </div>
-      <p class="results-footnote">Chiffres mesurés sur l'ensemble des projets livrés. Grille de calcul disponible sur demande.</p>
+      <p class="results-footnote">Et ce ne sont pas des chiffres de plaquette. <b>La grille de calcul est disponible sur demande.</b></p>
     </div>
   </div>
 </section>
@@ -3162,32 +3194,64 @@ function initMethode(){
    juste un scrub serré sur le moment où les cards traversent l'écran.
    ============================================================ */
 function initResults(){
+  const track = document.getElementById('results-track');
   const cards = gsap.utils.toArray('.result-card');
+  const dots  = gsap.utils.toArray('#results-dots .rdot');
+
   gsap.from('.results-text', {
     y: 24, opacity: 0, duration: .8, ease: 'power3.out',
     scrollTrigger: { trigger: '.results', start: 'top 80%', once: true }
   });
   gsap.from(cards, {
     y: 36, opacity: 0, stagger: .1, duration: .75, ease: 'power3.out',
-    scrollTrigger: { trigger: '.results-grid', start: 'top 85%', once: true }
+    scrollTrigger: { trigger: '.results-track', start: 'top 85%', once: true }
   });
 
   // Scrub-driven counters — chaque compteur a son propre tween sur scroll
+  // Support data-format="thousand" → "1 800" (locale fr-FR)
   document.querySelectorAll('.big-counter').forEach(el => {
     const target = +el.dataset.target;
+    const useThousand = el.dataset.format === 'thousand';
     const obj = { v: 0 };
-    el.textContent = '0';
+    el.textContent = useThousand ? '0' : '0';
     gsap.to(obj, {
       v: target, ease: 'none',
       scrollTrigger: {
-        trigger: '.results-grid',
+        trigger: '.results-track',
         start: 'top 85%',
         end: 'top 20%',
         scrub: 1,
       },
-      onUpdate: () => { el.textContent = Math.round(obj.v); }
+      onUpdate: () => {
+        const v = Math.round(obj.v);
+        el.textContent = useThousand ? v.toLocaleString('fr-FR').replace(/ | /g, ' ') : v;
+      }
     });
   });
+
+  // IntersectionObserver-lite — dot actif = card la plus centrée dans le track
+  if (track && cards.length && dots.length){
+    let raf;
+    const update = () => {
+      const r = track.getBoundingClientRect();
+      const cc = r.left + r.width / 2;
+      let best = 0, bestScore = -Infinity;
+      cards.forEach((c, i) => {
+        const cr = c.getBoundingClientRect();
+        const center = cr.left + cr.width / 2;
+        const score = 1 - Math.min(Math.abs(center - cc) / (r.width / 2), 1);
+        if (score > bestScore){ bestScore = score; best = i; }
+      });
+      dots.forEach((d, i) => d.classList.toggle('is-active', i === best));
+    };
+    track.addEventListener('scroll', () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    }, { passive: true });
+    // Premier passage après refresh layout
+    ScrollTrigger.addEventListener('refreshInit', update);
+    update();
+  }
 }
 
 /* ============================================================
