@@ -216,7 +216,12 @@ body.has-cursor .cursor-glow{display:block;}
 }
 .nav-logo:hover{transform:translateY(-1px);filter:drop-shadow(0 4px 22px rgba(124,92,252,.55));}
 .nav.is-scrolled .nav-logo{height:34px;}
-.nav-links{display:flex;gap:32px;align-items:center;}
+.nav-links{
+  display:flex;align-items:center;
+  /* Interpole 24px → 32px entre 1024 et 1280px de viewport, locked au-delà.
+     Calcul : (vw - 1024) / 256 * 8 + 24 → simplifié en 3.125vw - 8 */
+  gap:clamp(24px, calc(3.125vw - 8px), 32px);
+}
 .nav-links a{
   font-size:13px;letter-spacing:.02em;color:var(--text-dim);
   position:relative;padding:6px 0;transition:color .25s;
