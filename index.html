@@ -292,8 +292,8 @@ body.has-cursor .cursor-glow{display:block;}
 .section-eyebrow .line{width:48px;height:1px;background:var(--line-strong);}
 .section-title{
   font-family:'Syne',sans-serif;font-weight:600;
-  font-size:clamp(26px,3.8vw,56px);   /* fix : -30% (was 80max) */
-  line-height:1.05;letter-spacing:-.025em;max-width:20ch;
+  font-size:clamp(20px,2.6vw,40px);   /* fix services : -30% supplementaire (user demande) */
+  line-height:1.08;letter-spacing:-.025em;max-width:22ch;
 }
 .section-sub{
   color:var(--text-dim);font-size:clamp(15px,1.1vw,17px);
@@ -749,27 +749,27 @@ body.has-cursor .cursor-glow{display:block;}
 }
 .service-text h3{
   font-family:'Syne',sans-serif;font-weight:700;
-  font-size:clamp(32px,4.4vw,64px);
-  line-height:1;letter-spacing:-.025em;margin-bottom:24px;
+  font-size:clamp(20px,2.6vw,38px);     /* fix : -40% (etait clamp 32,4.4vw,64) — etait plus gros que le H2 de section, hierarchie cassee */
+  line-height:1.08;letter-spacing:-.025em;margin-bottom:18px;
 }
 .service-text .lead{
   font-family:'Syne',sans-serif;font-weight:500;
-  font-size:clamp(17px,1.4vw,22px);
+  font-size:clamp(14.5px,1.15vw,17px);   /* fix : -18% (etait clamp 17,1.4vw,22) */
   color:var(--text);
-  line-height:1.4;letter-spacing:-.005em;
-  margin-bottom:22px;max-width:48ch;
+  line-height:1.45;letter-spacing:-.005em;
+  margin-bottom:18px;max-width:52ch;     /* fix : harmonise max-width avec .desc */
 }
 .service-text .desc{
-  font-size:15px;color:var(--text-dim);
-  line-height:1.65;margin-bottom:28px;max-width:52ch;
+  font-size:14.5px;color:var(--text-dim);
+  line-height:1.6;margin-bottom:22px;max-width:52ch;
 }
 .service-text .desc b{color:var(--text);font-weight:500;}
 .service-text .example{
   position:relative;
-  padding:18px 22px;
+  padding:14px 18px;
   background:linear-gradient(90deg,rgba(124,92,252,.08),transparent);
   border-radius:0 var(--r-md) var(--r-md) 0;
-  max-width:54ch;
+  max-width:52ch;       /* fix : harmonise (etait 54ch) */
   overflow:hidden;
 }
 .service-text .example::before{
@@ -791,7 +791,8 @@ body.has-cursor .cursor-glow{display:block;}
   font-size:14.5px;color:var(--text);line-height:1.55;
 }
 .service-visual{
-  position:relative;height:520px;
+  position:relative;
+  height:clamp(340px,44vh,460px);     /* fix : etait 520px fixe -> responsive */
   border-radius:var(--r-lg);
   background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
   border:1px solid var(--line);
@@ -806,7 +807,7 @@ body.has-cursor .cursor-glow{display:block;}
 }
 
 /* Chat visual */
-.chat-visual{padding:24px;}
+.chat-visual{padding:24px;}   /* fix : reference, tous les autres alignes a 24 */
 .chat-header{
   display:flex;align-items:center;gap:10px;
   padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:24px;
@@ -842,7 +843,7 @@ body.has-cursor .cursor-glow{display:block;}
 @keyframes typingDot{0%,60%,100%{opacity:.3;transform:translateY(0);}30%{opacity:1;transform:translateY(-3px);}}
 
 /* Workflow visual */
-.workflow-visual{padding:30px;display:grid;place-items:center;}
+.workflow-visual{padding:24px;display:grid;place-items:center;}   /* fix : 30 -> 24 (unifie) */
 .workflow-svg{width:100%;height:100%;max-width:460px;}
 .workflow-svg .node-w{fill:rgba(10,14,26,.9);stroke:rgba(255,255,255,.18);stroke-width:1;}
 .workflow-svg .nlabel{font-family:'JetBrains Mono',monospace;font-size:9px;fill:var(--text);text-anchor:middle;dominant-baseline:central;font-weight:500;}
@@ -875,7 +876,7 @@ body.has-cursor .cursor-glow{display:block;}
 /* ============================================================
    VOICE VISUAL — Pilier 02 (Agents vocaux)
    ============================================================ */
-.voice-visual{padding:22px;display:flex;flex-direction:column;}
+.voice-visual{padding:24px;display:flex;flex-direction:column;}   /* fix : 22 -> 24 (unifie) */
 .voice-header{
   display:flex;align-items:center;justify-content:space-between;
   padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:18px;
@@ -976,7 +977,7 @@ body.has-cursor .cursor-glow{display:block;}
 /* ============================================================
    MARKETING VISUAL — Pilier 05 (Marketing & contenu)
    ============================================================ */
-.marketing-visual{padding:22px;display:flex;flex-direction:column;gap:14px;}
+.marketing-visual{padding:24px;display:flex;flex-direction:column;gap:14px;}   /* fix : 22 -> 24 (unifie) */
 .mk-header{
   display:flex;align-items:center;justify-content:space-between;
   padding-bottom:14px;border-bottom:1px solid var(--line);
@@ -1981,11 +1982,23 @@ body.has-cursor .cursor-glow{display:block;}
   .problems-grid,.results-grid{grid-template-columns:1fr;}
   .footer-top{grid-template-columns:1fr;}
   .footer-mega{font-size:80px;}
-  /* Services mobile carousel — even tighter */
-  .services-wrap{padding:90px 0 60px;}
-  .services-head{padding:0 22px;}
+  /* Services mobile carousel — even tighter
+     fix user : chaque pilier doit tenir dans 1 ecran (avant : ~940px de haut). */
+  .services-wrap{padding:60px 0 40px;}
+  .services-head{padding:0 22px;gap:24px;margin-bottom:40px;}
+  .services-head h2.section-title{font-size:clamp(18px,5.2vw,26px);max-width:24ch;}
+  .services-head p{font-size:13.5px;}
   .services-stack{gap:14px;padding:0 4vw;}
-  .service-panel{flex:0 0 92%;padding:30px 0;}
+  .service-panel{flex:0 0 92%;padding:20px 0;}
+  .service-panel .panel-num{font-size:11px;margin-bottom:16px;letter-spacing:.16em;}
+  .service-text .pillar-num{font-size:11px;margin-bottom:12px;}
+  .service-text h3{font-size:22px;margin-bottom:12px;line-height:1.1;}
+  .service-text .lead{font-size:14px;margin-bottom:12px;line-height:1.4;}
+  .service-text .desc{font-size:13px;margin-bottom:14px;line-height:1.55;}
+  .service-text .example{padding:12px 14px;}
+  .service-text .example-label{font-size:9.5px;margin-bottom:6px;}
+  .service-text .example p{font-size:12.5px;line-height:1.5;}
+  .service-visual{height:260px;}    /* fix : 380 -> 260 (etait la cause des panels enormes) */
   .preloader-logo,.preloader-logo img{height:80px;}
 
   /* Profiles: stack vertically (no horizontal carousel on mobile) */
