@@ -3838,45 +3838,41 @@ function initServices(){
       });
     })
     .add(QUERY_MOBILE, () => {
-      /* Mobile vertical stack : TILTED CARD DROP 3D
-         Chaque pilier arrive incline (rotateX:-30deg + y:80px) au-dessus de
-         sa position et 'tombe a plat' au scroll, comme on poserait une carte
-         sur une table. transformOrigin:50% 100% = pivot au bas pour effet
-         'depose'. Scrub: 1 pour suivre le scroll precisement. */
+      /* Mobile vertical stack : TILTED CARD DROP 3D (one-shot, pas scrub)
+         Chaque pilier arrive incline (rotateX:-30deg + y:80px) et 'tombe a plat'
+         en 1.1s avec ease power3.out quand il entre dans le viewport a 'top 85%'.
+         once:true -> anim joue une fois, pas de saccade au scroll-back.
+
+         Pourquoi ONE-SHOT et pas scrub :
+         - Avec scrub, P1/P2 etaient deja past 'top 45%' au chargement -> aucune anim
+         - P4/P5 avaient leur scrub interrompu avant fin -> arrivaient ds section suivante
+         - One-shot garantit un timing identique pour TOUS les piliers */
       const panels = gsap.utils.toArray('.service-panel');
 
-      /* Etat initial : toutes les cartes inclinees vers l'arriere */
-      gsap.set(panels, {
-        rotationX: -30,
-        y: 80,
-        opacity: 0,
-        transformOrigin: '50% 100%',
-        transformPerspective: 1200,
-      });
-
-      /* Anim 'drop flat' au scroll */
       panels.forEach(panel => {
-        gsap.to(panel, {
-          rotationX: 0,
-          y: 0,
-          opacity: 1,
+        gsap.from(panel, {
+          rotationX: -30,
+          y: 80,
+          opacity: 0,
+          transformOrigin: '50% 100%',
+          transformPerspective: 1200,
+          duration: 1.1,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: panel,
-            start: 'top 88%',
-            end: 'top 45%',
-            scrub: 1,
-            invalidateOnRefresh: true,
+            start: 'top 85%',
+            once: true,
           }
         });
 
-        /* Bonus : visual clip-path reveal interne quand le panel est presque pose */
+        /* Bonus : visual clip-path reveal interne, declenche 0.3s apres le drop */
         const visual = panel.querySelector('.service-visual');
         if (visual) {
           gsap.from(visual, {
-            clipPath: 'inset(0% 0% 0% 100%)',   /* slide from right */
+            clipPath: 'inset(0% 0% 0% 100%)',
             duration: 1, ease: 'power4.inOut',
-            scrollTrigger: { trigger: panel, start: 'top 65%', once: true }
+            delay: .3,
+            scrollTrigger: { trigger: panel, start: 'top 85%', once: true }
           });
         }
       });
