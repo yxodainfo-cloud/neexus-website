@@ -2125,7 +2125,7 @@ body.has-cursor .cursor-glow{display:block;}
           <span class="label">Le Constat</span>
         </div>
         <h2 data-split>Chaque jour, votre entreprise paie un impôt invisible.</h2>
-        <p data-fade>Pas dans les comptes. Dans les heures. Dans les commandes oubliées, les mails en retard, les clients qui partent parce que personne n'a pu répondre à temps, les équipes brillantes coincées sur des tâches indignes de leur talent.</p>
+        <p>Pas dans les comptes. Dans les heures. Dans les commandes oubliées, les mails en retard, les clients qui partent parce que personne n'a pu répondre à temps, les équipes brillantes coincées sur des tâches indignes de leur talent.</p>
       </div>
     </div>
     <div class="constat-stage" id="constat-stage">
@@ -2170,7 +2170,7 @@ body.has-cursor .cursor-glow{display:block;}
           <span class="label">Notre Mission</span>
         </div>
         <h2 data-split>On ne vend pas de l'IA. On rend du temps, du chiffre, et de la sérénité.</h2>
-        <p data-fade>Neexus propulse les entreprises — petites, moyennes, grandes, tous secteurs — vers le niveau supérieur, grâce à des solutions IA et des automatisations sur mesure. La technologie n'est pas là pour remplacer vos équipes, elle est là pour les augmenter. Elle prend en charge le répétitif, le pénible, le chronophage. Vos collaborateurs reviennent sur l'intelligence humaine, la relation client, la stratégie, la créativité.</p>
+        <p>Neexus propulse les entreprises — petites, moyennes, grandes, tous secteurs — vers le niveau supérieur, grâce à des solutions IA et des automatisations sur mesure. La technologie n'est pas là pour remplacer vos équipes, elle est là pour les augmenter. Elle prend en charge le répétitif, le pénible, le chronophage. Vos collaborateurs reviennent sur l'intelligence humaine, la relation client, la stratégie, la créativité.</p>
       </div>
       <div class="mission-stage">
         <div class="mission-platter" id="mission-platter">
@@ -3548,6 +3548,7 @@ function initConstat(){
   gsap.from('.constat-head > *', {
     y: 24, opacity: 0, stagger: .08,
     duration: .7, ease: 'power3.out',
+    clearProps: 'transform,opacity',     /* fix : libere les props apres l'anim pour ne pas bloquer le p a opacity:0 si trigger merdouille */
     scrollTrigger: { trigger: '.constat', start: 'top 75%', once: true }
   });
 
@@ -3593,6 +3594,7 @@ function initMission(){
   gsap.from('.mission-head > *', {
     y: 24, opacity: 0, stagger: .08,
     duration: .7, ease: 'power3.out',
+    clearProps: 'transform,opacity',     /* fix : libere les props apres l'anim */
     scrollTrigger: { trigger: '.mission', start: 'top 75%', once: true }
   });
 
