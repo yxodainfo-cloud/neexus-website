@@ -649,3 +649,212 @@ Avec ré-encodage ffmpeg keyframe-par-frame pour scrub fluide (commande à fourn
 4. **Phase 4 commit 4/6** — Résultats 4 grid → 3 carousel scroll-snap + counter `data-format="thousand"` fr-FR + 3 dots magenta.
 5. **Phase 4 commit 5/6** — Témoignages 3 grid → 6 roue 3D cylindrique 60° apart, pin + scrub -300°, 6 dots.
 6. **Phase 4 commit 6/6** — **Nouvelles sections 01 Le Constat (carousel horizontal pinné) + 02 Notre Mission (plaque tournante 3D) + CTA Final → formulaire visuel avec datepicker natif + renumérotation finale + doc CLAUDE.md**.
+
+---
+
+## PHASE 4.5 / 4.6 — Polish massif post-Phase 4 (13 mai 2026)
+
+**Contexte** : Phase 4 livrée mais nombreuses imperfections en usage réel (95% mobile). Cette phase couvre une vingtaine de micro-commits qui finalisent l'expérience : refontes de sections clés, isolation des couleurs pour éviter les bugs `bg-clip:text` + SplitType, polish des animations d'entrée. **À la fin de cette phase, le site est jugé prêt pour intégration d'une vidéo de fond** (voir §"Préparation vidéo" plus bas).
+
+### Modifications majeures par section
+
+#### Hero (`#hero`)
+- **Word-aware SplitType** : `new SplitType(line, { types: 'words, chars' })` au lieu de `'chars'` seul → empêche le wrap au milieu d'un mot (bug constaté quand le viewport devenait trop étroit pour une ligne)
+- H1 réduit : `clamp(...140px max)` → `clamp(...92px max)`, plus `overflow:visible` sur `.line` + padding-top breathing
+- Mobile menu : overflow corrigé, sous-titre passé en blanc lisible, ligne italique en blanc
+- Sous-CTA mobile (`.hero-micro-proof`) : passe en **grid 3 colonnes** au lieu de flex wrap, gap 14×10px, font 10.5px, text-shadow pour visibilité sur glow
+- Preloader : `initSite()` désormais appelé à `2.4s` au lieu de `onComplete` (3.45s) → entry hero démarre EN MÊME TEMPS que le clipPath reveal du preloader, supprime ~1s de temps mort
+- Parallax scrub du pin Hero adouci (sub `opacity: 0.75` au lieu de 0.25, CTA `y: 18` au lieu de 40) → contenu reste lisible en mi-scrub
+
+#### Constat (`#constat`) + Mission (`#mission`)
+- Focus progress du Constat basé sur `self.progress` (pas sur la position viewport-center) → garantit que ça démarre TOUJOURS sur carte 1 puis 2/3/4 dans l'ordre
+- Sous-titre Constat : couleur passe en blanc, carte mobile non coupée
+- Sous-titres Constat + Mission : **suppression conflit `data-fade` vs init internes** — les deux initialisaient le même `<p>` avec stagger contradictoire → ajout de `clearProps:'transform,opacity'` après les anim d'entry
+- Mission : sous-titre raccourci, "euros" → "argent" pour ouvrir le ROI au-delà du financier, cards mobile dans le viewport (radius 215→195 à ≤380)
+
+#### Pour Qui (`#profils`) — refonte complète
+**Abandon du scroll-snap horizontal** (commit `c4363ce`) → **deck 3D avec envol** :
+- 6 cartes empilées en Z négatif, front card a `.is-front` (halo conic)
+- Pin durant 5 transitions (5 × 60% vh)
+- Scroll fait s'envoler la front card vers la gauche+haut (rotation Z + slide off) + la suivante remonte
+- `initProfilesDeck()` remplace `initProfilesCarousel()` dans `initSite()` — l'ancien est gardé en dead code pour ref
+- `.profiles-progress` : barre verticale gauche qui se remplit selon `self.progress`
+
+#### Services (`#services`) — refonte mobile critique
+Le user signale "9 swipes pour passer 1 carte" → carousel horizontal mobile cassé sur son téléphone.
+- **Abandon du carousel horizontal mobile** → stack vertical natif (commit `1bc3dd6`)
+- Tentative 1 : tilted card drop 3D scrubed → rejetée (incohérent entre piliers)
+- Tentative 2 : tilted drop one-shot → bof
+- **Final** : zigzag slide horizontal alterné (commit `fe0b11c`). P1/P3/P5 entrent depuis la gauche (`x: -100vw`), P2/P4 depuis la droite (`x: +100vw`). One-shot `top 85%` once.
+- Desktop reste en horizontal pin scrubbed (snap entre panels)
+- Padding desktop 100px pour clear navbar, mobile ultra-compact gap 18px (était 80px → cause principale des panels énormes mobile), titres -30%, visuals responsive, description clamp 4 lignes
+- Navbar réordonnée pour matcher l'ordre du scroll réel (commit `bda2bb6`) : `Constat → Mission → Pour Qui → Services → ...` (Pour Qui passe avant Services dans le menu, cohérent avec ce qu'on voit en scrollant)
+
+#### Méthode (`#methode`) — SURPRISE notebook flip 3D
+- Avant : cascade diagonale (Phase 4) + SVG line traced (Phase 3)
+- Phase 4.5 : **notebook flip 3D** (commit `1183601`) — chaque step se déroule depuis sa tranche supérieure (`rotateX:-90deg`, `transformOrigin: '50% 0%'`, `transformPerspective: 1200`) vers son état plat. Effet "tourner une page de carnet vertical". Pulse magenta `drop-shadow` sur le `.step-num` à 0.7s du début (quand la carte est presque ouverte).
+- **Phase 4.5 final** (commit `db1e640`) : entrée **adoucie** — `rotationX: -55` (au lieu de -90), ajout `y: 30` (slide-up), duration 1.5s (au lieu de 1.1), ease `power2.out` (au lieu de power3.out), trigger `top 90%` (au lieu de 82%). Pulse num adouci : scale 1.05 + 14px glow + sine.out + delay 1.0s. Les cards ne "tapent" plus l'écran.
+
+#### Résultats (`#resultats`) — REFONTE COMPLÈTE en roue 3D
+Commits `2ada70d` → `7032030`. Plusieurs itérations.
+
+**État final** :
+- **Roue 3D axe X** (Ferris wheel / "roue de voiture") — pas axe Y. La rotation est autour d'un axe HORIZONTAL traversant l'écran, les cartes basculent verticalement par-dessus.
+- Pattern miroir de Mission mais avec axe X : `.results-wheel-stage` (perspective 1500, height `clamp(500px,68vh,620px)`, `display:grid;place-items:center`) → `.results-wheel` (relative, `clamp(320px,84vw,440px)` × `clamp(340px,46vh,400px)`, `transform-style:preserve-3d`) → 3 `.result-card` en `inset:0`, transform `rotateX(var(--i)) translateZ(var(--results-r))`.
+- Radius responsive : 240 desktop / 220 ≤1024 / 190 ≤640 / 170 ≤380
+- Pin durant 2.4 vh, rotation `rotationX: 0 → -240°` sur progress 0→1 (3 cartes × 120°, finit face à carte 3)
+- 3 dots magenta synchro via `Math.round(self.progress * (N-1))`
+- `backface-visibility:hidden` masque les cartes au dos
+
+**Compteurs ONE-SHOT (pas scrubés)** — point clé livré après plusieurs tentatives :
+```js
+document.querySelectorAll('.big-counter').forEach((el, i) => {
+  const target = +el.dataset.target;
+  const obj = { v: 0 };
+  gsap.to(obj, {
+    v: target,
+    duration: 1.6 + i * 0.15,
+    ease: 'power2.out',
+    scrollTrigger: { trigger: '.results', start: 'top 75%', once: true },
+    onUpdate: () => renderCounter(el, target, obj.v / target)
+  });
+});
+```
+Les 3 compteurs animent UNE FOIS quand la section entre dans le viewport (avant que le pin engage). Quand chaque carte arrive face caméra durant la rotation, son chiffre est **déjà à son target complet** (1800 / 70 / 96) — sinon le 1800 n'atteignait jamais sa cible avant que sa carte tourne hors champ (bug remonté plusieurs fois).
+
+**Isolation des couleurs par enfant** (commit `399c24d`) — fix architectural :
+- `.result-card .num` (parent) : **plus de bg-clip:text + color:transparent** au niveau parent (cassait l'affichage du `.unit` qui héritait `color:transparent`)
+- `.result-card .num .big-counter` : bg-clip:text + gradient **isolé sur le chiffre seul**
+- `.result-card .num .unit` : **solid `var(--pink)`** + `flex-shrink:0` + `display:inline-block` + `-webkit-text-fill-color:var(--pink)` — le `%` / `+` sont TOUJOURS visibles, jamais coupés
+- Font reduit : `clamp(2.8rem, 6.5vw, 6.5rem)` au lieu de `4-10rem` pour que "1 800+" tienne dans la carte wheel (largeur clippée par `overflow:hidden`) + `flex-wrap:nowrap` + `white-space:nowrap`
+
+**`.italic-glow` (titre H2 "n'importe qui")** — itéré 3 fois :
+- ❌ Tentative 1 : `filter:drop-shadow(...)` + bg-clip:text → **filter casse bg-clip:text sur Chrome/Edge** (bug rendering connu), texte totalement invisible
+- ❌ Tentative 2 : `text-shadow:0 0 22px ... 0 0 44px` heavy → halo gigantesque qui **engloutit** le texte gradient (blob flou magenta/violet)
+- ✅ **Final** : `color: var(--pink)` solid + `text-shadow:0 0 8px rgba(214,51,132,.55)` léger
+- + `.italic-glow .word { padding-right: 0.35em; padding-left: 0.08em; }` — fix du "i" coupé : SplitType met inline `overflow:hidden` sur chaque `.word` pour clipper le slide-up vertical, mais en italique le glyphe final (point ascenseur du "i" + slant) + le text-shadow halo dépassent à droite et se font couper. Le padding scoped donne de l'air avant le clip.
+
+#### Stack (`#stack`) — refonte (commits `2a56d69` → `c8da569`)
+**Avant** : 15 tuiles dans des cards glass avec background, border, aspect-ratio, conic gradient hover border, grid auto-fit, breathing scale 0.92-1.10.
+
+**Après** :
+- **Plus de cards autour des logos** : `.stack-tile` perd `background`, `border`, `aspect-ratio`, `border-radius`, `overflow:hidden`. `::before` → `display:none`. Mobile : `background:none` aussi.
+- Les `.mark` (carrés colorés avec lettres) restent intacts — c'est l'identité visuelle de chaque tool
+- **Hover** : remplace le conic border par `filter: drop-shadow(0 0 14px rgba(124,92,252,.5))` sur le `.mark`. Scale hover passe de 1.18 → 1.5 (plus d'espace puisqu'il n'y a plus de card)
+- **Zoom amplifié** : `minScale: 0.78 + random*.07` / `maxScale: 1.20 + random*.12` → amplitude ~50% (au lieu de ~18%). Cycle 2.5-6.5s. Breathing **vraiment visible**.
+- **Scatter random** : `gsap.set` avant l'entry sur chaque tile : `x: ±12px, y: ±14px, rotation: ±7°`. Les tiles sortent légèrement de leur cellule grid sans se disperser → effet "cloud rapproché". Le breathing tween ne touche QUE scale, donc scatter persiste pendant les zooms. Idem pour le hover (touche scale + rotationX + rotationY, pas x/y/rotationZ).
+- **Conflict entry/breathing résolu** : avant le breathing démarrait à l'init en parallèle de l'entry → les deux tweens se battaient sur scale. Maintenant breathing démarre dans le `onComplete` de l'entry.
+- **Desktop 5/5/5** (commit `c8da569`) : `@media (min-width:1025px) { .stack-grid { grid-template-columns: repeat(5,1fr); max-width: 720px; } }` → 3 rangées exactes de 5 (au lieu de 6×2 + 3 orphelines à gauche), cluster centré.
+- Grid resserré : minmax 120→100 desktop, gap 16→8 desktop / 10→6 mobile
+
+#### Témoignages (`#temoignages`) — spacing reduit
+Le titre apparaissait à 1/3 du viewport à cause de `.section{padding:140px 0}` + `.testi-pin{padding:80px 0; justify-content:center; min-height:100svh}` (centre vertical sur 100svh).
+- `.testi` override : `padding-top: 60px !important; padding-bottom: 0 !important;` (au lieu des 140 du `.section`)
+- `.testi-pin` : `justify-content: flex-start` (au lieu de center), `padding: 20px 0 0` (au lieu de 80px 0)
+- `.testi-head margin-bottom: 32px` desktop (au lieu de 48)
+- Mobile (≤640) : encore tighter — `padding-top: 30px !important`, `padding-top: 0` sur pin, `margin-bottom: 18px` sous titre
+
+#### CTA Final (`#cta`)
+- **"gagner" du H2 visible** : `.cta-final h2 .grad` était `bg-clip:text + color:transparent` → même bug que `.italic-glow`. Solution : `background:none; color:#fff; -webkit-text-fill-color:#fff` (solid white). Plus de gradient mais lisible.
+- **Espace bouton ↔ texte rassurance** : `.cta-form-rassurance margin-top` passe de `4px` → `56px`. Cause : `.btn-primary` a `box-shadow: 0 12px 40px rgba(124,92,252,.35)` qui projette un halo violet ~50-60px sous le bouton — le texte était DANS le halo. Avec flex-gap 18px du `.cta-form` parent, le total est 74px → clear complet.
+
+#### Footer
+- **Suppression de `.footer-mega`** (le "NEEXUS" géant tout au fond, font-size `clamp(80px, 18vw, 260px)` en bg-clip gradient blanc transparent). HTML retiré + règles CSS retirées (3 endroits : base, responsive override 80px, commentaire de remplacement).
+
+### ❌ CSS `zoom` DESKTOP — TENTÉ ET REVERTED — NE PAS RÉESSAYER
+
+Commits `53c20e0` (apply) → `df31f2b` (revert immédiat).
+
+**Contexte** : utilisateur trouvait le site trop grand sur son écran principal, regardait le navigateur à 80% zoom dans les paramètres → demande "fais ça par défaut pour les autres utilisateurs".
+
+**Tentative** :
+```css
+@media (min-width: 1025px) {
+  html { zoom: 0.8; }
+}
+```
+
+**Bugs critiques constatés** :
+1. **Coordonnées de souris décalées** — hover sur le menu nav "Pour Qui" allume "Résultats" (1 cran d'écart). Le navigateur ne recalcule pas les coordonnées de pointer events quand `zoom` est appliqué à `html`. Connu sur Chrome/Edge.
+2. **Viewport décalé à gauche** — `zoom: 0.8` rend le contenu à 80% du viewport mais ne change pas le viewport lui-même → 20% de vide à droite (et en bas). Section Méthode notamment montre une énorme zone vide.
+
+**Leçon** : ne JAMAIS utiliser CSS `zoom` global pour "shrinker" le site. C'est non-standard et a des interactions buggy.
+
+**Options viables pour atteindre l'objectif "site plus compact sur desktop"** (à explorer si l'envie revient) :
+- A) Réduire `--container` 1340 → 1100px + paddings `.section` 140 → 100px
+- B) Refactor des `clamp(min, vw, max)` de fonts globalement : shrinker tous les `max` de 20%
+- C) Combinaison A + B
+- D) Wrapper transform: scale avec gestion manuelle des fixed elements (complexe, faisable)
+
+Aucune solution one-liner type CSS zoom n'existe — c'est du vrai travail. Ne pas re-tenter sans plan.
+
+### Rappel critique — préparation vidéo de fond
+
+(Voir aussi §"Glassmorphism" Phase 4 plus haut.)
+
+**Toutes les sections sont déjà configurées pour qu'une vidéo de fond puisse être ajoutée sans casser la lisibilité** :
+- Cards avec `background: rgba(10,14,26, .55-.62)` + `backdrop-filter: blur(18px) saturate(140%)` + `border: 1px solid var(--line)`
+- Aucune section n'utilise un solid black opaque pour son fond — toutes utilisent les vars `--bg-0` à `--bg-3` (semi-transparents possibles avec rgba)
+- Le z-index est prêt à recevoir : `video(0) → overlay(1) → orbs(0-fixed) → content(2-5) → nav(1000) → preloader(top)`
+
+**Quand la vidéo arrivera** :
+```html
+<video class="bg-video" autoplay muted playsinline loop preload="metadata">
+  <source src="bg.mp4" type="video/mp4">
+</video>
+<div class="video-overlay"></div>
+```
++ CSS :
+```css
+.bg-video{
+  position:fixed; inset:0; width:100%; height:100%;
+  object-fit:cover; z-index:0; pointer-events:none;
+}
+.video-overlay{
+  position:fixed; inset:0; z-index:1; pointer-events:none;
+  background:linear-gradient(180deg, rgba(7,10,20,.55), rgba(7,10,20,.75));
+}
+```
+**Pour scroll-motion vidéo** (le user souhaite que la vidéo réagisse au scroll) :
+- Option simple : `position: fixed` sur la vidéo, GSAP `ScrollTrigger` qui scrub `currentTime` selon `scroll progress` global
+- Option performante : ré-encoder la vidéo en keyframe-par-frame (`ffmpeg -i in.mp4 -g 1 -keyint_min 1 -c:v libx264 -crf 22 out.mp4`) pour scrub fluide sur tous browsers
+- Tester sur mobile : iOS Safari refuse souvent le scrub vidéo programmatique → fallback vidéo en boucle classique sur mobile, scrub uniquement sur desktop
+- Code de référence (à insérer dans `initSite()` au moment voulu) :
+  ```js
+  const video = document.querySelector('.bg-video');
+  if (video && !reducedMotion) {
+    video.pause();
+    ScrollTrigger.create({
+      trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 1,
+      onUpdate: self => {
+        if (video.duration) video.currentTime = video.duration * self.progress;
+      }
+    });
+  }
+  ```
+
+### Apprentissages CSS à retenir pour Phase 5+
+
+1. **`bg-clip:text` + `color:transparent` est HÉRITÉ par les enfants** — si parent a ces props, les enfants deviennent transparents et le gradient parent est censé couvrir leur zone, mais ce mécanisme casse souvent (SplitType nested word spans, mélange de font-sizes, navigateurs). **Préférer isoler le bg-clip:text au plus petit élément possible** (sur la `<span>` directement, pas sur son parent flex container). Donner aux enfants secondaires une `color` solide explicite via `color: ...; -webkit-text-fill-color: ...`.
+2. **`filter: drop-shadow()` casse `background-clip:text`** sur Chrome/Edge. Le rendu compositing détruit le gradient text. → Utiliser `text-shadow` pour les halos sur du gradient text.
+3. **`text-shadow` heavy halos (>15px blur) sur petit texte** engloutissent visuellement le texte lui-même. Garder les blurs ≤10px pour rester subtils.
+4. **SplitType met `overflow:hidden` inline sur chaque `.word`** (pour le slide-up). Les italiques (slant + dots ascenseurs) et les text-shadow halos dépassent à droite et se font clipper. → Pour tout span en italique inside `[data-split]`, prévoir `padding-right: 0.3-0.4em` scoped sur ses `.word`.
+5. **CSS `zoom` est non-standard** et a des bugs critiques (coordonnées souris, viewport offset). Ne pas l'utiliser pour shrinker globalement.
+6. **`gap` flex est additif avec margin-top/bottom des items**. Espace réel = gap + margin (sur le côté concerné). Penser au `box-shadow` étendu des boutons (`.btn-primary` projette ~50-60px sous lui).
+7. **Pattern 3D wheel** : pour qu'une rotation autour de X (Ferris wheel) fonctionne visuellement, le stage doit être TALL (clamp 500-620px). Pour Y (Lazy Susan), il doit être WIDE. Cards en `inset:0` du wheel (pas `translate(-50%,-50%)`), wheel `transform-style: preserve-3d`, stage `perspective: 1400-1500px`.
+
+### Commits Phase 4.5 / 4.6
+
+État final pushé : `df31f2b` (revert du zoom).
+
+Approximativement 25 commits, dont les majeurs :
+- Hero : `c6d4732`, `e26f29f`, `a00978e`, `7b6375e`, `892dc91`
+- Constat/Mission : `8f514a3`, `fcc8328`, `1e7450d`
+- Pour Qui deck 3D : `c4363ce`
+- Navbar reorder : `bda2bb6`
+- Services mobile : `1bc3dd6`, `0809c13`, `8fe6eb6`, `fe0b11c`, `9fe4468`, `d573f85`, `636d3d0`
+- Méthode notebook flip : `1183601`
+- Résultats roue 3D itérations : `2ada70d`, `d0bc58d`, `304d2d2`, `399c24d`, `7032030`
+- Stack refonte : `2a56d69`, `c8da569`
+- 4 fixes finaux (témoignages + gagner + rassurance + footer-mega) : `db1e640`, `dd02cfe`
+- ❌ Zoom desktop tenté + reverted : `53c20e0` + `df31f2b`
