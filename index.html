@@ -87,15 +87,12 @@ button{font:inherit;color:inherit;background:none;border:0;}
 }
 .italic{font-style:italic;font-family:'Syne',sans-serif;font-weight:500;}
 .italic-glow{
-  /* fix : pas de text-shadow heavy ni de filter — les deux cassent ou
-     occultent le bg-clip:text (le halo de 22+44px engloutissait le texte).
-     Pattern identique a .gradient-text italic, proven cross-browser.
-     display:inline-block stabilise bg-clip avec les word spans imbriques
-     que SplitType cree dans la H2. */
-  display:inline-block;
+  /* fix definitif : solid pink + glow text-shadow.
+     Le bg-clip:text + nested word spans de SplitType etait instable
+     (texte invisible). Solid color = visibilite garantie cross-browser. */
   font-style:italic;font-family:'Syne',sans-serif;font-weight:500;
-  background:var(--grad-text);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
+  color:var(--pink);
+  text-shadow:0 0 10px rgba(214,51,132,.5),0 0 20px rgba(214,51,132,.25);
 }
 
 /* ============================================================
@@ -1297,25 +1294,34 @@ body.has-cursor .cursor-glow{display:block;}
    On garde uniquement le glow conique sur la bordure au survol. */
 .result-card:hover::before{opacity:1;}
 .result-card .num{
+  /* fix architectural : bg-clip:text DEPLACE sur .big-counter (pas sur .num)
+     pour que .unit puisse avoir sa propre couleur solide sans heriter de
+     color:transparent. Resultat : le % et le + sont TOUJOURS visibles. */
   font-family:'Syne',sans-serif;font-weight:700;
-  /* fix : font reduit (etait 4-10rem) pour que "1 800+" tienne dans la carte
-     wheel (large clipping by overflow:hidden + flex nowrap below). */
   font-size:clamp(2.8rem,6.5vw,6.5rem);line-height:.9;
   letter-spacing:-.04em;
-  background:var(--grad-text);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
   margin-bottom:18px;
   display:flex;align-items:baseline;justify-content:center;
   flex-wrap:nowrap;white-space:nowrap;
   position:relative;z-index:1;
-  text-shadow:0 0 28px rgba(124,92,252,.45);   /* fix : text-shadow (pas filter) — compat bg-clip:text */
 }
-.result-card .num .prefix{font-size:.55em;margin-right:2px;opacity:.9;}
+.result-card .num .big-counter{
+  /* gradient text isole sur le chiffre seulement */
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+.result-card .num .prefix{
+  font-size:.55em;margin-right:2px;opacity:.9;
+  color:var(--pink);
+}
 .result-card .num .unit{
-  /* fix : flex-shrink:0 garantit que le % ou + ne sera JAMAIS coupe meme si
-     le chiffre est large. display:inline-block force son propre box. */
+  /* fix definitif : solid pink (visible TOUJOURS).
+     flex-shrink:0 + display:inline-block = jamais coupe. */
   display:inline-block;flex-shrink:0;
-  font-size:.5em;margin-left:6px;opacity:.95;font-weight:600;
+  font-size:.55em;margin-left:8px;opacity:1;font-weight:700;
+  color:var(--pink);
+  -webkit-text-fill-color:var(--pink);
 }
 .result-card .lbl{
   font-size:14px;color:var(--text);font-weight:500;
