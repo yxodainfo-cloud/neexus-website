@@ -1543,6 +1543,14 @@ body.has-cursor .cursor-glow{display:block;}
   perspective:1000px;
   will-change:transform;
 }
+/* Phase 4.6b : DESKTOP — force 5 colonnes (5/5/5 avec 15 tiles)
+   + max-width resserre pour clusteriser au centre au lieu d'etaler */
+@media (min-width:1025px){
+  .stack-grid{
+    grid-template-columns:repeat(5,1fr);
+    max-width:720px;
+  }
+}
 .stack-tile{
   /* Phase 4.6 : plus de carre autour des logos —
      background/border/aspect-ratio/padding-box supprimes.
