@@ -1307,104 +1307,140 @@ body.has-cursor .cursor-glow{display:block;}
    ============================================================ */
 .profiles{
   position:relative;
-  padding:140px 0;
+  padding:0 !important;     /* fix : kill section padding (le pin gere son espace) */
   z-index:2;
+}
+.profiles-pin{
+  min-height:100svh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:60px 0;
+  overflow:hidden;
 }
 .profiles-head{
   max-width:var(--container);
-  margin:0 auto 60px;
-  padding:0 36px;
+  margin:0 auto 32px;
+  padding:0 28px;
+  text-align:center;
 }
 .profiles-head h2{
   font-family:'Syne',sans-serif;font-weight:600;
-  font-size:clamp(26px,3.8vw,56px);    /* fix : -30% */
-  line-height:1.05;letter-spacing:-.025em;
-  max-width:22ch;margin-bottom:28px;
+  font-size:clamp(22px,3.4vw,46px);
+  line-height:1.08;letter-spacing:-.025em;
+  max-width:24ch;margin:0 auto 18px;
 }
 .profiles-head .intro{
-  color:var(--text-dim);
-  font-size:clamp(15px,1.1vw,17px);
-  max-width:64ch;line-height:1.65;
+  color:#ffffff;
+  font-size:clamp(13.5px,1vw,15.5px);
+  max-width:62ch;line-height:1.6;margin:0 auto;
+  text-shadow:0 1px 12px rgba(0,0,0,.5);
+  opacity:.88;
 }
-.profiles-head .intro b{color:var(--text);font-weight:500;}
+.profiles-head .intro b{color:#ffffff;font-weight:600;opacity:1;}
 
-.profiles-carousel{
-  display:flex;
-  gap:24px;
-  padding:40px 22vw 40px 22vw;
-  overflow-x:auto;
-  overflow-y:visible;
-  scroll-snap-type:x mandatory;
-  scrollbar-width:none;
-  -ms-overflow-style:none;
+/* PHASE 4 DECK 3D — 6 cartes empilees, scroll fait s'envoler la front card */
+.profiles-deck-stage{
+  position:relative;width:100%;
+  height:clamp(420px,52vh,540px);
+  display:grid;place-items:center;
+  perspective:1600px;
+  perspective-origin:50% 42%;
 }
-.profiles-carousel::-webkit-scrollbar{display:none;}
-
-.profile-card{
-  flex:0 0 56vw;
-  max-width:540px;
-  min-width:300px;
-  scroll-snap-align:center;
-  padding:44px 38px;
-  border-radius:var(--r-lg);
-  background:var(--glass);
-  border:1px solid var(--line);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
+.profiles-deck{
   position:relative;
+  width:clamp(300px,44vw,460px);
+  height:clamp(380px,46vh,480px);
+  transform-style:preserve-3d;
+  will-change:transform;
+}
+.profiles-progress{
+  position:absolute;left:50%;bottom:-32px;
+  transform:translateX(-50%);
+  width:clamp(180px,22vw,260px);height:3px;
+  background:rgba(255,255,255,.08);border-radius:3px;
   overflow:hidden;
-  transform:scale(.85);
-  filter:saturate(.55) brightness(.7);
-  transition:transform .55s cubic-bezier(.2,.8,.2,1),filter .45s ease;
-  will-change:transform,filter;
 }
-.profile-card.is-active{
-  transform:scale(1);
-  filter:saturate(1) brightness(1);
+.profiles-progress::before{
+  content:'';position:absolute;inset:0;
+  width:var(--progress,0%);height:100%;
+  background:var(--grad);
+  box-shadow:0 0 12px rgba(214,51,132,.6);
+  transition:none;
 }
-.profile-card::before{
+.profile-card{
+  position:absolute;inset:0;
+  padding:36px 30px;
+  border-radius:var(--r-lg);
+  background:rgba(10,14,26,.78);
+  border:1px solid var(--line);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  overflow:hidden;
+  transform-style:preserve-3d;
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+  box-shadow:0 24px 60px -22px rgba(0,0,0,.7);
+  will-change:transform,opacity;
+  display:flex;flex-direction:column;
+}
+.profile-card::after{
+  /* halo conic statique sur la front card uniquement (via gsap toggle .is-front) */
   content:'';position:absolute;inset:-1px;border-radius:inherit;
-  background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.4) 25%,transparent 50%,rgba(214,51,132,.4) 75%,transparent 100%);
+  background:conic-gradient(from 0deg,rgba(124,92,252,.4),rgba(214,51,132,.4),rgba(77,124,255,.4),rgba(124,92,252,.4));
   -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
   -webkit-mask-composite:xor;mask-composite:exclude;
   padding:1px;opacity:0;
-  transition:opacity .5s;
-  animation:rotateBorder 8s linear infinite;
+  transition:opacity .4s;
   pointer-events:none;
 }
-.profile-card.is-active::before{opacity:.7;}
+.profile-card.is-front::after{opacity:.6;}
 .profile-card .sector{
-  display:inline-block;
+  align-self:flex-start;
   font-family:'JetBrains Mono',monospace;
   font-size:10px;letter-spacing:.18em;text-transform:uppercase;
   color:var(--magenta);
   padding:6px 12px;border:1px solid rgba(214,51,132,.3);
   border-radius:100px;background:rgba(214,51,132,.06);
-  margin-bottom:22px;
+  margin-bottom:18px;
 }
 .profile-card h3{
   font-family:'Syne',sans-serif;font-weight:600;
-  font-size:clamp(22px,2.2vw,30px);
-  letter-spacing:-.015em;line-height:1.1;
-  margin-bottom:24px;
+  font-size:clamp(18px,2vw,26px);
+  letter-spacing:-.015em;line-height:1.15;
+  margin-bottom:18px;
 }
-.profile-card .block{margin-bottom:18px;}
+.profile-card .block{margin-bottom:14px;}
 .profile-card .block:last-child{margin-bottom:0;}
 .profile-card .block .label{
   font-family:'JetBrains Mono',monospace;
-  font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
   color:var(--text-mute);
-  margin-bottom:8px;
+  margin-bottom:6px;
 }
 .profile-card .block p{
-  color:var(--text-dim);
-  font-size:14.5px;line-height:1.6;
+  color:#d8dce6;
+  font-size:13.5px;line-height:1.55;
 }
-.profile-card .block.deploy p{color:var(--text);}
+.profile-card .block.deploy p{color:#ffffff;}
+
+@media(max-width:640px){
+  .profiles-pin{padding:32px 0;}
+  .profiles-head{margin-bottom:24px;padding:0 22px;}
+  .profiles-head h2{font-size:clamp(18px,5.4vw,26px);}
+  .profiles-head .intro{font-size:13px;}
+  .profiles-deck-stage{height:clamp(380px,56vh,460px);}
+  .profiles-deck{
+    width:min(82vw,340px);
+    height:clamp(360px,52vh,440px);
+  }
+  .profile-card{padding:26px 22px;}
+  .profile-card .sector{font-size:9px;margin-bottom:14px;}
+  .profile-card h3{font-size:18px;margin-bottom:14px;}
+  .profile-card .block p{font-size:13px;}
+}
 
 .profiles-bridge{
   max-width:var(--container);
-  margin:60px auto 0;
+  margin:80px auto 100px;
   padding:0 36px;
   text-align:center;
 }
@@ -2206,22 +2242,24 @@ body.has-cursor .cursor-glow{display:block;}
      POUR QUI (PROFILS) — desktop carrousel snap, mobile stack
      ============================================================ -->
 <section class="profiles" id="profils">
-  <div class="profiles-head">
-    <div class="section-eyebrow">
-      <span class="num">04</span>
-      <span class="line"></span>
-      <span class="label">Pour Qui</span>
+  <div class="profiles-pin">
+    <div class="profiles-head">
+      <div class="section-eyebrow" style="justify-content:center;">
+        <span class="num">04</span>
+        <span class="line"></span>
+        <span class="label">Pour Qui</span>
+      </div>
+      <h2 data-split>Là où l'IA et l'automatisation changent vraiment la donne.</h2>
+      <p class="intro">
+        Voici quelques contextes que nous connaissons bien — ceux où nos clients ont retrouvé du temps,
+        de la sérénité, et souvent du chiffre. <b>Si le vôtre n'y figure pas exactement, c'est sans doute
+        parce qu'il mérite une étude qui lui ressemble.</b>
+      </p>
     </div>
-    <h2 data-split>Là où l'IA et l'automatisation changent vraiment la donne.</h2>
-    <p class="intro" data-fade>
-      Voici quelques contextes que nous connaissons bien — ceux où nos clients ont retrouvé du temps,
-      de la sérénité, et souvent du chiffre. <b>Si le vôtre n'y figure pas exactement, c'est sans doute
-      parce qu'il mérite une étude qui lui ressemble.</b>
-    </p>
-  </div>
-
-  <div class="profiles-carousel" id="profiles-carousel">
-    <article class="profile-card" data-profile>
+    <div class="profiles-deck-stage">
+      <div class="profiles-deck" id="profiles-deck">
+        <div class="profiles-progress" id="profiles-progress" aria-hidden="true"></div>
+        <article class="profile-card" data-profile>
       <div class="sector">Commerces &amp; proximité</div>
       <h3>Restaurants, salons, cliniques, commerces de proximité</h3>
       <div class="block">
@@ -2298,9 +2336,11 @@ body.has-cursor .cursor-glow{display:block;}
         <p>Audit de la journée type, identification des 30% de tâches automatisables, déploiement progressif. Ils retrouvent leur temps. Leur motivation. Et la capacité de faire ce pour quoi vous les avez recrutés.</p>
       </div>
     </article>
+      </div>
+    </div>
   </div>
 
-  <div class="profiles-bridge" data-fade>
+  <div class="profiles-bridge">
     <div class="lead">Aucun de ces contextes ne ressemble exactement au vôtre&nbsp;?</div>
     <p>C'est souvent un bon signe — ça veut dire qu'il y a probablement des leviers spécifiques à votre métier qu'on n'a pas encore explorés ensemble. <b>C'est exactement pour ça que l'audit existe.</b></p>
   </div>
@@ -3157,7 +3197,7 @@ function initSite(){
   initHeroPinned();
   initConstat();                // Phase 4 : section 01 (remplace Pain Points)
   initMission();                // Phase 4 : section 02 (NEW)
-  initProfilesCarousel();       // snap detection works on touch too
+  initProfilesDeck();           // Phase 4 polish : deck 3D (remplace le carousel snap)
   initProfiles();
   initServices();
   initMethode();
@@ -3935,76 +3975,105 @@ function initTesti(){
    PROFILS — fade-up cards + bridge fade
    ============================================================ */
 function initProfiles(){
-  const cards = gsap.utils.toArray('.profile-card');
-  gsap.from(cards, {
-    y: 60, opacity: 0, scale: .96,
-    stagger: .08, duration: .9, ease: 'power3.out',
-    scrollTrigger: { trigger: '.profiles-carousel', start: 'top 78%', once: true }
+  /* Entry fade-up du head (universal, court) */
+  gsap.from('.profiles-head > *', {
+    y: 24, opacity: 0, stagger: .08,
+    duration: .7, ease: 'power3.out',
+    clearProps: 'transform,opacity',
+    scrollTrigger: { trigger: '.profiles', start: 'top 75%', once: true }
   });
   const bridge = document.querySelector('.profiles-bridge');
   if (bridge) {
     gsap.from(bridge, {
       y: 30, opacity: 0, duration: .8, ease: 'power3.out',
-      scrollTrigger: { trigger: bridge, start: 'top 88%', once: true }
+      clearProps: 'transform,opacity',
+      scrollTrigger: { trigger: bridge, start: 'top 85%', once: true }
     });
   }
 }
 
 /* ============================================================
-   PROFILS CAROUSEL — detect active (centered) card on desktop
-   The carousel uses CSS scroll-snap. We use IntersectionObserver
-   to find which card is centered and toggle .is-active.
+   PROFILS DECK — Phase 4 polish
+   6 cartes empilees en 3D. Scroll fait s'envoler la front card
+   vers la gauche (rotation + slide off) et la suivante remonte.
+   Pin sur 5 transitions (= 5 * 60% vh). Front card a class .is-front
+   pour halo conic.
    ============================================================ */
-function initProfilesCarousel(){
-  const carousel = document.getElementById('profiles-carousel');
-  const cards = Array.from(document.querySelectorAll('.profile-card'));
-  if (!carousel || cards.length === 0) return;
+function initProfilesDeck(){
+  const deck = document.getElementById('profiles-deck');
+  const progressBar = document.getElementById('profiles-progress');
+  const cards = gsap.utils.toArray('.profile-card');
+  if (!deck || cards.length === 0) return;
 
-  // Initial: center the middle card on first paint so it looks active
-  requestAnimationFrame(() => {
-    const middle = Math.floor(cards.length / 2);
-    cards[middle]?.classList.add('is-active');
-    const target = cards[middle];
-    if (target) {
-      const offset = target.offsetLeft - (carousel.clientWidth - target.clientWidth) / 2;
-      carousel.scrollTo({ left: offset, behavior: 'instant' in carousel ? 'instant' : 'auto' });
+  const N = cards.length;   // 6
+
+  /* Fallback reduced-motion : stack vertical statique */
+  if (reducedMotion) {
+    const stage = document.querySelector('.profiles-deck-stage');
+    if (stage){
+      stage.style.cssText += 'height:auto;perspective:none;display:flex;flex-direction:column;gap:20px;padding:20px;';
     }
+    deck.style.cssText += 'width:100%;height:auto;display:flex;flex-direction:column;gap:20px;transform-style:flat;';
+    cards.forEach(c => {
+      c.style.cssText += 'position:relative;inset:auto;transform:none;opacity:1;';
+      c.classList.add('is-front');
+    });
+    return;
+  }
+
+  /* Etat initial : applique la stack pose 0 immediatement
+     pour eviter le flash de 'toutes les cartes superposees' au load */
+  applyDeckState(0);
+
+  ScrollTrigger.create({
+    trigger: '.profiles-pin',
+    start: 'top top',
+    end: () => `+=${window.innerHeight * (N - 1) * 0.62}`,
+    pin: true,
+    pinSpacing: true,
+    scrub: 1,
+    invalidateOnRefresh: true,
+    onUpdate: self => applyDeckState(self.progress)
   });
 
-  const observer = new IntersectionObserver((entries) => {
-    let bestCard = null;
-    let bestRatio = 0;
-    cards.forEach(card => {
-      const rect = card.getBoundingClientRect();
-      const containerRect = carousel.getBoundingClientRect();
-      const cardCenter = rect.left + rect.width / 2;
-      const containerCenter = containerRect.left + containerRect.width / 2;
-      const distance = Math.abs(cardCenter - containerCenter);
-      const score = 1 - Math.min(distance / containerRect.width, 1);
-      if (score > bestRatio) { bestRatio = score; bestCard = card; }
-    });
-    cards.forEach(c => c.classList.toggle('is-active', c === bestCard));
-  }, { root: carousel, threshold: [0, .25, .5, .75, 1] });
-
-  cards.forEach(c => observer.observe(c));
-  // Also recompute on scroll (smoother)
-  let raf;
-  carousel.addEventListener('scroll', () => {
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(() => {
-      const containerRect = carousel.getBoundingClientRect();
-      const containerCenter = containerRect.left + containerRect.width / 2;
-      let bestCard = null, bestScore = 0;
-      cards.forEach(card => {
-        const rect = card.getBoundingClientRect();
-        const cardCenter = rect.left + rect.width / 2;
-        const distance = Math.abs(cardCenter - containerCenter);
-        const score = 1 - Math.min(distance / (containerRect.width / 2), 1);
-        if (score > bestScore) { bestScore = score; bestCard = card; }
+  function applyDeckState(progress){
+    const continuousIdx = progress * (N - 1);
+    const frontIdx = Math.round(continuousIdx);
+    cards.forEach((card, i) => {
+      const distance = i - continuousIdx;
+      let xPct, y, z, rotateZ, opacity, scale;
+      if (distance < 0){
+        /* En train de s'envoler vers la gauche/haut */
+        const fly = Math.min(1.4, -distance);
+        xPct   = -130 * fly;
+        y      = -40 * fly;
+        z      = 80 * fly;
+        rotateZ= -12 * fly;
+        opacity= Math.max(0, 1 - fly * 1.3);
+        scale  = 1 - fly * 0.04;
+      } else {
+        /* Dans la stack (Z negatif) */
+        xPct   = 0;
+        y      = distance * 14;
+        z      = -distance * 64;
+        rotateZ= -distance * 1.8;
+        opacity= Math.max(0.15, 1 - distance * 0.18);
+        scale  = Math.max(0.78, 1 - distance * 0.05);
+      }
+      gsap.set(card, {
+        xPercent: xPct, y, z,
+        rotation: rotateZ,
+        opacity, scale,
+        transformOrigin: '50% 50%',
+        zIndex: 100 - i + (distance < 0 ? -50 : 0)  /* front card on top */
       });
-      cards.forEach(c => c.classList.toggle('is-active', c === bestCard));
+      card.classList.toggle('is-front', i === frontIdx);
     });
-  }, { passive: true });
+    /* Update progress bar */
+    if (progressBar){
+      progressBar.style.setProperty('--progress', `${progress * 100}%`);
+    }
+  }
 }
 
 /* ============================================================
