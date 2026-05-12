@@ -1899,8 +1899,15 @@ body.has-cursor .cursor-glow{display:block;}
   .mobile-menu{display:flex;}
   .section{padding:90px 22px;}
   .hero{padding:0 22px;}
-  .hero-micro-proof{flex-direction:column;align-items:flex-start;gap:14px;padding-top:24px;}
+  /* fix : sous-CTA horizontaux meme sur mobile (user demande 3 cote a cote) */
+  .hero-micro-proof{
+    flex-direction:row;flex-wrap:wrap;
+    align-items:center;justify-content:flex-start;
+    gap:6px 10px;padding-top:20px;
+    font-size:10.5px;
+  }
   .hero-micro-proof .proof-sep{display:none;}
+  .hero-micro-proof .proof-item{flex:0 0 auto;}
   .cta-final{padding:120px 22px;}
   .hero-scroll-hint{display:none;}
   .problems-grid,.results-grid{grid-template-columns:1fr;}
@@ -3051,11 +3058,18 @@ const preloaderTag = document.getElementById('preloader-tag');
 const preloaderLine = document.getElementById('preloader-line');
 
 gsap.set('.nav', { yPercent: -100, opacity: 0 });
+/* fix : pre-cache les contenus du hero immediatement (avant que le preloader
+   ne reveal le hero a 2.5s). Sinon l'utilisateur voit ~1s d'etat final fige
+   avant que l'entry timeline ne demarre. initHeroPinned() les rendra a opacity:1
+   simultanement au demarrage de l'animation entry. */
+gsap.set(['.hero-title', '.hero-sub', '.cta-row', '.hero-micro-proof'], { opacity: 0 });
 
 const counterObj = { val: 0 };
 const tlPre = gsap.timeline({
-  defaults: { ease: 'power3.out' },
-  onComplete: () => initSite()
+  defaults: { ease: 'power3.out' }
+  /* fix : initSite() est maintenant call() a 2.4s, pas en onComplete (3.45s).
+     Ainsi l'entry tween du hero demarre en MEME TEMPS que le clipPath reveal,
+     supprimant le ~1s de temps mort entre reveal et animation entry. */
 });
 
 tlPre
@@ -3078,6 +3092,7 @@ tlPre
     filter: 'drop-shadow(0 0 0 rgba(124,92,252,0)) blur(2px)',
     duration: .7, ease: 'power3.in'
   }, 2.1)
+  .call(() => initSite(), null, 2.4)    /* fix : entry hero demarre AVANT le reveal */
   .to(preloader, { clipPath: 'inset(100% 0 0 0)', duration: .95, ease: 'expo.inOut' }, 2.5)
   .to('.nav', { yPercent: 0, opacity: 1, duration: .9, ease: 'expo.out' }, 2.6)
   .set(preloader, { display: 'none' });
@@ -3412,16 +3427,27 @@ function initOrbsParallax(){
 function initHeroPinned(){
   document.querySelectorAll('[data-hero-line]').forEach(line => new SplitType(line, { types: 'words, chars' }));   /* fix : groupe en mots pour empêcher wrap au milieu d'un mot */
 
+  /* fix : 1) cible les enfants a opacity:0 (etat initial entry)
+            2) puis unhide les parents (etaient opacity:0 via gsap.set au top du script)
+     Important : ordre = enfants d'abord, parents apres, sinon flash de contenu visible. */
+  gsap.set('[data-hero-line] .char', { opacity: 0, y: 80, rotateX: -90 });
+  gsap.set('.cta-row .btn', { opacity: 0, y: 26 });
+  gsap.set('.hero-micro-proof .proof-item, .hero-micro-proof .proof-sep', { opacity: 0, y: 14 });
+  gsap.set('.hero-sub', { opacity: 0, y: 26 });
+  /* unhide les conteneurs parents */
+  gsap.set(['.hero-title', '.cta-row', '.hero-micro-proof'], { opacity: 1 });
+  /* hero-sub : laisse opacity:0 ici car son entry-tween le passera a opacity:1 */
+
   /* 1) ENTRY TIMELINE — runs on load, makes the hero appear */
-  const tl = gsap.timeline({ delay: .15 });
-  tl.from('[data-hero-line] .char', {
-      rotateX: -90, y: 80, opacity: 0,
+  const tl = gsap.timeline({ delay: .05 });   /* fix : delay reduit .15->.05 pour moins de temps mort */
+  tl.to('[data-hero-line] .char', {
+      rotateX: 0, y: 0, opacity: 1,
       stagger: { each: .012, from: 'start' },
       duration: .9, ease: 'power3.out'
     })
-    .from('.hero-sub',                  { opacity: 0, y: 26, duration: .7, ease: 'power3.out' }, '-=.5')
-    .from('.cta-row .btn',              { opacity: 0, y: 26, stagger: .08, duration: .6, ease: 'back.out(1.4)' }, '-=.4')
-    .from('.hero-micro-proof .proof-item, .hero-micro-proof .proof-sep', { opacity: 0, y: 14, stagger: .07, duration: .55, ease: 'power3.out' }, '-=.3');
+    .to('.hero-sub',                  { opacity: 1, y: 0, duration: .7, ease: 'power3.out' }, '-=.5')
+    .to('.cta-row .btn',              { opacity: 1, y: 0, stagger: .08, duration: .6, ease: 'back.out(1.4)' }, '-=.4')
+    .to('.hero-micro-proof .proof-item, .hero-micro-proof .proof-sep', { opacity: 1, y: 0, stagger: .07, duration: .55, ease: 'power3.out' }, '-=.3');
 
   // Counters animate up once after entry — count-up sur la micro-preuve
   document.querySelectorAll('.hero-micro-proof .counter').forEach((el, i) => {
@@ -3458,11 +3484,14 @@ function initHeroPinned(){
         invalidateOnRefresh: true,
       }
     });
+    /* fix : parallax adouci pour garder le texte lisible
+       (avant : sub opacity .25 -> illisible / cta-row y:40 -> decale visible).
+       Maintenant tout reste lisible meme en mi-scrub. */
     heroTl
-      .to('.hero-title',       { y: -80, opacity: .35, ease: 'none' }, 0)
-      .to('.hero-sub',         { y: -50, opacity: .25, ease: 'none' }, 0)
-      .to('.cta-row',          { y: 40,  opacity: .65, ease: 'none' }, 0)
-      .to('.hero-micro-proof', { y: -30, opacity: 0,   ease: 'none' }, 0.2)
+      .to('.hero-title',       { y: -50, opacity: .8,  ease: 'none' }, 0)
+      .to('.hero-sub',         { y: -30, opacity: .75, ease: 'none' }, 0)
+      .to('.cta-row',          { y: 18,  opacity: .85, ease: 'none' }, 0)
+      .to('.hero-micro-proof', { y: -18, opacity: .55, ease: 'none' }, 0.2)
       .to('.orb-1',            { scale: 1.4, opacity: .85, ease: 'none' }, 0)
       .to('.orb-2',            { scale: 1.6, opacity: .75, ease: 'none' }, 0);
     return () => heroTl.scrollTrigger?.kill();
