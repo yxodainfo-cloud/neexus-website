@@ -861,103 +861,121 @@ body.has-cursor .cursor-glow{display:block;}
 .services-dots{display:none;} /* unused — horizontal scroll removed */
 
 /* ============================================================
-   METHODE
+   METHODE — PHASE 4 : cascade diagonale en escalier
    ============================================================ */
 .methode-inner{
-  display:grid;grid-template-columns:1fr 1.2fr;
-  gap:100px;align-items:start;
+  display:flex;flex-direction:column;
+  align-items:stretch;
+  gap:60px;
 }
-.methode-sticky{position:relative;}
-.methode-sticky h2{
+.methode-head{
+  text-align:center;
+  max-width:60ch;
+  margin:0 auto;
+}
+.methode-head h2{
   font-family:'Syne',sans-serif;font-weight:600;
   font-size:clamp(36px,5vw,72px);
-  letter-spacing:-.025em;line-height:1;margin-bottom:32px;
+  letter-spacing:-.025em;line-height:1.05;margin-bottom:24px;
 }
-.methode-sticky p{
+.methode-head p{
   color:var(--text-dim);font-size:16px;
-  max-width:38ch;line-height:1.65;margin-bottom:48px;
+  max-width:54ch;line-height:1.65;margin:0 auto;
 }
-.methode-progress{
-  position:relative;width:100%;max-width:280px;
-  height:4px;background:var(--line);
-  border-radius:100px;overflow:hidden;
-}
-.methode-progress .fill{
-  position:absolute;inset:0;
-  background:var(--grad);
-  transform-origin:0;transform:scaleX(0);
-}
-.methode-progress-label{
-  display:flex;justify-content:space-between;
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px;color:var(--text-mute);letter-spacing:.05em;
-  margin-top:10px;max-width:280px;
-}
-.methode-steps{display:flex;flex-direction:column;gap:80px;position:relative;}
-/* PHASE 3 — SVG line tracée le long des steps */
-.methode-line{
-  position:absolute;
-  top:0;bottom:0;
-  left:-40px;width:60px;
-  pointer-events:none;
-  overflow:visible;
-}
-.methode-line path{
-  fill:none;
-  stroke:url(#methode-line-grad);
-  stroke-width:2;
-  stroke-linecap:round;
-  filter:drop-shadow(0 0 10px rgba(124,92,252,.5));
-}
-.methode-step{
-  --glow-opacity:0;
-}
-.methode-step::after{
-  content:'';
-  position:absolute;
-  inset:-1px;
-  border-radius:inherit;
-  background:radial-gradient(circle at 0% 50%, rgba(124,92,252,.35), transparent 50%);
-  opacity:var(--glow-opacity);
-  pointer-events:none;
-  transition:opacity .2s linear;
-}
-@media (max-width:1024px){
-  .methode-line{left:-22px;width:44px;}
+.methode-head p b{color:var(--text);font-weight:500;}
+
+/* Cascade diagonale : chaque step décalée vers la droite */
+.methode-steps{
+  position:relative;
+  display:flex;flex-direction:column;
+  gap:42px;
+  max-width:var(--container);
+  margin:0 auto;
+  width:100%;
+  padding-top:20px;
 }
 .methode-step{
   position:relative;
-  padding:40px;border-radius:var(--r-lg);
-  background:var(--glass);border:1px solid var(--line);
+  padding:36px 38px;
+  border-radius:var(--r-lg);
+  background:var(--glass);
+  border:1px solid var(--line);
   backdrop-filter:blur(10px);
+  width:min(560px, 78%);
+  /* Décalage diagonal — défini par data-step-index via inline custom property */
+  margin-left:var(--step-offset, 0);
+  transition:transform .55s cubic-bezier(.2,.8,.2,1), border-color .35s;
 }
+/* Step indices déclarent leur offset directement via attribut data-i */
+.methode-step[data-i="0"]{--step-offset:0;}
+.methode-step[data-i="1"]{--step-offset:13%;}
+.methode-step[data-i="2"]{--step-offset:26%;}
+.methode-step[data-i="3"]{--step-offset:39%;}
+
+/* Flèche diagonale entre 2 steps consécutives */
+.methode-step::before{
+  content:'';
+  position:absolute;
+  width:60px;height:60px;
+  right:-58px;bottom:-58px;
+  background:
+    linear-gradient(135deg,transparent 0%,transparent 47%,#4d7cff 47%,#7c5cfc 50%,#d63384 53%,transparent 53%);
+  opacity:.55;
+  pointer-events:none;
+  filter:drop-shadow(0 0 8px rgba(124,92,252,.4));
+}
+.methode-step:last-child::before{display:none;}
+
 .methode-step .step-head{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:28px;padding-bottom:24px;
+  display:flex;align-items:baseline;justify-content:space-between;gap:18px;
+  margin-bottom:18px;padding-bottom:18px;
   border-bottom:1px solid var(--line);
+  flex-wrap:wrap;
 }
 .methode-step .step-num{
   font-family:'Syne',sans-serif;font-weight:700;
-  font-size:clamp(48px,7vw,96px);line-height:1;
+  font-size:clamp(40px,5vw,68px);line-height:1;
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
   letter-spacing:-.04em;
 }
 .methode-step .step-tag{
   font-family:'JetBrains Mono',monospace;
-  font-size:11px;color:var(--text-mute);
-  letter-spacing:.1em;text-transform:uppercase;
-  padding:6px 12px;border:1px solid var(--line);border-radius:100px;
+  font-size:10.5px;color:var(--text-dim);
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:6px 12px;border:1px solid var(--line-strong);border-radius:100px;
+  white-space:nowrap;
 }
 .methode-step h3{
   font-family:'Syne',sans-serif;font-weight:600;
-  font-size:28px;letter-spacing:-.01em;margin-bottom:14px;
+  font-size:clamp(20px,2vw,26px);letter-spacing:-.01em;margin-bottom:12px;
 }
-.methode-step p{color:var(--text-dim);font-size:15px;line-height:1.6;}
-.methode-step .step-deliverables{
+.methode-step p{color:var(--text-dim);font-size:15px;line-height:1.6;max-width:48ch;}
+.methode-step p b{color:var(--text);font-weight:500;}
+
+@media (max-width:1024px){
+  .methode-step{width:min(520px, 86%);}
+  .methode-step[data-i="0"]{--step-offset:0;}
+  .methode-step[data-i="1"]{--step-offset:8%;}
+  .methode-step[data-i="2"]{--step-offset:14%;}
+  .methode-step[data-i="3"]{--step-offset:0;}
+  /* Sur tablette on garde l'effet escalier mais réduit, et la dernière revient à gauche pour ne pas sortir */
+}
+@media (max-width:640px){
+  /* Sur mobile <640px, on désactive complètement le décalage (pas de place pour l'escalier) */
+  .methode-step{width:100%;}
+  .methode-step[data-i="0"],
+  .methode-step[data-i="1"],
+  .methode-step[data-i="2"],
+  .methode-step[data-i="3"]{--step-offset:0;}
+  .methode-step::before{display:none;}
+  .methode-steps{gap:18px;}
+  .methode-step{padding:28px 24px;}
+}
+.methode-step .step-deprecated-deliverables{
   margin-top:24px;display:flex;gap:8px;flex-wrap:wrap;
 }
-.methode-step .step-deliverables span{
+.methode-step .step-deprecated-deliverables span{
   font-size:11px;color:var(--text-dim);
   padding:6px 12px;background:rgba(255,255,255,.03);
   border:1px solid var(--line);border-radius:100px;
@@ -2139,82 +2157,47 @@ body.has-cursor .cursor-glow{display:block;}
 <section class="section methode" id="methode">
   <div class="container">
     <div class="methode-inner">
-      <div class="methode-sticky">
-        <div class="section-eyebrow">
+      <div class="methode-head">
+        <div class="section-eyebrow" style="justify-content:center;">
           <span class="num">04</span>
           <span class="line"></span>
           <span class="label">Méthode</span>
         </div>
-        <h2 data-split>Notre méthode en 4 étapes.</h2>
-        <p>Une approche éprouvée, transparente, sans surprise. De l'audit gratuit au déploiement, vous savez toujours où vous en êtes.</p>
-        <div class="methode-progress"><div class="fill" id="methode-fill"></div></div>
-        <div class="methode-progress-label">
-          <span id="methode-step-label">00</span>
-          <span>/04</span>
-        </div>
+        <h2 data-split>De l'idée au résultat&nbsp;: 4 étapes. Zéro perte de temps.</h2>
+        <p>Pas de jargon. Pas de PowerPoint à rallonge. <b>Un cadre clair, des livrables datés</b>, et une équipe qui prend en charge — pour que vos équipes, elles, restent concentrées sur leur métier.</p>
       </div>
       <div class="methode-steps" id="methode-steps">
-        <svg class="methode-line" id="methode-line" preserveAspectRatio="none" aria-hidden="true">
-          <defs>
-            <linearGradient id="methode-line-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"  stop-color="#4d7cff"/>
-              <stop offset="50%" stop-color="#7c5cfc"/>
-              <stop offset="100%" stop-color="#d63384"/>
-            </linearGradient>
-          </defs>
-          <path id="methode-line-path" d="M30,0 L30,1200" vector-effect="non-scaling-stroke"/>
-        </svg>
-        <article class="methode-step" data-step>
+        <article class="methode-step" data-step data-i="0">
           <div class="step-head">
             <div class="step-num">01</div>
-            <div class="step-tag">Semaine 1 · Gratuit</div>
+            <div class="step-tag">Durée typique · 1 à 10 jours</div>
           </div>
-          <h3>Audit gratuit</h3>
-          <p>On analyse vos process actuels, on identifie les goulots d'étranglement, et on chiffre les <b style="color:var(--text);">3 quick-wins</b> à plus fort impact.</p>
-          <div class="step-deliverables">
-            <span>Cartographie process</span>
-            <span>Calcul ROI</span>
-            <span>Roadmap 90j</span>
-          </div>
+          <h3>Audit</h3>
+          <p>On rentre dans votre entreprise comme si on devait y travailler dès lundi. On cartographie vos process, on identifie les goulots, on chiffre le gain potentiel — en heures, en euros, en satisfaction client. <b>À la fin, vous avez un rapport clair</b>&nbsp;: ce qui coince, ce qui rapporte, dans quel ordre attaquer.</p>
         </article>
-        <article class="methode-step" data-step>
+        <article class="methode-step" data-step data-i="1">
           <div class="step-head">
             <div class="step-num">02</div>
-            <div class="step-tag">Semaine 2-3</div>
+            <div class="step-tag">Durée typique · 1 à 2 semaines</div>
           </div>
-          <h3>Stratégie</h3>
-          <p>On conçoit la solution sur mesure. Architecture, choix techniques, planning précis — vous validez chaque étape avant qu'on touche à quoi que ce soit.</p>
-          <div class="step-deliverables">
-            <span>Architecture</span>
-            <span>Maquettes</span>
-            <span>Specs techniques</span>
-          </div>
+          <h3>Stratégie &amp; solutions</h3>
+          <p>On vous présente le plan. Quelles automatisations, quels outils, quelles IA, dans quel ordre, pour quel ROI. Vous validez, on ajuste. <b>Aucune ligne de code n'est écrite avant que vous ayez dit «&nbsp;go&nbsp;»</b>.</p>
         </article>
-        <article class="methode-step" data-step>
+        <article class="methode-step" data-step data-i="2">
           <div class="step-head">
             <div class="step-num">03</div>
-            <div class="step-tag">Semaine 4-8</div>
+            <div class="step-tag">Durée typique · 2 à 8 semaines</div>
           </div>
           <h3>Déploiement</h3>
-          <p>On construit, on intègre, on teste, on forme vos équipes. <b style="color:var(--text);">Zéro perturbation</b> de votre activité — la bascule se fait quand vous êtes prêt.</p>
-          <div class="step-deliverables">
-            <span>Build &amp; tests</span>
-            <span>Formation</span>
-            <span>Mise en prod</span>
-          </div>
+          <p>On construit, on intègre, on teste. Vos équipes sont impliquées juste ce qu'il faut — pas plus. On documente tout. On forme les bons interlocuteurs. <b>On bascule en production quand vous êtes prêts, pas avant.</b></p>
         </article>
-        <article class="methode-step" data-step>
+        <article class="methode-step" data-step data-i="3">
           <div class="step-head">
             <div class="step-num">04</div>
-            <div class="step-tag">En continu</div>
+            <div class="step-tag">Durée typique · En continu</div>
           </div>
-          <h3>Optimisation</h3>
-          <p>On mesure, on ajuste, on scale. Vos workflows évoluent avec votre business. Maintenance, support, et itérations basées sur les données.</p>
-          <div class="step-deliverables">
-            <span>Monitoring</span>
-            <span>A/B testing</span>
-            <span>Évolutions</span>
-          </div>
+          <h3>Optimisation continue</h3>
+          <p>Une solution déployée n'est pas une solution finie. On suit les indicateurs, on ajuste, on améliore. Et quand un nouveau besoin émerge, on est déjà là pour le traiter — <b>sans repartir de zéro</b>.</p>
         </article>
       </div>
     </div>
@@ -3152,84 +3135,22 @@ function initServices(){
    • Progress bar + label scroll-driven (déjà en place)
    ============================================================ */
 function initMethode(){
-  const steps     = gsap.utils.toArray('[data-step]');
-  const fill      = document.getElementById('methode-fill');
-  const stepLabel = document.getElementById('methode-step-label');
-  const stepsBox  = document.getElementById('methode-steps');
-  const line      = document.getElementById('methode-line-path');
+  const steps = gsap.utils.toArray('[data-step]');
+  if (steps.length === 0) return;
 
-  // Tracer la ligne SVG : on calibre son d="M30,0 L30,<height>" à la hauteur réelle du conteneur
-  if (line && stepsBox) {
-    const sync = () => {
-      const h = stepsBox.offsetHeight;
-      line.setAttribute('d', `M30,0 L30,${h}`);
-      const len = line.getTotalLength();
-      line.style.strokeDasharray = len;
-      line.style.strokeDashoffset = len;
-    };
-    sync();
-    window.addEventListener('resize', sync);
-
-    gsap.to(line, {
-      strokeDashoffset: 0,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: stepsBox,
-        start: 'top 75%',
-        end: 'bottom 25%',
-        scrub: 1,
-        invalidateOnRefresh: true,
-        onRefresh: sync,
-      }
-    });
-  }
-
-  // Fade-up entrée par step + glow scrubbed pendant le passage de la ligne
+  /* PHASE 4 : layout escalier diagonal. Chaque step entre depuis la gauche
+     (scale + opacity + translateX) avec un décalage stagger qui prolonge
+     visuellement l'effet de cascade. */
   steps.forEach((step, i) => {
     gsap.from(step, {
-      y: 40, opacity: 0,
-      duration: .85, ease: 'power3.out',
+      x: -40 - (i * 10),   // les steps plus bas viennent de plus à gauche
+      y: 30,
+      opacity: 0,
+      scale: .96,
+      duration: .9 + i * .04,
+      delay: i * .04,
+      ease: 'power3.out',
       scrollTrigger: { trigger: step, start: 'top 88%', once: true }
-    });
-
-    // Glow scrubed : --glow-opacity 0 → 1 → 0 quand la step passe au centre
-    gsap.fromTo(step,
-      { '--glow-opacity': 0 },
-      {
-        '--glow-opacity': 1,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: step,
-          start: 'top 70%',
-          end: 'center 50%',
-          scrub: 1,
-        }
-      }
-    );
-    gsap.to(step, {
-      '--glow-opacity': 0,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: step,
-        start: 'center 50%',
-        end: 'bottom 30%',
-        scrub: 1,
-      }
-    });
-
-    // Progress bar + label (gardé)
-    ScrollTrigger.create({
-      trigger: step,
-      start: 'top 70%',
-      end: 'bottom 70%',
-      onEnter: () => {
-        if (fill) gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
-        if (stepLabel) stepLabel.textContent = String(i + 1).padStart(2, '0');
-      },
-      onEnterBack: () => {
-        if (fill) gsap.to(fill, { scaleX: (i + 1) / steps.length, duration: .8, ease: 'power3.out' });
-        if (stepLabel) stepLabel.textContent = String(i + 1).padStart(2, '0');
-      },
     });
   });
 }
