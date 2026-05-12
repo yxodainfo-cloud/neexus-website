@@ -330,32 +330,115 @@ Vercel déploie automatiquement sur neexusds.com.
 
 ---
 
-## PHASE 2 — ENRICHISSEMENT (Mai 2026)
+## PHASE 2 — ENRICHISSEMENT (12 mai 2026)
 
-Ce site est désormais en Phase 2. Voir `BRIEF-ENRICHISSEMENT.md` pour le détail.
+Voir `BRIEF-ENRICHISSEMENT.md` pour le brief original. Cette section reflète **l'état final livré**.
 
-**Ajouts de sections :**
-- Section "Pour Qui" (`#profils`, `03 Profils`) — 6 contextes clients avec carrousel snap horizontal sur desktop, stack vertical sur mobile (entre Problems et Services)
-- Section "Notre Stack" (`#stack`, `06 Stack`) — 15 logos d'outils avec animation zoom in/out désynchronisé via `gsap.fromTo(...repeat:-1, yoyo:true)` par tuile, durées 3-7s aléatoires (entre Résultats et Témoignages)
-- Section "FAQ" (`#faq`, `08 Questions`) — accordéon 7 questions, ouverture mutuellement exclusive (entre Témoignages et CTA Final)
+### Ajouts de sections (3 nouvelles)
 
-**Renumérotation des sections existantes :**
-- Méthode : 03 → 04
-- Résultats : 04 → 05
-- Témoignages : 05 → 07
-- CTA Final : 06 → 09
+| ID HTML | Numéro affiché | Position dans le flux | Layout |
+|---|---|---|---|
+| `#profils` | **`02 Profils`** | Entre Problems et Services | 6 cartes — carrousel snap horizontal desktop, stack vertical mobile |
+| `#stack` | **`06 Stack`** | Entre Résultats et Témoignages | 15 tuiles d'outils — zoom irrégulier désynchronisé, parallax souris desktop |
+| `#faq` | **`08 Questions`** | Entre Témoignages et CTA Final | Accordéon 7 items, ouverture mutuellement exclusive |
 
-**Navbar :** ajout du lien "FAQ" entre "Témoignages" et "Audit gratuit" (desktop + menu mobile).
+### Renumérotation finale (ordre du scroll respecté)
 
-**Ajustements de ton :**
-- Renforcement systématique du principe directeur : *la techno augmente les équipes, elle ne les remplace pas*.
-- Voir BRIEF-ENRICHISSEMENT.md §2 pour la liste précise des modifications de copy sur les sections existantes (Problems intro + P-01 + P-04, sous-titres Pilier 01 et 02 des Services, libellés Résultats 1 et 4 + footnote).
+| Section | Avant | Après |
+|---|---|---|
+| Hero | — | — (inchangé) |
+| Problems | `01` | `01` (inchangé) |
+| **Profils** | — | **`02`** (nouveau) |
+| Services | `02` | **`03`** |
+| Méthode | `03` | **`04`** |
+| Résultats | `04` | **`05`** |
+| **Stack** | — | **`06`** (nouveau) |
+| Témoignages | `05` | **`07`** |
+| **FAQ** | — | **`08`** (nouveau) |
+| CTA Final | `06` | **`09`** |
 
-**Stack technique :** inchangée (HTML + GSAP + Lenis + SplitType, single-file, déploiement Vercel auto).
+⚠️ Le brief original (§6) suggérait de garder Services à `02` et numéroter Profils `03`, créant une discontinuité visuelle au scroll (`01 → 03 → 02 → ...`). Nous avons corrigé en ordre scroll naturel.
 
-**Conventions à respecter pour toute Phase 3+ :**
-- Réutiliser les design tokens existants dans `:root` (ne pas en ajouter d'autres sans raison)
-- Suivre le pattern `gsap.matchMedia()` pour le split desktop (`QUERY_DESKTOP = '(min-width: 1025px)'`) vs mobile (`QUERY_MOBILE = '(max-width: 1024px)'`)
-- Animations universelles dans `initSite()` directement, polish desktop dans le bloc `mm.add(QUERY_DESKTOP, …)`
-- Toute animation en boucle infinie (style stack zoom) doit être désactivée si `prefers-reduced-motion: reduce`
-- Sur mobile (≤ 768px), désactiver les `backdrop-filter` coûteux et les `::before` avec `conic-gradient` animés
+### Navbar
+
+- **Ajout du lien `FAQ`** entre `Témoignages` et `Audit gratuit` (desktop + menu mobile)
+- **Gap inter-liens responsive via `clamp()`** pour éviter une nav tassée sur laptops 13-14" :
+  ```css
+  .nav-links { gap: clamp(24px, calc(3.125vw - 8px), 32px); }
+  ```
+  → `24px` à ≤1024px, interpolation linéaire jusqu'à `32px` à ≥1280px, locked aux extrémités.
+
+### Ajustements de ton (principe « augmentation > remplacement »)
+
+| Section | Élément | Modification |
+|---|---|---|
+| Problems | H2 | « Si vous reconnaissez ces situations, **vos équipes méritent mieux**. » |
+| Problems | Intro | Ajout : « *Et surtout, elles épuisent les équipes qui les subissent au quotidien.* » |
+| Problems | P-01 | Ajout : « *autant d'heures qui devraient servir à autre chose.* » |
+| Problems | P-04 | Ajout : « *Pendant ce temps, vos meilleurs éléments s'épuisent.* » |
+| Services | Pilier 01 lead | Reformulé : « *prennent en charge le répétitif … passent la main à vos équipes pile au bon moment* » |
+| Services | Pilier 02 lead | Reformulé : « *Vos équipes retrouvent du temps pour ce qui compte vraiment.* » |
+| Résultats | Libellé chiffre 1 | « Heures rendues par mois aux équipes » (au lieu de « Économisées par mois ») |
+| Résultats | Libellé chiffre 4 | « Temps de première réponse, tous canaux » (au lieu de « Temps de réponse moyen ») |
+| Résultats | Footnote ajoutée | *« Chiffres mesurés sur l'ensemble des projets livrés. Grille de calcul disponible sur demande. »* |
+
+### Notes techniques sur les 3 nouvelles sections
+
+**Pour Qui (`#profils`)**
+- `scroll-snap-type: x mandatory` sur `.profiles-carousel`, `scroll-snap-align: center` sur `.profile-card`
+- Padding latéral `22vw` desktop (→ `10vw` à ≤1024px → `0` à ≤768px) pour centrer le snap
+- Carte centrale : `transform: scale(1)`, latérales : `scale(.85) + filter: saturate(.55) brightness(.7)`
+- Détection de la carte centrale via `IntersectionObserver` **+** recalcul sur événement `scroll` (raf-throttled) pour fiabilité
+- `initProfilesCarousel()` est appelée **uniquement sur desktop** (snap horizontal). Sur mobile : `flex-direction: column`, `scroll-snap-type: none`, toutes les cartes en `scale(1)`.
+
+**Stack (`#stack`)**
+- 15 tuiles avec **monogrammes inline** (lettre/symbole stylisé + couleur de marque) — placeholders à remplacer plus tard par les vrais SVG officiels, tuile par tuile
+- Animation phare : chaque tuile reçoit son **propre cycle de respiration** désynchronisé
+  ```js
+  const minScale = 0.92 + Math.random() * 0.02;
+  const maxScale = 1.04 + Math.random() * 0.06;
+  const duration = 3 + Math.random() * 4;
+  const delay    = Math.random() * 2;
+  gsap.fromTo(tile, { scale: minScale }, {
+    scale: maxScale, duration, delay,
+    repeat: -1, yoyo: true, ease: 'sine.inOut'
+  });
+  ```
+- Entrée staggerée random : `stagger: { each: .05, from: 'random' }` + `ease: 'back.out(1.4)'`
+- **Hover desktop** : `gsap.killTweensOf(tile)` puis `scale: 1.15`, tooltip apparaît. Au mouseleave, le cycle de respiration redémarre avec de nouvelles valeurs random.
+- **Parallax souris desktop** : la grille suit le curseur en direction opposée (±8px max, lerp 0.08)
+- **`prefers-reduced-motion: reduce`** : skip les loops infinies (entrée stagger reste, repos statique ensuite)
+- **Mobile** : `backdrop-filter: none`, tooltips cachées, grille 3 cols
+
+**FAQ (`#faq`)**
+- `<button class="faq-question" type="button" aria-expanded="false">` (sémantique a11y correcte)
+- Icône `+ → ×` : pseudo-éléments `::before` (barre horizontale) et `::after` (barre verticale via `rotate(90deg)`), parent `.faq-icon` qui passe à `transform: rotate(45deg)` quand `.is-open` → le `+` devient `×` par rotation
+- Animation : `gsap.set(answer, { height: 'auto' }); gsap.from(answer, { height: 0, duration: .45, ease: 'power3.inOut' })` pour ouvrir
+- **Ouverture mutuellement exclusive** : ouvrir un item ferme les autres ouverts (parcourt tous les `.faq-item.is-open` et anime `height: 0`)
+- Hover sur item fermé : `background` passe à `var(--grad-soft)` via CSS transition
+
+### Stack technique
+
+Inchangée : HTML + GSAP 3.12.5 (+ ScrollTrigger + ScrollToPlugin) + Lenis 1.1.18 + SplitType 0.3.4, single-file `index.html`, déploiement Vercel auto via push sur `main`.
+
+### Commits Phase 2
+
+- `0d9ad08` — Phase 2 : Pour Qui + Stack + FAQ + ajustements copy + renumérotation
+- `10ba4fe` — nav : clamp gap 24→32px interpolé entre 1024 et 1280px viewport
+
+### Conventions à respecter pour toute Phase 3+
+
+1. **Design tokens** : réutiliser ceux de `:root`, ne pas en ajouter sans raison forte
+2. **Split desktop/mobile** : pattern `gsap.matchMedia()` avec
+   ```js
+   const QUERY_DESKTOP = '(min-width: 1025px)';
+   const QUERY_MOBILE  = '(max-width: 1024px)';
+   ```
+3. **Animations universelles** dans `initSite()` directement (mêmes sur desktop et mobile), **polish desktop** dans le bloc `mm.add(QUERY_DESKTOP, …)` (Lenis, cursor, magnetic, tilt, orbs parallax, profiles carousel)
+4. **Animations en boucle infinie** (style stack zoom) **doivent être désactivées** si `prefers-reduced-motion: reduce` — voir le guard `if (reducedMotion) return;` dans `initStack()`
+5. **Sur mobile (≤ 768px)** :
+   - Désactiver les `backdrop-filter` coûteux (`@media (max-width:768px) { ... backdrop-filter: none !important; }`)
+   - Désactiver les `::before` avec `conic-gradient` animés
+   - Pas de pin, pas de scrub, pas de Lenis, pas de cursor custom, pas de magnetic/tilt
+6. **Numérotation affichée** : doit suivre l'ordre du scroll. Si une section est ajoutée au milieu, renuméroter celles d'après.
+7. **Anchors HTML** (`#services`, `#methode`, etc.) : ne JAMAIS changer les IDs techniques, ils sont stables. Seuls les **numéros affichés** dans `.section-eyebrow .num` bougent lors d'une renumérotation.
