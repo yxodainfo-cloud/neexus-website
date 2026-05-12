@@ -1079,6 +1079,8 @@ body.has-cursor .cursor-glow{display:block;}
   margin:0 auto;
   width:100%;
   padding-top:20px;
+  perspective:1400px;             /* SURPRISE polish : 3D context pour notebook flip */
+  perspective-origin:50% 30%;
 }
 .methode-step{
   position:relative;
@@ -1091,6 +1093,9 @@ body.has-cursor .cursor-glow{display:block;}
   /* Décalage diagonal — défini par data-step-index via inline custom property */
   margin-left:var(--step-offset, 0);
   transition:transform .55s cubic-bezier(.2,.8,.2,1), border-color .35s;
+  transform-style:preserve-3d;     /* SURPRISE polish */
+  backface-visibility:hidden;
+  will-change:transform,opacity;
 }
 /* Step indices déclarent leur offset directement via attribut data-i */
 .methode-step[data-i="0"]{--step-offset:0;}
@@ -3868,20 +3873,56 @@ function initMethode(){
   const steps = gsap.utils.toArray('[data-step]');
   if (steps.length === 0) return;
 
-  /* PHASE 4 : layout escalier diagonal. Chaque step entre depuis la gauche
-     (scale + opacity + translateX) avec un décalage stagger qui prolonge
-     visuellement l'effet de cascade. */
+  /* Entry fade-up du head */
+  gsap.from('.methode-head > *', {
+    y: 24, opacity: 0, stagger: .08, duration: .7, ease: 'power3.out',
+    clearProps: 'transform,opacity',
+    scrollTrigger: { trigger: '.methode', start: 'top 75%', once: true }
+  });
+
+  if (reducedMotion){
+    /* Fallback : simple fade-up sans 3D */
+    gsap.from(steps, {
+      y: 30, opacity: 0, stagger: .08, duration: .6, ease: 'power2.out',
+      scrollTrigger: { trigger: '.methode-steps', start: 'top 85%', once: true }
+    });
+    return;
+  }
+
+  /* SURPRISE Phase 4 polish : NOTEBOOK FLIP 3D
+     Chaque step se deroule depuis sa tranche superieure (rotateX:-90deg)
+     vers son etat plat (rotateX:0). transformOrigin:50% 0% = pivot au top
+     de la carte. On a l'impression de tourner une page de carnet vertical.
+     + pulse magenta sur le step-num quand la carte est ouverte. */
   steps.forEach((step, i) => {
     gsap.from(step, {
-      x: -40 - (i * 10),   // les steps plus bas viennent de plus à gauche
-      y: 30,
+      rotationX: -90,
+      transformOrigin: '50% 0%',
+      transformPerspective: 1200,
       opacity: 0,
-      scale: .96,
-      duration: .9 + i * .04,
-      delay: i * .04,
+      duration: 1.1,
       ease: 'power3.out',
-      scrollTrigger: { trigger: step, start: 'top 88%', once: true }
+      scrollTrigger: { trigger: step, start: 'top 82%', once: true }
     });
+
+    /* Pulse magenta sur le numero : 0.7s apres le debut de la flip
+       pour qu'il pulse quand la carte est presque ouverte */
+    const num = step.querySelector('.step-num');
+    if (num){
+      gsap.fromTo(num,
+        { scale: 1, filter: 'drop-shadow(0 0 0px rgba(214,51,132,0))' },
+        {
+          scale: 1.08,
+          filter: 'drop-shadow(0 0 18px rgba(214,51,132,.75))',
+          duration: .35,
+          delay: .7,
+          ease: 'power2.out',
+          yoyo: true,
+          repeat: 1,
+          scrollTrigger: { trigger: step, start: 'top 82%', once: true }
+        }
+      );
+    }
   });
 }
 
