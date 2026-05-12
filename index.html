@@ -697,7 +697,7 @@ body.has-cursor .cursor-glow{display:block;}
 .services-wrap{
   position:relative;
   background:var(--bg-0);
-  padding:50px 0 40px;        /* fix : etait 140 100 -> 50 40 (user demande de comprimer la section header) */
+  padding:100px 0 50px;       /* fix : top 50 -> 100 pour clear la navbar fixe (etait coupee derriere) */
   overflow:hidden;
 }
 .services-head{
@@ -1982,24 +1982,31 @@ body.has-cursor .cursor-glow{display:block;}
   .problems-grid,.results-grid{grid-template-columns:1fr;}
   .footer-top{grid-template-columns:1fr;}
   .footer-mega{font-size:80px;}
-  /* Services mobile carousel — ultra compact
-     fix user : avant chaque panel faisait 800-900px sur mobile (texte + gap 80 + visual 380). */
-  .services-wrap{padding:36px 0 28px;}
-  .services-head{padding:0 22px;gap:18px;margin-bottom:24px;}
-  .services-head h2.section-title{font-size:clamp(17px,5vw,24px);max-width:24ch;}
-  .services-head p{font-size:13px;}
-  .services-stack{gap:14px;padding:0 4vw;}
-  .service-panel{flex:0 0 92%;padding:14px 0;}
-  .service-panel .panel-num{font-size:10.5px;margin-bottom:12px;letter-spacing:.16em;}
-  .service-content{gap:18px;}                          /* fix mobile : gap 28 -> 18 */
-  .service-text .pillar-num{font-size:10.5px;margin-bottom:10px;}
-  .service-text h3{font-size:20px;margin-bottom:10px;line-height:1.1;}
-  .service-text .lead{font-size:13.5px;margin-bottom:10px;line-height:1.4;}
-  .service-text .desc{font-size:12.5px;margin-bottom:12px;line-height:1.55;}
-  .service-text .example{padding:10px 12px;}
-  .service-text .example-label{font-size:9.5px;margin-bottom:5px;}
-  .service-text .example p{font-size:12px;line-height:1.5;}
-  .service-visual{height:220px !important;}            /* fix critique : 260 -> 220 + !important pour ecraser tablet 300 */
+  /* Services mobile carousel — ULTRA compact
+     fix : user signale encore que panels trop grands -> reduction plus aggressive */
+  .services-wrap{padding:80px 0 24px;}        /* fix : top 36 -> 80 pour clear navbar */
+  .services-head{padding:0 22px;gap:14px;margin-bottom:20px;}
+  .services-head h2.section-title{font-size:clamp(16px,4.6vw,22px);max-width:24ch;line-height:1.15;}
+  .services-head p{font-size:12.5px;}
+  .services-stack{gap:12px;padding:0 4vw;}
+  .service-panel{flex:0 0 92%;padding:10px 0;}
+  .service-panel .panel-num{font-size:10px;margin-bottom:10px;letter-spacing:.16em;}
+  .service-content{gap:14px;}
+  .service-text .pillar-num{font-size:10px;margin-bottom:8px;}
+  .service-text h3{font-size:19px;margin-bottom:8px;line-height:1.1;}
+  .service-text .lead{font-size:13px;margin-bottom:8px;line-height:1.4;}
+  .service-text .desc{font-size:12px;margin-bottom:10px;line-height:1.5;}
+  /* fix : desc clamp 4 lignes max sur mobile -> evite explosion verticale */
+  .service-text .desc{
+    display:-webkit-box;
+    -webkit-line-clamp:4;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .service-text .example{padding:8px 10px;}
+  .service-text .example-label{font-size:9px;margin-bottom:4px;}
+  .service-text .example p{font-size:11.5px;line-height:1.45;}
+  .service-visual{height:180px !important;}    /* fix : 220 -> 180 (encore plus compact) */
   .preloader-logo,.preloader-logo img{height:80px;}
 
   /* Profiles: stack vertically (no horizontal carousel on mobile) */
