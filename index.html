@@ -86,6 +86,12 @@ button{font:inherit;color:inherit;background:none;border:0;}
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .italic{font-style:italic;font-family:'Syne',sans-serif;font-weight:500;}
+.italic-glow{
+  font-style:italic;font-family:'Syne',sans-serif;font-weight:500;
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 18px rgba(214,51,132,.45)) drop-shadow(0 0 36px rgba(124,92,252,.25));
+}
 
 /* ============================================================
    CURSOR (desktop only)
@@ -1210,26 +1216,24 @@ body.has-cursor .cursor-glow{display:block;}
   color:var(--text-dim);font-size:16px;
   max-width:54ch;line-height:1.65;margin-inline:auto;
 }
-/* PHASE 4 — Carousel horizontal snap pour les 3 chiffres */
-.results-carousel{
-  position:relative;
-  margin:0 -36px;
+/* PHASE 4.5 — ROUE 3D : 3 chiffres pivotent groupes sur axe Y
+   (cousine visuelle de Mission et Témoignages, sens horaire -240°) */
+.results-wheel-stage{
+  position:relative;width:100%;
+  height:clamp(440px,56vh,540px);
+  perspective:1500px;perspective-origin:50% 50%;
+  margin:0 auto 24px;
 }
-.results-track{
-  display:flex;
-  gap:24px;
-  padding:20px 36px 36px;
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  scroll-behavior:smooth;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
+.results-wheel{
+  position:absolute;inset:0;margin:auto;
+  width:100%;height:100%;
+  transform-style:preserve-3d;
+  -webkit-transform-style:preserve-3d;
+  will-change:transform;
 }
-.results-track::-webkit-scrollbar{display:none;}
 .results-dots{
   display:flex;align-items:center;justify-content:center;
-  gap:10px;
-  margin-top:8px;
+  gap:10px;margin-top:8px;
 }
 .rdot{
   width:8px;height:8px;border-radius:50%;
@@ -1241,21 +1245,34 @@ body.has-cursor .cursor-glow{display:block;}
   transform:scale(1.4);
   box-shadow:0 0 12px var(--magenta);
 }
-/* Anciennes règles results-grid restent pour compat éventuelle */
-.results-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:20px;
-}
 .result-card{
-  flex:0 0 min(540px, 88vw);
-  scroll-snap-align:center;
-  position:relative;
+  --results-r:380px;
+  position:absolute;top:50%;left:50%;
+  width:min(460px,86vw);
+  height:min(380px,62vh);
   padding:48px 32px 38px;
   border-radius:var(--r-lg);
   background:var(--glass);border:1px solid var(--line);
   backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
   overflow:hidden;text-align:center;
-  transition:transform .55s cubic-bezier(.2,.8,.2,1);
+  transform:
+    translate3d(-50%,-50%,0)
+    rotateY(var(--i,0deg))
+    translateZ(var(--results-r));
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
 }
+@media (max-width:1024px){ .result-card{ --results-r:300px; } }
+@media (max-width:640px){
+  .result-card{
+    --results-r:240px;
+    width:min(360px,84vw);
+    height:auto;min-height:300px;
+    padding:36px 24px 28px;
+  }
+}
+@media (max-width:380px){ .result-card{ --results-r:200px; } }
 .result-card::before{
   content:'';position:absolute;inset:-1px;border-radius:inherit;
   background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.55) 25%,transparent 50%,rgba(214,51,132,.55) 75%,transparent 100%);
@@ -1272,7 +1289,8 @@ body.has-cursor .cursor-glow{display:block;}
   filter:blur(40px);opacity:.55;
   pointer-events:none;z-index:0;
 }
-.result-card:hover{transform:translateY(-6px);}
+/* fix roue 3D : pas de hover transform — il casserait le cylindre.
+   On garde uniquement le glow conique sur la bordure au survol. */
 .result-card:hover::before{opacity:1;}
 .result-card .num{
   font-family:'Syne',sans-serif;font-weight:700;
@@ -1918,7 +1936,7 @@ body.has-cursor .cursor-glow{display:block;}
   .problems-head,.services-head,.methode-inner,.footer-top{
     grid-template-columns:1fr;gap:40px;
   }
-  .problems-grid,.results-grid{grid-template-columns:repeat(2,1fr);}
+  .problems-grid{grid-template-columns:repeat(2,1fr);}
   .service-content{grid-template-columns:1fr;gap:28px;}   /* fix critique : gap 80 -> 28 sur mobile/tablet (etait la cause principale des panels enormes) */
   .service-visual{height:300px;}                          /* fix : 380 -> 300 sur tablet */
   .methode-sticky{position:relative;top:0;}
@@ -1984,7 +2002,7 @@ body.has-cursor .cursor-glow{display:block;}
   .hero-micro-proof .proof-label{font-size:.95em;opacity:.88;}
   .cta-final{padding:120px 22px;}
   .hero-scroll-hint{display:none;}
-  .problems-grid,.results-grid{grid-template-columns:1fr;}
+  .problems-grid{grid-template-columns:1fr;}
   .footer-top{grid-template-columns:1fr;}
   .footer-mega{font-size:80px;}
   /* Services mobile = VERTICAL STACK (abandon du carousel horizontal qui ne marchait pas)
@@ -2715,28 +2733,28 @@ body.has-cursor .cursor-glow{display:block;}
           <span class="line"></span>
           <span class="label">Les Résultats</span>
         </div>
-        <h2 data-split>Les chiffres qu'on défend devant <span class="gradient-text italic">n'importe qui</span>.</h2>
+        <h2 data-split>Les chiffres qu'on défend devant <span class="italic-glow">n'importe qui</span>.</h2>
       </div>
-      <div class="results-carousel" id="results-carousel">
-        <div class="results-track" id="results-track">
-          <article class="result-card" data-card data-result>
+      <div class="results-wheel-stage">
+        <div class="results-wheel" id="results-wheel">
+          <article class="result-card" data-card data-result style="--i:0deg">
             <div class="num"><span class="big-counter" data-target="1800" data-format="thousand">0</span><span class="unit">+</span></div>
             <div class="lbl">heures de tâches répétitives économisées chaque mois pour nos clients</div>
           </article>
-          <article class="result-card" data-card data-result>
+          <article class="result-card" data-card data-result style="--i:120deg">
             <div class="num"><span class="big-counter" data-target="70">0</span><span class="unit">+</span></div>
             <div class="lbl">solutions digitales déployées en production</div>
           </article>
-          <article class="result-card" data-card data-result>
+          <article class="result-card" data-card data-result style="--i:240deg">
             <div class="num"><span class="big-counter" data-target="96">0</span><span class="unit">%</span></div>
             <div class="lbl">de satisfaction client sur l'ensemble de nos missions</div>
           </article>
         </div>
-        <div class="results-dots" id="results-dots" aria-hidden="true">
-          <span class="rdot is-active"></span>
-          <span class="rdot"></span>
-          <span class="rdot"></span>
-        </div>
+      </div>
+      <div class="results-dots" id="results-dots" aria-hidden="true">
+        <span class="rdot is-active"></span>
+        <span class="rdot"></span>
+        <span class="rdot"></span>
       </div>
       <p class="results-footnote">Et ce ne sont pas des chiffres de plaquette. <b>La grille de calcul est disponible sur demande.</b></p>
     </div>
@@ -3927,70 +3945,98 @@ function initMethode(){
 }
 
 /* ============================================================
-   RESULTATS — PHASE 3
-   Compteurs SCRUBÉS — les chiffres montent à mesure que l'utilisateur
-   scrolle. Universal (mobile + desktop). Pas de pin (trop bloquant),
-   juste un scrub serré sur le moment où les cards traversent l'écran.
+   RESULTATS — PHASE 4.5
+   Roue 3D : 3 chiffres pivotent groupes sur axe Y (0 -> -240°)
+   Pin durant 2.4 viewports. backface-visibility masque les cartes
+   au dos. Chaque compteur tique uniquement dans sa fenetre de scroll
+   ou sa carte est en train de devenir face camera — sinon le 1 800
+   n'atteindrait jamais sa cible avant de tourner hors champ.
    ============================================================ */
 function initResults(){
-  const track = document.getElementById('results-track');
+  const wheel = document.getElementById('results-wheel');
   const cards = gsap.utils.toArray('.result-card');
   const dots  = gsap.utils.toArray('#results-dots .rdot');
+  if (!wheel || cards.length === 0) return;
 
+  // Entry fade-up du head (universal)
   gsap.from('.results-text', {
     y: 24, opacity: 0, duration: .8, ease: 'power3.out',
     scrollTrigger: { trigger: '.results', start: 'top 80%', once: true }
   });
-  gsap.from(cards, {
-    y: 36, opacity: 0, stagger: .1, duration: .75, ease: 'power3.out',
-    scrollTrigger: { trigger: '.results-track', start: 'top 85%', once: true }
-  });
 
-  // Scrub-driven counters — chaque compteur a son propre tween sur scroll
-  // Support data-format="thousand" → "1 800" (locale fr-FR)
-  document.querySelectorAll('.big-counter').forEach(el => {
-    const target = +el.dataset.target;
+  // Helper : rend la valeur d'un compteur a une progression locale [0..1]
+  const renderCounter = (el, target, lp) => {
     const useThousand = el.dataset.format === 'thousand';
-    const obj = { v: 0 };
-    el.textContent = useThousand ? '0' : '0';
-    gsap.to(obj, {
-      v: target, ease: 'none',
-      scrollTrigger: {
-        trigger: '.results-track',
-        start: 'top 85%',
-        end: 'top 20%',
-        scrub: 1,
-      },
-      onUpdate: () => {
-        const v = Math.round(obj.v);
-        el.textContent = useThousand ? v.toLocaleString('fr-FR').replace(/ | /g, ' ') : v;
-      }
-    });
-  });
+    const v = Math.round(target * lp);
+    el.textContent = useThousand ? v.toLocaleString('fr-FR') : v;
+  };
 
-  // IntersectionObserver-lite — dot actif = card la plus centrée dans le track
-  if (track && cards.length && dots.length){
-    let raf;
-    const update = () => {
-      const r = track.getBoundingClientRect();
-      const cc = r.left + r.width / 2;
-      let best = 0, bestScore = -Infinity;
-      cards.forEach((c, i) => {
-        const cr = c.getBoundingClientRect();
-        const center = cr.left + cr.width / 2;
-        const score = 1 - Math.min(Math.abs(center - cc) / (r.width / 2), 1);
-        if (score > bestScore){ bestScore = score; best = i; }
+  if (reducedMotion){
+    /* Fallback : stack vertical statique + compteurs one-shot a l'entree */
+    const stage = document.querySelector('.results-wheel-stage');
+    if (stage){ stage.style.height = 'auto'; stage.style.perspective = 'none'; }
+    wheel.style.cssText += 'position:relative;display:flex;flex-direction:column;gap:20px;align-items:center;transform-style:flat;height:auto;';
+    cards.forEach(c => {
+      c.style.cssText += 'position:relative;inset:auto;top:auto;left:auto;transform:none;width:100%;max-width:360px;height:auto;';
+    });
+    document.querySelectorAll('.big-counter').forEach(el => {
+      const target = +el.dataset.target;
+      const obj = { v: 0 };
+      gsap.to(obj, {
+        v: target, duration: 1.6, ease: 'power2.out',
+        scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+        onUpdate: () => renderCounter(el, target, obj.v / target)
       });
-      dots.forEach((d, i) => d.classList.toggle('is-active', i === best));
-    };
-    track.addEventListener('scroll', () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(update);
-    }, { passive: true });
-    // Premier passage après refresh layout
-    ScrollTrigger.addEventListener('refreshInit', update);
-    update();
+    });
+    return;
   }
+
+  /* 3 cartes x 120° = full cycle. On s'arrete a -240° pour finir
+     face a la carte 3. Meme pattern que Mission (3 cartes platter). */
+  const N = cards.length;            // 3
+  const STEP = 360 / N;              // 120 deg
+  const END_ROT = -STEP * (N - 1);   // -240 deg
+
+  /* Fenetres de scroll par compteur — chacune calee sur le moment
+     ou la carte associee devient face camera.
+     - carte 1 (1800) : face au demarrage du pin, tique 0% -> 18%
+     - carte 2 (70)   : face vers le milieu,     tique 42% -> 58%
+     - carte 3 (96)   : face a la fin,           tique 85% -> 100% */
+  const counterWindows = [
+    { start: 0.00, end: 0.18 },
+    { start: 0.42, end: 0.58 },
+    { start: 0.85, end: 1.00 },
+  ];
+  const easeOut = lp => 1 - Math.pow(1 - lp, 2);
+
+  ScrollTrigger.create({
+    trigger: '.results-pin',
+    start: 'top top',
+    end: () => `+=${window.innerHeight * 2.4}`,
+    pin: true,
+    pinSpacing: true,
+    scrub: 1,
+    invalidateOnRefresh: true,
+    onUpdate: self => {
+      // 1) Rotation de la roue
+      gsap.set(wheel, { rotationY: END_ROT * self.progress });
+
+      // 2) Dot actif = carte la plus proche du face-camera
+      const idx = Math.min(N - 1, Math.max(0, Math.round(self.progress * (N - 1))));
+      dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
+
+      // 3) Compteurs — chacun tique dans sa fenetre
+      cards.forEach((card, i) => {
+        const counter = card.querySelector('.big-counter');
+        if (!counter) return;
+        const target = +counter.dataset.target;
+        const w = counterWindows[i];
+        let lp = (self.progress - w.start) / (w.end - w.start);
+        lp = Math.max(0, Math.min(1, lp));
+        renderCounter(counter, target, easeOut(lp));
+      });
+    }
+  });
 }
 
 /* ============================================================
