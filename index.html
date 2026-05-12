@@ -78,6 +78,19 @@ button{font:inherit;color:inherit;background:none;border:0;}
 .lenis.lenis-smooth{scroll-behavior:auto!important;}
 .lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain;}
 
+/* Phase 4.6c : DESKTOP ZOOM-OUT 0.8
+   Sur desktop (>=1025px) tout le document est zoome a 80% par defaut —
+   equivalent CSS du Ctrl+- (zoom navigateur a 80%). L'utilisateur
+   trouvait le site trop grand sur son ecran principal et zoomait
+   manuellement a chaque fois ; on baked it in.
+   - zoom (et non transform:scale) pour preserver le comportement
+     correct des position:fixed (navbar, scroll progress, glow orbs)
+     et pour que GSAP/Lenis lisent des mesures coherentes.
+   - Mobile/tablet (<1025px) inchanges — au touch on a besoin de grand. */
+@media (min-width:1025px){
+  html{zoom:0.8;}
+}
+
 /* ============================================================
    TYPO
    ============================================================ */
