@@ -522,3 +522,130 @@ function initSite(){
 ### Commits Phase 3
 
 - (à pusher) — Phase 3 : Réinjection cinématique mobile-first (pin/scrub/reveals universels)
+
+---
+
+## PHASE 4 — Refonte contenu + structure (12 sections finales)
+
+**Date** : Mai 2026 — 6 micro-commits (Option C, safety mode)
+**Trafic cible** : 95% mobile, 3% tablet, 2% PC — décisions architecturées smartphone-first.
+**Préparation vidéo** : tous les cards utilisent `rgba(10,14,26,.55–.62)` + `backdrop-filter: blur(18px) saturate(140%)` pour rester lisibles sur une vidéo de fond future (à brancher quand la longueur du site sera figée — ping 🎥).
+
+### Numérotation finale des sections
+
+Le Hero n'a **pas d'eyebrow numéroté**. Les autres sections suivent la séquence narrative naturelle. Tous les `.section-eyebrow` sont **masqués via CSS** (`display:none !important`) — la numérotation reste éditoriale et reversible.
+
+| Eyebrow | Section | ID | État |
+|---|---|---|---|
+| — | Hero | `#hero` | Refonte textes (H1, sous-titre, micro-preuve count-up) |
+| **01** | Le Constat | `#constat` | **NOUVEAU** — 4 blocs en carousel horizontal pinné |
+| **02** | Notre Mission | `#mission` | **NOUVEAU** — 3 cartes plaque tournante 3D |
+| **03** | Nos Services | `#services` | 5 piliers (3 → 5) avec Voix IA + Marketing en plus |
+| **04** | Pour Qui | `#profils` | 6 profils (inchangé visuellement) |
+| **05** | Notre Méthode | `#methode` | Layout cascade diagonale (escalier décalé) |
+| **06** | Les Résultats | `#resultats` | 4 grid → 3 carousel scroll-snap + counter fr-FR |
+| **07** | Notre Stack | `#stack` | Inchangé (constellation 15 logos zoom désynchronisé) |
+| **08** | Témoignages | `#temoignages` | 3 grid → 6 roue 3D 60° apart |
+| **09** | FAQ | `#faq` | 8 questions (ajout Q8 "Et si ça ne marche pas ?") |
+| **10** | CTA Final | `#cta` | Refonte boutons → **formulaire visuel + datepicker natif** |
+| — | Footer | — | Refonte 4 colonnes (À propos · Services · Ressources · Contact) |
+
+### Sections nouvelles ou refondues — détails techniques
+
+#### 01 · Le Constat (`#constat`)
+- **Comportement** : pin de la section, le scroll vertical pilote la translation horizontale de `.constat-track` (4 blocs).
+- **Focus carte centrée** : à chaque `onUpdate`, la carte la plus proche du centre viewport reçoit `.is-focus` (scale 1.04, border magenta, glow). Les autres passent à `opacity:.5`.
+- **État initial** : blocs 1-2 visibles, 3-4 en teaser à droite.
+- **JS** : `initConstat()` — `ScrollTrigger.create({ trigger: '.constat-pin', pin:true, scrub:1, end: distance*1.3 + 0.5vh })`.
+- **Mobile** : flex-basis `min(78vw, 320px)`, padding réduit.
+- **Reduced-motion** : track passe en `flex-wrap:wrap` + toutes cartes en `.is-focus`.
+
+#### 02 · Notre Mission (`#mission`)
+- **Comportement** : plaque tournante 3D — 3 cartes positionnées à `rotateY(0/120/240deg) translateZ(--mission-r)`, toutes groupées sur le même axe Y.
+- **`backface-visibility:hidden`** : masque naturellement les cartes du dos.
+- **Rotation totale** : `0° → -240°` sur 2.4 viewports de scroll (pin actif). Termine face à la 3ᵉ carte (`Au service de vos équipes`).
+- **JS** : `initMission()` — `ScrollTrigger.create({ trigger: '.mission-pin', pin:true, scrub:1, onUpdate: rot = -240 * progress })`.
+- **`--mission-r`** : 260px desktop, 240px tablet, 215px mobile ≤640, 195px ≤380.
+- **Reduced-motion** : platter passe en flex column, cartes empilées.
+
+#### 06 · Les Résultats (`#resultats`)
+- **Avant** : grid de 4 cards avec compteurs.
+- **Après** : 3 cards (1 800+ heures, 70+ solutions, 96% satisfaction) dans `.results-track` avec `scroll-snap-type:x mandatory`.
+- **Compteur 1 800** : `data-format="thousand"` → formaté en `toLocaleString('fr-FR')` puis normalisé en espace standard.
+- **Dots magenta** : 3 `.rdot`, le centré reçoit `.is-active` via IntersectionObserver-lite sur le scroll du track.
+- **Phrase finale** : "Et ce ne sont pas des chiffres de plaquette. La grille de calcul est disponible sur demande."
+
+#### 08 · Témoignages (`#temoignages`)
+- **Avant** : 3 cards en grid avec 3D tilt scrubé.
+- **Après** : 6 cards sur une **roue 3D cylindrique**, chacune à `rotateY(i*60deg) translateZ(--testi-r)`.
+- **Sens de rotation** : scroll bas = sens horaire vu d'en haut = `rotationY: -300deg` au total (s'arrête à la 6ᵉ carte). Les cartes de droite viennent au centre.
+- **`backface-visibility:hidden`** masque les cartes au dos pendant la rotation.
+- **6 témoins** : Sofia L. (Salon), Vincent T. (Logistique), Camille D. (SaaS), Léa K. (E-commerce), Jean-Marc V. (Cabinet), Mehdi B. (Industrie).
+- **KPI gradient** en headline de chaque carte (ex: "+35% de RDV hors heures d'ouverture").
+- **6 dots magenta** synchro via `onUpdate` (carte active = `Math.round(progress * 5)`).
+- **JS** : `initTesti()` — pin sur 3.2 viewports, scrub 1.
+- **Reduced-motion** : stage devient stack vertical, perspective désactivée.
+
+#### 10 · CTA Final (`#cta`)
+- **Avant** : 2 boutons (mailto + lien temoignages).
+- **Après** : formulaire visuel complet — Nom, Email, Téléphone, **Datepicker natif HTML5** (`<input type="datetime-local">` avec `color-scheme:dark`), Message (textarea optionnel).
+- **Datepicker** : valeur par défaut = demain 14h00 (locale browser), `min` = maintenant.
+- **Submit** : `preventDefault()` + feedback visuel (bouton → "Envoyé ✓" pendant 3.5s puis reset form).
+- **Pas de backend** : c'est un formulaire visuel uniquement (placeholder UX).
+- **JS** : `initCTAForm()` — entry stagger fade-up + datepicker init + submit handler.
+
+### Architecture JS — `initSite()` v4 (Phase 4)
+
+```js
+function initSite(){
+  initNav();
+  initScrollProgress();
+  initLenis();
+  initSplitTitles();
+  initSplitCta();
+  initFades();
+  initServiceVisuals();
+  initOrbsParallax();
+
+  initHeroPinned();
+  initConstat();              // Phase 4 NEW : pin + horizontal scrub (4 blocs)
+  initMission();              // Phase 4 NEW : pin + rotation Y groupée (3 cartes)
+  initProfilesCarousel();
+  initProfiles();
+  initServices();             // 5 piliers (Phase 4 : était 3)
+  initMethode();              // cascade diagonale (Phase 4)
+  initResults();              // 3 carousel + dots + counter fr-FR (Phase 4)
+  initStack();
+  initTesti();                // 6 cards roue 3D (Phase 4 : était 3)
+  initFaq();
+  initCTAForm();              // Phase 4 NEW : datepicker + visual submit
+  // ...
+}
+```
+
+### Glassmorphism — préparation vidéo de fond
+
+Toutes les cartes des sections sont configurées pour rester lisibles si une vidéo de fond est ajoutée plus tard :
+
+- `background: rgba(10,14,26,.55)` à `.62` selon la densité texte
+- `backdrop-filter: blur(18px) saturate(140%)` + préfixe `-webkit-`
+- `border: 1px solid var(--line)` pour contraste
+- Z-index strict : `video(0) → overlay(1) → content(5) → nav(1000)` (à appliquer quand la vidéo arrivera)
+
+Quand la longueur définitive du site sera figée, intégrer la vidéo via :
+```html
+<video class="bg-video" autoplay muted playsinline loop>
+  <source src="bg.mp4" type="video/mp4">
+</video>
+<div class="video-overlay"></div>
+```
+Avec ré-encodage ffmpeg keyframe-par-frame pour scrub fluide (commande à fournir).
+
+### Commits Phase 4
+
+1. **Phase 4 commit 1/6** — Textes Hero + Pour Qui + FAQ Q8 + Footer 4 blocs + CSS hide section-eyebrow + count-up micro-preuve Hero.
+2. **Phase 4 commit 2/6** — Services 3 → 5 piliers (ajout Voix IA + Marketing) + `.service-text .example` avec gradient bar.
+3. **Phase 4 commit 3/6** — Méthode cascade diagonale (`--step-offset` 0/13/26/39% desktop, 0/8/14/0% tablet, 0 mobile) + arrows diagonales `::before`.
+4. **Phase 4 commit 4/6** — Résultats 4 grid → 3 carousel scroll-snap + counter `data-format="thousand"` fr-FR + 3 dots magenta.
+5. **Phase 4 commit 5/6** — Témoignages 3 grid → 6 roue 3D cylindrique 60° apart, pin + scrub -300°, 6 dots.
+6. **Phase 4 commit 6/6** — **Nouvelles sections 01 Le Constat (carousel horizontal pinné) + 02 Notre Mission (plaque tournante 3D) + CTA Final → formulaire visuel avec datepicker natif + renumérotation finale + doc CLAUDE.md**.

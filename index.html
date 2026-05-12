@@ -505,6 +505,149 @@ body.has-cursor .cursor-glow{display:block;}
 }
 
 /* ============================================================
+   02 LE CONSTAT — PHASE 4
+   Section pinnée. Le scroll vertical pilote la translation horizontale
+   d'une track de 4 blocs. La carte centrée prend le focus (scale+couleur).
+   À l'arrivée : blocs 1-2 visibles, 3-4 débordants à droite (teaser).
+   ============================================================ */
+.constat{background:var(--bg-1);overflow:hidden;position:relative;}
+.constat-pin{
+  min-height:100svh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:60px 0;
+}
+.constat-head{text-align:center;margin-bottom:40px;padding:0 24px;}
+.constat-head h2{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(32px,4.6vw,60px);
+  letter-spacing:-.025em;line-height:1.05;
+  max-width:20ch;margin-inline:auto;
+}
+.constat-head p{
+  color:var(--text-dim);max-width:62ch;margin-inline:auto;
+  margin-top:18px;line-height:1.6;font-size:15px;
+}
+.constat-stage{
+  width:100%;overflow:hidden;
+  padding:30px max(24px,4vw);
+}
+.constat-track{
+  display:flex;gap:24px;
+  will-change:transform;
+}
+.constat-card{
+  flex:0 0 clamp(280px,42vw,400px);
+  min-height:clamp(320px,46vh,400px);
+  padding:36px 28px;
+  border-radius:var(--r-lg);
+  background:rgba(10,14,26,.55);
+  border:1px solid var(--line);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  display:flex;flex-direction:column;
+  transition:transform .45s cubic-bezier(.2,.8,.2,1),
+             border-color .4s, opacity .4s, box-shadow .4s;
+  position:relative;
+}
+.constat-card.is-focus{
+  transform:scale(1.04);
+  border-color:rgba(214,51,132,.55);
+  box-shadow:0 24px 60px -22px rgba(214,51,132,.35);
+}
+.constat-card:not(.is-focus){opacity:.5;}
+.constat-card .c-num{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(48px,7vw,80px);line-height:1;letter-spacing:-.03em;
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:18px;
+}
+.constat-card h3{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(20px,2.2vw,28px);
+  line-height:1.15;letter-spacing:-.02em;
+  margin-bottom:16px;
+}
+.constat-card p{
+  color:var(--text-dim);font-size:14.5px;line-height:1.6;
+}
+@media(max-width:640px){
+  .constat-card{flex-basis:min(78vw,320px);padding:28px 22px;}
+  .constat-card p{font-size:13.5px;}
+}
+
+/* ============================================================
+   03 NOTRE MISSION — PHASE 4
+   3 cartes pivotent groupées sur le même axe Y (plaque tournante).
+   Pin pendant la rotation. Cartes à 0°/120°/240°, backface-hidden masque
+   celles au dos. Rotation -240° pour finir face à la 3e carte.
+   ============================================================ */
+.mission{background:var(--bg-0);position:relative;overflow:hidden;}
+.mission-pin{
+  min-height:100svh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:60px 0;
+}
+.mission-head{text-align:center;margin-bottom:40px;padding:0 24px;}
+.mission-head h2{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(28px,4.2vw,56px);
+  letter-spacing:-.025em;line-height:1.08;
+  max-width:24ch;margin-inline:auto;
+}
+.mission-head p{
+  color:var(--text-dim);max-width:68ch;margin-inline:auto;
+  margin-top:22px;line-height:1.65;font-size:15px;
+}
+.mission-stage{
+  position:relative;width:100%;
+  height:clamp(420px,52vh,500px);
+  perspective:1400px;perspective-origin:50% 50%;
+  display:grid;place-items:center;
+}
+.mission-platter{
+  position:relative;
+  width:clamp(280px,76vw,360px);
+  height:clamp(360px,46vh,420px);
+  transform-style:preserve-3d;
+  will-change:transform;
+}
+.mission-card{
+  position:absolute;inset:0;
+  padding:38px 30px;
+  border-radius:var(--r-lg);
+  background:rgba(10,14,26,.62);
+  border:1px solid var(--line);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  transform:rotateY(var(--i,0deg)) translateZ(var(--mission-r,260px));
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;
+  display:flex;flex-direction:column;justify-content:center;
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.55);
+}
+.mission-card .m-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;letter-spacing:.18em;color:var(--text-mute);
+  margin-bottom:24px;
+}
+.mission-card h3{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(28px,3.4vw,40px);
+  line-height:1.05;letter-spacing:-.02em;
+  margin-bottom:20px;
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.mission-card p{color:var(--text);font-size:15px;line-height:1.6;}
+@media(max-width:1024px){ .mission-card{--mission-r:240px;} }
+@media(max-width:640px){
+  .mission-card{--mission-r:215px;padding:32px 24px;}
+  .mission-card h3{font-size:26px;}
+  .mission-card p{font-size:14px;}
+}
+@media(max-width:380px){ .mission-card{--mission-r:195px;} }
+
+/* ============================================================
    SERVICES — PHASE 3
    Desktop ≥1025px : horizontal pin scrubbed (GSAP translateX the track)
    Mobile  ≤1024px : native swipeable snap carousel (CSS overflow-x:auto)
@@ -1549,22 +1692,87 @@ body.has-cursor .cursor-glow{display:block;}
   mask-image:radial-gradient(ellipse 70% 50% at 50% 50%,#000,transparent 90%);
   -webkit-mask-image:radial-gradient(ellipse 70% 50% at 50% 50%,#000,transparent 90%);
 }
+.cta-final-inner{
+  position:relative;z-index:2;
+  max-width:780px;margin:0 auto;
+}
 .cta-final h2{
   font-family:'Syne',sans-serif;font-weight:700;
-  font-size:clamp(48px,8vw,128px);
-  letter-spacing:-.035em;line-height:.95;
-  max-width:14ch;margin:0 auto 36px;
+  font-size:clamp(36px,6vw,84px);
+  letter-spacing:-.025em;line-height:1.02;
+  max-width:22ch;margin:0 auto 28px;
 }
 .cta-final h2 .grad{
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .cta-final p{
-  color:var(--text-dim);font-size:18px;
-  max-width:54ch;margin:0 auto 56px;line-height:1.55;
+  color:var(--text-dim);font-size:17px;
+  max-width:54ch;margin:0 auto 8px;line-height:1.6;
 }
-.cta-final .cta-row{justify-content:center;margin-bottom:0;}
-.cta-final .btn-primary{padding:22px 36px;font-size:15px;}
+
+/* CTA FORM — PHASE 4 */
+.cta-form{
+  margin-top:48px;text-align:left;
+  display:flex;flex-direction:column;gap:18px;
+}
+.cta-form-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;
+}
+.cta-field{display:flex;flex-direction:column;gap:8px;position:relative;}
+.cta-field > span{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text-mute);
+}
+.cta-field input,
+.cta-field textarea{
+  padding:14px 16px;width:100%;
+  background:rgba(10,14,26,.55);
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  color:var(--text);font-size:15px;
+  font-family:'Inter',sans-serif;
+  transition:border-color .25s,background-color .25s,box-shadow .25s;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.cta-field input:focus,
+.cta-field textarea:focus{
+  outline:none;
+  border-color:var(--purple);
+  background:rgba(10,14,26,.78);
+  box-shadow:0 0 0 3px rgba(124,92,252,.18);
+}
+.cta-field input::placeholder,
+.cta-field textarea::placeholder{
+  color:var(--text-mute);opacity:.6;
+}
+.cta-field textarea{resize:vertical;min-height:90px;}
+.cta-field-wide{grid-column:1/-1;}
+.cta-field input[type="datetime-local"]{
+  color-scheme:dark;
+  font-family:'Inter',sans-serif;
+}
+.cta-field input[type="datetime-local"]::-webkit-calendar-picker-indicator{
+  filter:invert(.85);cursor:pointer;opacity:.7;
+}
+.cta-field input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover{opacity:1;}
+.cta-form-submit{
+  margin-top:12px;align-self:center;
+  padding:20px 36px;font-size:14px;letter-spacing:.04em;
+  display:inline-flex;align-items:center;gap:10px;
+}
+.cta-form-rassurance{
+  text-align:center;
+  font-size:13px;color:var(--text-dim);
+  max-width:54ch;margin:4px auto 0;line-height:1.5;
+}
+@media(max-width:640px){
+  .cta-form-grid{grid-template-columns:1fr;}
+  .cta-final{padding:120px 22px;}
+  .cta-form-submit{width:100%;justify-content:center;}
+}
 
 /* ============================================================
    FOOTER
@@ -1831,47 +2039,87 @@ body.has-cursor .cursor-glow{display:block;}
 <!-- ============================================================
      PROBLEMS
      ============================================================ -->
-<section class="section problems" id="problems">
-  <div class="container">
-    <div class="problems-head">
-      <div>
-        <div class="section-eyebrow">
+<!-- ============================================================
+     02 · LE CONSTAT — Phase 4
+     Section pinnée, 4 blocs en carousel horizontal scrubé.
+     Carte centrée prend le focus (scale + couleur magenta).
+     ============================================================ -->
+<section class="section constat" id="constat">
+  <div class="constat-pin">
+    <div class="container">
+      <div class="constat-head">
+        <div class="section-eyebrow" style="justify-content:center;">
           <span class="num">01</span>
           <span class="line"></span>
-          <span class="label">Pain Points</span>
+          <span class="label">Le Constat</span>
         </div>
-        <h2 class="section-title" data-split>Si vous reconnaissez ces situations, vos équipes méritent mieux.</h2>
+        <h2 data-split>Chaque jour, votre entreprise paie un impôt invisible.</h2>
+        <p data-fade>Pas dans les comptes. Dans les heures. Dans les commandes oubliées, les mails en retard, les clients qui partent parce que personne n'a pu répondre à temps, les équipes brillantes coincées sur des tâches indignes de leur talent.</p>
       </div>
-      <p class="problems-intro" data-fade>
-        Ces frictions coûtent en moyenne <b>28h par semaine</b> à une PME.
-        Et surtout, elles épuisent les équipes qui les subissent au quotidien.
-      </p>
     </div>
-    <div class="problems-grid">
-      <article class="problem-card" data-card>
-        <div class="tag">P-01</div>
-        <div class="icon">🔄</div>
-        <h3>Tâches répétitives</h3>
-        <p>Votre équipe passe <b style="color:var(--text);">60% de son temps</b> sur des tâches qui ne génèrent aucun chiffre d'affaires. Saisie manuelle, copier-coller entre outils, relances, devis — autant d'heures qui devraient servir à autre chose.</p>
-      </article>
-      <article class="problem-card" data-card>
-        <div class="tag">P-02</div>
-        <div class="icon">📞</div>
-        <h3>Clients perdus</h3>
-        <p>Un prospect qui attend <b style="color:var(--text);">5 minutes sans réponse</b> a 80% de chances de partir chez le concurrent. Les leads qualifiés s'évaporent.</p>
-      </article>
-      <article class="problem-card" data-card>
-        <div class="tag">P-03</div>
-        <div class="icon">🔧</div>
-        <h3>Outils déconnectés</h3>
-        <p>CRM, facturation, emails, planning, comptabilité — vos outils ne se parlent pas. Résultat : double saisie, erreurs, vue partielle.</p>
-      </article>
-      <article class="problem-card" data-card>
-        <div class="tag">P-04</div>
-        <div class="icon">⏰</div>
-        <h3>Pas le temps</h3>
-        <p>Trop occupé à faire tourner le quotidien pour penser à demain. La transformation digitale reste un projet « qu'on lancera bientôt »… depuis trois ans. Pendant ce temps, vos meilleurs éléments s'épuisent.</p>
-      </article>
+    <div class="constat-stage" id="constat-stage">
+      <div class="constat-track" id="constat-track">
+        <article class="constat-card" data-i="0">
+          <span class="c-num">01</span>
+          <h3>Les heures qui s'évaporent</h3>
+          <p>Saisie manuelle, copier-coller, relances par mail, mises à jour de fichiers. Une équipe de 10 personnes perd en moyenne 12&nbsp;heures par semaine sur des tâches qu'aucun outil moderne ne devrait laisser à un humain.</p>
+        </article>
+        <article class="constat-card" data-i="1">
+          <span class="c-num">02</span>
+          <h3>Les clients qui filent</h3>
+          <p>Un appel manqué, c'est un client perdu. Une question sans réponse à 22h, c'est un panier abandonné. Un SAV qui répète 50&nbsp;fois la même chose, c'est une équipe qui s'épuise et finit par s'en aller.</p>
+        </article>
+        <article class="constat-card" data-i="2">
+          <span class="c-num">03</span>
+          <h3>Les erreurs qui coûtent cher</h3>
+          <p>Une référence mal saisie, une commande mal transmise, un devis envoyé deux fois. Plus le volume monte, plus la marge fond — et plus la pression remonte sur les équipes.</p>
+        </article>
+        <article class="constat-card" data-i="3">
+          <span class="c-num">04</span>
+          <h3>La croissance qui plafonne</h3>
+          <p>Vos équipes sont déjà à fond. On vous a vendu un seul levier pour avancer&nbsp;: embaucher. Il en existe un autre, dix fois plus rapide, qui ne demande à personne de tirer encore plus.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     03 · NOTRE MISSION — Phase 4
+     3 cartes pivotent groupées sur même axe Y (plaque tournante).
+     Pin durant la rotation, backface masque les cartes au dos.
+     ============================================================ -->
+<section class="section mission" id="mission">
+  <div class="mission-pin">
+    <div class="container">
+      <div class="mission-head">
+        <div class="section-eyebrow" style="justify-content:center;">
+          <span class="num">02</span>
+          <span class="line"></span>
+          <span class="label">Notre Mission</span>
+        </div>
+        <h2 data-split>On ne vend pas de l'IA. On rend du temps, du chiffre, et de la sérénité.</h2>
+        <p data-fade>Neexus propulse les entreprises — petites, moyennes, grandes, tous secteurs — vers le niveau supérieur, grâce à des solutions IA et des automatisations sur mesure. La technologie n'est pas là pour remplacer vos équipes, elle est là pour les augmenter. Elle prend en charge le répétitif, le pénible, le chronophage. Vos collaborateurs reviennent sur l'intelligence humaine, la relation client, la stratégie, la créativité.</p>
+      </div>
+      <div class="mission-stage">
+        <div class="mission-platter" id="mission-platter">
+          <article class="mission-card" style="--i:0deg">
+            <span class="m-num">01 · Principe</span>
+            <h3>Sur mesure</h3>
+            <p>Aucun copier-coller. Chaque solution est pensée pour votre contexte, vos outils, vos équipes.</p>
+          </article>
+          <article class="mission-card" style="--i:120deg">
+            <span class="m-num">02 · Principe</span>
+            <h3>Mesurable</h3>
+            <p>Si on ne peut pas chiffrer le gain — en heures, en euros, en satisfaction — on ne le déploie pas. Point.</p>
+          </article>
+          <article class="mission-card" style="--i:240deg">
+            <span class="m-num">03 · Principe</span>
+            <h3>Au service de vos équipes</h3>
+            <p>On ne remplace personne. On enlève ce qui ralentit, on comble les trous dans les process, on amplifie ce qui marche déjà.</p>
+          </article>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1882,9 +2130,9 @@ body.has-cursor .cursor-glow{display:block;}
 <section class="profiles" id="profils">
   <div class="profiles-head">
     <div class="section-eyebrow">
-      <span class="num">02</span>
+      <span class="num">04</span>
       <span class="line"></span>
-      <span class="label">Profils</span>
+      <span class="label">Pour Qui</span>
     </div>
     <h2 data-split>Là où l'IA et l'automatisation changent vraiment la donne.</h2>
     <p class="intro" data-fade>
@@ -2248,9 +2496,9 @@ body.has-cursor .cursor-glow{display:block;}
     <div class="methode-inner">
       <div class="methode-head">
         <div class="section-eyebrow" style="justify-content:center;">
-          <span class="num">04</span>
+          <span class="num">05</span>
           <span class="line"></span>
-          <span class="label">Méthode</span>
+          <span class="label">Notre Méthode</span>
         </div>
         <h2 data-split>De l'idée au résultat&nbsp;: 4 étapes. Zéro perte de temps.</h2>
         <p>Pas de jargon. Pas de PowerPoint à rallonge. <b>Un cadre clair, des livrables datés</b>, et une équipe qui prend en charge — pour que vos équipes, elles, restent concentrées sur leur métier.</p>
@@ -2301,9 +2549,9 @@ body.has-cursor .cursor-glow{display:block;}
     <div class="results-inner">
       <div class="results-text">
         <div class="section-eyebrow" style="justify-content:center;">
-          <span class="num">05</span>
+          <span class="num">06</span>
           <span class="line"></span>
-          <span class="label">Résultats</span>
+          <span class="label">Les Résultats</span>
         </div>
         <h2 data-split>Les chiffres qu'on défend devant <span class="gradient-text italic">n'importe qui</span>.</h2>
       </div>
@@ -2339,9 +2587,9 @@ body.has-cursor .cursor-glow{display:block;}
 <section class="stack-section" id="stack">
   <div class="stack-head">
     <div class="section-eyebrow" style="justify-content:center;">
-      <span class="num">06</span>
+      <span class="num">07</span>
       <span class="line"></span>
-      <span class="label">Stack</span>
+      <span class="label">Notre Stack</span>
     </div>
     <h2 data-split>Le meilleur de l'IA. Au service de votre business.</h2>
     <p class="intro" data-fade>
@@ -2437,7 +2685,7 @@ body.has-cursor .cursor-glow{display:block;}
     <div class="container">
       <div class="testi-head">
         <div class="section-eyebrow" style="justify-content:center;">
-          <span class="num">09</span>
+          <span class="num">08</span>
           <span class="line"></span>
           <span class="label">Témoignages</span>
         </div>
@@ -2544,7 +2792,7 @@ body.has-cursor .cursor-glow{display:block;}
 <section class="faq" id="faq">
   <div class="faq-head">
     <div class="section-eyebrow" style="justify-content:center;">
-      <span class="num">08</span>
+      <span class="num">09</span>
       <span class="line"></span>
       <span class="label">Questions</span>
     </div>
@@ -2647,27 +2895,49 @@ body.has-cursor .cursor-glow{display:block;}
      CTA FINAL
      ============================================================ -->
 <section class="cta-final" id="cta">
-  <div class="section-eyebrow" style="justify-content:center;margin-bottom:40px;">
-    <span class="num">09</span>
-    <span class="line"></span>
-    <span class="label">Et maintenant ?</span>
-  </div>
-  <h2 data-split-cta>
-    Prêt à automatiser <span class="grad italic">votre croissance</span> ?
-  </h2>
-  <p data-fade>
-    On identifie ensemble les <b style="color:var(--text);">3 quick-wins</b> qui auront le plus
-    d'impact sur votre business. 30 minutes, en visio, gratuit, sans engagement.
-  </p>
-  <div class="cta-row" data-fade>
-    <a href="mailto:contact@neexusds.com" class="btn btn-primary" data-cursor data-magnetic>
-      Réserver mon audit gratuit
-      <span class="arrow">→</span>
-    </a>
-    <a href="#temoignages" class="btn btn-ghost" data-cursor data-magnetic>
-      Voir un cas client
-      <span class="arrow">↗</span>
-    </a>
+  <div class="cta-final-inner">
+    <div class="section-eyebrow" style="justify-content:center;margin-bottom:36px;">
+      <span class="num">10</span>
+      <span class="line"></span>
+      <span class="label">Réserver</span>
+    </div>
+    <h2 data-split-cta>
+      Et si on regardait ensemble combien votre entreprise pourrait <span class="grad italic">gagner&nbsp;?</span>
+    </h2>
+    <p data-fade>
+      30 minutes d'appel. Aucun engagement. À la fin, vous repartez avec une cartographie claire de ce qui peut être automatisé chez vous, et l'estimation du gain associé. Que vous travailliez avec Neexus ensuite ou pas.
+    </p>
+    <form class="cta-form" id="cta-form" novalidate data-fade>
+      <div class="cta-form-grid">
+        <label class="cta-field">
+          <span>Nom</span>
+          <input type="text" name="name" placeholder="Marc Dubois" autocomplete="name" required>
+        </label>
+        <label class="cta-field">
+          <span>Email</span>
+          <input type="email" name="email" placeholder="marc@entreprise.fr" autocomplete="email" required>
+        </label>
+        <label class="cta-field">
+          <span>Téléphone</span>
+          <input type="tel" name="phone" placeholder="+33 6 12 34 56 78" autocomplete="tel" required>
+        </label>
+        <label class="cta-field">
+          <span>Quand vous rappeler ?</span>
+          <input type="datetime-local" name="callback" required>
+        </label>
+      </div>
+      <label class="cta-field cta-field-wide">
+        <span>Votre contexte (optionnel)</span>
+        <textarea name="message" rows="3" placeholder="En une ou deux phrases : ce qui vous fait perdre du temps en ce moment."></textarea>
+      </label>
+      <button type="submit" class="btn btn-primary cta-form-submit" data-cursor data-magnetic>
+        Réserver mon audit gratuit
+        <span class="arrow">→</span>
+      </button>
+      <p class="cta-form-rassurance">
+        Pas de carte bancaire. Pas de «&nbsp;rappel commercial dans 48h&nbsp;». Un humain, un agenda, une vraie conversation.
+      </p>
+    </form>
   </div>
 </section>
 
@@ -2799,7 +3069,8 @@ function initSite(){
      Each init function does its own internal mm.add() if it needs a
      desktop/mobile variant (e.g. services horizontal scroll vs swipe). */
   initHeroPinned();
-  initProblems();
+  initConstat();                // Phase 4 : section 01 (remplace Pain Points)
+  initMission();                // Phase 4 : section 02 (NEW)
   initProfilesCarousel();       // snap detection works on touch too
   initProfiles();
   initServices();
@@ -2808,6 +3079,7 @@ function initSite(){
   initStack();
   initTesti();
   initFaq();
+  initCTAForm();                // Phase 4 : section 10 (formulaire)
 
   /* Desktop-only polish (cursor, magnetic hover, 3D mouse parallax) */
   gsap.matchMedia().add(QUERY_DESKTOP, () => {
@@ -3170,13 +3442,150 @@ function initHeroPinned(){
 /* ============================================================
    PROBLEMS — fade-up + stagger
    ============================================================ */
-function initProblems(){
-  gsap.utils.toArray('.problem-card').forEach((card, i) => {
-    gsap.from(card, {
-      y: 36, opacity: 0,
-      duration: .8, delay: (i % 2) * .12, ease: 'power3.out',
-      scrollTrigger: { trigger: card, start: 'top 88%', once: true }
+/* ============================================================
+   LE CONSTAT — PHASE 4
+   Pin section, scroll vertical → translation horizontale de la track.
+   La carte centrée (proche du centre viewport) reçoit .is-focus.
+   ============================================================ */
+function initConstat(){
+  const track = document.getElementById('constat-track');
+  const cards = gsap.utils.toArray('.constat-card');
+  if (!track || cards.length === 0) return;
+
+  gsap.from('.constat-head > *', {
+    y: 24, opacity: 0, stagger: .08,
+    duration: .7, ease: 'power3.out',
+    scrollTrigger: { trigger: '.constat', start: 'top 75%', once: true }
+  });
+
+  if (reducedMotion){
+    track.style.flexWrap = 'wrap';
+    track.style.justifyContent = 'center';
+    cards.forEach(c => c.classList.add('is-focus'));
+    return;
+  }
+
+  const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 60);
+
+  ScrollTrigger.create({
+    trigger: '.constat-pin',
+    start: 'top top',
+    end: () => `+=${distance() * 1.3 + window.innerHeight * 0.5}`,
+    pin: true,
+    pinSpacing: true,
+    scrub: 1,
+    invalidateOnRefresh: true,
+    onUpdate: self => {
+      const x = -distance() * self.progress;
+      gsap.set(track, { x });
+      // Détecte la carte la plus proche du centre viewport
+      const vc = window.innerWidth / 2;
+      let best = 0, bestDist = Infinity;
+      cards.forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        const center = r.left + r.width / 2;
+        const d = Math.abs(center - vc);
+        if (d < bestDist){ bestDist = d; best = i; }
+      });
+      cards.forEach((c, i) => c.classList.toggle('is-focus', i === best));
+    }
+  });
+}
+
+/* ============================================================
+   NOTRE MISSION — PHASE 4
+   Plaque tournante : 3 cartes pivotent groupées sur axe Y (-240°)
+   ============================================================ */
+function initMission(){
+  const platter = document.getElementById('mission-platter');
+  const cards = gsap.utils.toArray('.mission-card');
+  if (!platter || cards.length === 0) return;
+
+  gsap.from('.mission-head > *', {
+    y: 24, opacity: 0, stagger: .08,
+    duration: .7, ease: 'power3.out',
+    scrollTrigger: { trigger: '.mission', start: 'top 75%', once: true }
+  });
+
+  if (reducedMotion){
+    const stage = document.querySelector('.mission-stage');
+    if (stage){ stage.style.height = 'auto'; stage.style.perspective = 'none'; }
+    platter.style.cssText += 'width:100%;height:auto;display:flex;flex-direction:column;gap:20px;';
+    cards.forEach(c => {
+      c.style.cssText += 'position:relative;inset:auto;transform:none;width:100%;max-width:340px;margin:0 auto;';
     });
+    return;
+  }
+
+  // 3 cartes × 120° = full cycle. Rotation 0 → -240° pour finir face à carte 3
+  ScrollTrigger.create({
+    trigger: '.mission-pin',
+    start: 'top top',
+    end: () => `+=${window.innerHeight * 2.4}`,
+    pin: true,
+    pinSpacing: true,
+    scrub: 1,
+    invalidateOnRefresh: true,
+    onUpdate: self => {
+      const rot = -240 * self.progress;
+      gsap.set(platter, { rotationY: rot });
+    }
+  });
+}
+
+/* ============================================================
+   CTA FORM — PHASE 4
+   Formulaire visuel uniquement (pas de backend pour l'instant).
+   Datepicker natif HTML5 + valeur par défaut J+1 à 14h.
+   Submit → feedback visuel temporaire, pas d'envoi réseau.
+   ============================================================ */
+function initCTAForm(){
+  const form = document.getElementById('cta-form');
+  if (!form) return;
+
+  // Valeur par défaut datepicker : demain 14h00, et min = maintenant
+  const dt = form.querySelector('input[type="datetime-local"]');
+  if (dt){
+    const pad = n => String(n).padStart(2, '0');
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    tomorrow.setHours(14, 0, 0, 0);
+    const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    dt.value = fmt(tomorrow);
+    dt.min = fmt(now);
+  }
+
+  // Feedback visuel uniquement — pas d'envoi backend
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const btn = form.querySelector('button[type="submit"]');
+    if (!btn || btn.disabled) return;
+    const original = btn.innerHTML;
+    btn.innerHTML = 'Envoyé — on vous rappelle ✓';
+    btn.disabled = true;
+    btn.style.opacity = '.75';
+    setTimeout(() => {
+      btn.innerHTML = original;
+      btn.disabled = false;
+      btn.style.opacity = '';
+      form.reset();
+      // Réinitialise la date après reset
+      if (dt){
+        const pad = n => String(n).padStart(2, '0');
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(14, 0, 0, 0);
+        dt.value = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth()+1)}-${pad(tomorrow.getDate())}T${pad(tomorrow.getHours())}:${pad(tomorrow.getMinutes())}`;
+      }
+    }, 3500);
+  });
+
+  // Entry fade-up du formulaire
+  gsap.from('.cta-form > *', {
+    y: 24, opacity: 0, stagger: .06,
+    duration: .7, ease: 'power3.out',
+    scrollTrigger: { trigger: '.cta-form', start: 'top 85%', once: true }
   });
 }
 
