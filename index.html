@@ -87,10 +87,13 @@ button{font:inherit;color:inherit;background:none;border:0;}
 }
 .italic{font-style:italic;font-family:'Syne',sans-serif;font-weight:500;}
 .italic-glow{
+  /* fix : filter:drop-shadow casse bg-clip:text sur Chrome/Edge.
+     text-shadow rend la couleur indépendamment de color:transparent → glow visible. */
+  display:inline-block;
   font-style:italic;font-family:'Syne',sans-serif;font-weight:500;
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
-  filter:drop-shadow(0 0 18px rgba(214,51,132,.45)) drop-shadow(0 0 36px rgba(124,92,252,.25));
+  text-shadow:0 0 22px rgba(214,51,132,.55),0 0 44px rgba(124,92,252,.30);
 }
 
 /* ============================================================
@@ -1217,16 +1220,20 @@ body.has-cursor .cursor-glow{display:block;}
   max-width:54ch;line-height:1.65;margin-inline:auto;
 }
 /* PHASE 4.5 — ROUE 3D : 3 chiffres pivotent groupes sur axe Y
-   (cousine visuelle de Mission et Témoignages, sens horaire -240°) */
+   Pattern miroir de Mission (Lazy Susan horizontal). Wheel interieur
+   plus petit que le stage + cards en inset:0 = geometrie d'orbite
+   horizontale propre (pas un flip vertical). */
 .results-wheel-stage{
   position:relative;width:100%;
-  height:clamp(440px,56vh,540px);
+  height:clamp(440px,56vh,520px);
   perspective:1500px;perspective-origin:50% 50%;
+  display:grid;place-items:center;
   margin:0 auto 24px;
 }
 .results-wheel{
-  position:absolute;inset:0;margin:auto;
-  width:100%;height:100%;
+  position:relative;
+  width:clamp(320px,84vw,440px);
+  height:clamp(380px,52vh,440px);
   transform-style:preserve-3d;
   -webkit-transform-style:preserve-3d;
   will-change:transform;
@@ -1246,33 +1253,26 @@ body.has-cursor .cursor-glow{display:block;}
   box-shadow:0 0 12px var(--magenta);
 }
 .result-card{
-  --results-r:380px;
-  position:absolute;top:50%;left:50%;
-  width:min(460px,86vw);
-  height:min(380px,62vh);
-  padding:48px 32px 38px;
+  --results-r:260px;
+  position:absolute;inset:0;
+  padding:44px 28px 36px;
   border-radius:var(--r-lg);
-  background:var(--glass);border:1px solid var(--line);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-  overflow:hidden;text-align:center;
-  transform:
-    translate3d(-50%,-50%,0)
-    rotateY(var(--i,0deg))
-    translateZ(var(--results-r));
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
+  background:rgba(10,14,26,.62);
+  border:1px solid var(--line);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.55);
+  overflow:hidden;
+  transform:rotateY(var(--i,0deg)) translateZ(var(--results-r));
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;
 }
-@media (max-width:1024px){ .result-card{ --results-r:300px; } }
+@media (max-width:1024px){ .result-card{ --results-r:240px; } }
 @media (max-width:640px){
-  .result-card{
-    --results-r:240px;
-    width:min(360px,84vw);
-    height:auto;min-height:300px;
-    padding:36px 24px 28px;
-  }
+  .result-card{ --results-r:210px;padding:34px 22px 26px; }
 }
-@media (max-width:380px){ .result-card{ --results-r:200px; } }
+@media (max-width:380px){ .result-card{ --results-r:190px; } }
 .result-card::before{
   content:'';position:absolute;inset:-1px;border-radius:inherit;
   background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.55) 25%,transparent 50%,rgba(214,51,132,.55) 75%,transparent 100%);
@@ -1294,17 +1294,20 @@ body.has-cursor .cursor-glow{display:block;}
 .result-card:hover::before{opacity:1;}
 .result-card .num{
   font-family:'Syne',sans-serif;font-weight:700;
-  font-size:clamp(4rem,8vw,10rem);line-height:.9;
-  letter-spacing:-.05em;
+  /* fix : font reduit (etait 4-10rem) pour que "1 800+" tienne dans la carte
+     wheel (large clipping by overflow:hidden + flex nowrap below). */
+  font-size:clamp(2.8rem,6.5vw,6.5rem);line-height:.9;
+  letter-spacing:-.04em;
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
   margin-bottom:18px;
   display:flex;align-items:baseline;justify-content:center;
+  flex-wrap:nowrap;white-space:nowrap;
   position:relative;z-index:1;
-  filter:drop-shadow(0 0 28px rgba(124,92,252,.45));
+  text-shadow:0 0 28px rgba(124,92,252,.45);   /* fix : text-shadow (pas filter) — compat bg-clip:text */
 }
 .result-card .num .prefix{font-size:.55em;margin-right:2px;opacity:.9;}
-.result-card .num .unit{font-size:.45em;margin-left:6px;opacity:.9;font-weight:600;}
+.result-card .num .unit{font-size:.5em;margin-left:6px;opacity:.95;font-weight:600;}
 .result-card .lbl{
   font-size:14px;color:var(--text);font-weight:500;
   margin-bottom:8px;letter-spacing:.01em;
@@ -3907,37 +3910,38 @@ function initMethode(){
     return;
   }
 
-  /* SURPRISE Phase 4 polish : NOTEBOOK FLIP 3D
-     Chaque step se deroule depuis sa tranche superieure (rotateX:-90deg)
-     vers son etat plat (rotateX:0). transformOrigin:50% 0% = pivot au top
-     de la carte. On a l'impression de tourner une page de carnet vertical.
-     + pulse magenta sur le step-num quand la carte est ouverte. */
+  /* SURPRISE Phase 4 polish : NOTEBOOK FLIP 3D — version DOUCE (fix Phase 4.5)
+     Chaque step se deroule depuis sa tranche superieure mais en douceur.
+     Avant : rotationX:-90 + power3.out + 1.1s → cards "tapaient" l'ecran.
+     Maintenant : rotationX:-55 (moins agressif) + slide-up + power2.out + 1.5s
+     + trigger plus tot (top 90% au lieu de 82%) → arrivee feutree.
+     + pulse magenta sur le step-num plus subtil et plus tard. */
   steps.forEach((step, i) => {
     gsap.from(step, {
-      rotationX: -90,
+      rotationX: -55,
+      y: 30,
       transformOrigin: '50% 0%',
       transformPerspective: 1200,
       opacity: 0,
-      duration: 1.1,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: step, start: 'top 82%', once: true }
+      duration: 1.5,
+      ease: 'power2.out',
+      scrollTrigger: { trigger: step, start: 'top 90%', once: true }
     });
 
-    /* Pulse magenta sur le numero : 0.7s apres le debut de la flip
-       pour qu'il pulse quand la carte est presque ouverte */
+    /* Pulse magenta sur le numero : adouci (scale 1.05 + 14px glow + sine.out) */
     const num = step.querySelector('.step-num');
     if (num){
       gsap.fromTo(num,
         { scale: 1, filter: 'drop-shadow(0 0 0px rgba(214,51,132,0))' },
         {
-          scale: 1.08,
-          filter: 'drop-shadow(0 0 18px rgba(214,51,132,.75))',
-          duration: .35,
-          delay: .7,
-          ease: 'power2.out',
+          scale: 1.05,
+          filter: 'drop-shadow(0 0 14px rgba(214,51,132,.65))',
+          duration: .55,
+          delay: 1.0,
+          ease: 'sine.out',
           yoyo: true,
           repeat: 1,
-          scrollTrigger: { trigger: step, start: 'top 82%', once: true }
+          scrollTrigger: { trigger: step, start: 'top 90%', once: true }
         }
       );
     }
