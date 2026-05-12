@@ -87,12 +87,19 @@ button{font:inherit;color:inherit;background:none;border:0;}
 }
 .italic{font-style:italic;font-family:'Syne',sans-serif;font-weight:500;}
 .italic-glow{
-  /* fix definitif : solid pink + glow text-shadow.
-     Le bg-clip:text + nested word spans de SplitType etait instable
-     (texte invisible). Solid color = visibilite garantie cross-browser. */
+  /* solid pink + glow text-shadow. Visible cross-browser. */
   font-style:italic;font-family:'Syne',sans-serif;font-weight:500;
   color:var(--pink);
-  text-shadow:0 0 10px rgba(214,51,132,.5),0 0 20px rgba(214,51,132,.25);
+  text-shadow:0 0 8px rgba(214,51,132,.55);
+}
+/* fix bug 'qui' coupe : SplitType (initSplitTitles) met inline-style
+   overflow:hidden sur chaque .word pour clipper le slide-up vertical.
+   En italique, le glyphe final (notamment 'i' avec point ascenseur)
+   et le halo text-shadow depassent A DROITE la boite du mot et se
+   font couper. On rajoute du padding horizontal pour donner l'air. */
+.italic-glow .word{
+  padding-right:.35em;
+  padding-left:.08em;
 }
 
 /* ============================================================
