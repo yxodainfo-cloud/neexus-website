@@ -320,10 +320,12 @@ body.has-cursor .cursor-glow{display:block;}
 .hero-inner{
   max-width:var(--container);
   margin:0 auto;
-  height:100vh;
-  height:100svh;          /* PHASE 3: match smartphone visible viewport */
+  min-height:100vh;
+  min-height:100svh;      /* PHASE 3: match smartphone visible viewport */
   display:flex;flex-direction:column;justify-content:center;
-  position:relative;padding-top:80px;
+  position:relative;
+  padding-top:clamp(100px,13vh,140px);   /* fix bug Hero : breathing sous la navbar (logo) */
+  padding-bottom:48px;
   will-change:transform,opacity;
 }
 .hero-badge{
@@ -349,11 +351,12 @@ body.has-cursor .cursor-glow{display:block;}
 @keyframes pulse{0%{transform:scale(1);opacity:.8;}100%{transform:scale(2.2);opacity:0;}}
 .hero-title{
   font-family:'Syne',sans-serif;font-weight:700;
-  font-size:clamp(48px,8.4vw,140px);
-  line-height:.92;letter-spacing:-.035em;
-  margin-bottom:32px;perspective:1200px;
+  font-size:clamp(32px,5.8vw,92px);     /* fix : font-size sane pour empêcher overflow */
+  line-height:.96;                       /* slightly plus aéré pour le wrap */
+  letter-spacing:-.025em;
+  margin-bottom:28px;perspective:1200px;
 }
-.hero-title .line{display:block;overflow:hidden;perspective:1200px;}
+.hero-title .line{display:block;overflow:visible;perspective:1200px;}
 .hero-title .line-2{
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
