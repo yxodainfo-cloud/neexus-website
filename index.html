@@ -420,30 +420,30 @@ body.has-cursor .cursor-glow{display:block;}
 .btn-ghost:hover::before{opacity:1;}
 .btn .arrow{transition:transform .35s;}
 .btn:hover .arrow{transform:translate(2px,-2px);}
-/* PHASE 4 — Micro-preuve en ligne (remplace hero-stats) */
+/* PHASE 4 — Micro-preuve : 3 items cote a cote
+   Desktop : flex inline avec separateurs
+   Mobile  : grid 3 colonnes, counter au-dessus du label */
 .hero-micro-proof{
   display:flex;
-  flex-wrap:nowrap;             /* fix : toujours horizontal sur desktop */
+  flex-wrap:nowrap;
   align-items:center;
-  gap:12px 20px;
+  gap:12px 22px;
   max-width:none;
   padding-top:28px;
   border-top:1px solid var(--line);
   font-family:'JetBrains Mono',monospace;
-  font-size:clamp(10.5px,.78vw,12px);   /* fix : plus petit pour tenir sur 1 ligne */
+  font-size:clamp(10.5px,.78vw,12.5px);
   letter-spacing:.04em;
-  color:#a8acba;                /* fix : plus clair que --text-dim */
-  text-shadow:0 1px 8px rgba(0,0,0,.4);
-}
-@media(max-width:760px){
-  .hero-micro-proof{flex-wrap:wrap;gap:6px 14px;}   /* mobile : peut wrapper si besoin */
-  .hero-micro-proof .proof-sep{display:none;}        /* on cache les separateurs en wrap */
+  color:#e8eaf0;                /* fix : plus clair, plus lisible */
+  text-shadow:0 1px 8px rgba(0,0,0,.55);
 }
 .hero-micro-proof .proof-item{
   display:inline-flex;
   align-items:baseline;
-  gap:5px;
+  gap:6px;
+  flex:0 0 auto;
 }
+.hero-micro-proof .proof-label{color:#d8dce6;}
 .hero-micro-proof .counter{
   font-family:'Syne',sans-serif;
   font-weight:700;
@@ -1899,15 +1899,27 @@ body.has-cursor .cursor-glow{display:block;}
   .mobile-menu{display:flex;}
   .section{padding:90px 22px;}
   .hero{padding:0 22px;}
-  /* fix : sous-CTA horizontaux meme sur mobile (user demande 3 cote a cote) */
+  /* fix : mobile = grid 3 colonnes
+     Number en haut + label compact en dessous → 3 items toujours cote a cote */
   .hero-micro-proof{
-    flex-direction:row;flex-wrap:wrap;
-    align-items:center;justify-content:flex-start;
-    gap:6px 10px;padding-top:20px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px 10px;
+    padding-top:22px;
     font-size:10.5px;
+    color:#ffffff;
+    text-shadow:0 1px 6px rgba(0,0,0,.6);
   }
   .hero-micro-proof .proof-sep{display:none;}
-  .hero-micro-proof .proof-item{flex:0 0 auto;}
+  .hero-micro-proof .proof-item{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:4px;
+    line-height:1.3;
+  }
+  .hero-micro-proof .counter{font-size:1.7em;}
+  .hero-micro-proof .proof-label{font-size:.95em;opacity:.88;}
   .cta-final{padding:120px 22px;}
   .hero-scroll-hint{display:none;}
   .problems-grid,.results-grid{grid-template-columns:1fr;}
@@ -2061,11 +2073,20 @@ body.has-cursor .cursor-glow{display:block;}
       </a>
     </div>
     <div class="hero-micro-proof" data-hero-fade>
-      <span class="proof-item"><span class="counter" data-target="70" data-suffix="+">0</span>&nbsp;solutions déployées</span>
+      <span class="proof-item">
+        <span class="counter" data-target="70" data-suffix="+">0</span>
+        <span class="proof-label">solutions déployées</span>
+      </span>
       <span class="proof-sep" aria-hidden="true">·</span>
-      <span class="proof-item"><span class="counter" data-target="96" data-suffix="%">0</span>&nbsp;de satisfaction client</span>
+      <span class="proof-item">
+        <span class="counter" data-target="96" data-suffix="%">0</span>
+        <span class="proof-label">de satisfaction client</span>
+      </span>
       <span class="proof-sep" aria-hidden="true">·</span>
-      <span class="proof-item"><span class="counter" data-target="1800" data-suffix="+" data-format="thousand">0</span>&nbsp;heures rendues chaque mois</span>
+      <span class="proof-item">
+        <span class="counter" data-target="1800" data-suffix="+" data-format="thousand">0</span>
+        <span class="proof-label">heures rendues chaque mois</span>
+      </span>
     </div>
   </div>
   <div class="hero-scroll-hint">
@@ -3491,7 +3512,7 @@ function initHeroPinned(){
       .to('.hero-title',       { y: -50, opacity: .8,  ease: 'none' }, 0)
       .to('.hero-sub',         { y: -30, opacity: .75, ease: 'none' }, 0)
       .to('.cta-row',          { y: 18,  opacity: .85, ease: 'none' }, 0)
-      .to('.hero-micro-proof', { y: -18, opacity: .55, ease: 'none' }, 0.2)
+      .to('.hero-micro-proof', { y: -10, opacity: .9, ease: 'none' }, 0.2)   /* fix : restent visibles pendant scrub */
       .to('.orb-1',            { scale: 1.4, opacity: .85, ease: 'none' }, 0)
       .to('.orb-2',            { scale: 1.6, opacity: .75, ease: 'none' }, 0);
     return () => heroTl.scrollTrigger?.kill();
