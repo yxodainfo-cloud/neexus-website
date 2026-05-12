@@ -298,10 +298,12 @@ body.has-cursor .cursor-glow{display:block;}
    ============================================================ */
 .hero{
   position:relative;
-  min-height:100vh;
+  min-height:100vh;       /* fallback */
+  min-height:100svh;      /* PHASE 3: respect smartphone nav bars */
   padding:0 36px;
   overflow:hidden;
   z-index:2;
+  will-change:transform;  /* hero is pinned + scrubbed, force GPU */
 }
 .hero-grid-bg{
   position:absolute;inset:0;
@@ -317,6 +319,7 @@ body.has-cursor .cursor-glow{display:block;}
   max-width:var(--container);
   margin:0 auto;
   height:100vh;
+  height:100svh;          /* PHASE 3: match smartphone visible viewport */
   display:flex;flex-direction:column;justify-content:center;
   position:relative;padding-top:80px;
   will-change:transform,opacity;
@@ -484,43 +487,55 @@ body.has-cursor .cursor-glow{display:block;}
 }
 
 /* ============================================================
-   SERVICES (HORIZONTAL SCROLL desktop / STACK mobile)
+   SERVICES — PHASE 3
+   Desktop ≥1025px : horizontal pin scrubbed (GSAP translateX the track)
+   Mobile  ≤1024px : native swipeable snap carousel (CSS overflow-x:auto)
    ============================================================ */
 .services-wrap{
   position:relative;
   background:var(--bg-0);
-  padding:140px 36px 100px;
+  padding:140px 0 100px;
+  overflow:hidden;
 }
 .services-head{
   max-width:var(--container);
   margin:0 auto 80px;
+  padding:0 36px;
   display:grid;grid-template-columns:1fr 1fr;
   gap:80px;align-items:end;
+}
+/* Outer scroll container — toggled per media in responsive section below */
+.services-rail{
+  position:relative;
+  width:100%;
 }
 .services-head p{
   color:var(--text-dim);max-width:42ch;
   font-size:16px;line-height:1.65;
 }
 .services-head p b{color:var(--text);font-weight:500;}
+/* PHASE 3: services-stack is a horizontal track on desktop (pinned by GSAP)
+   and a swipeable snap carousel on mobile. */
 .services-stack{
-  max-width:var(--container);
-  margin:0 auto;
-  display:flex;flex-direction:column;
-  gap:90px;
+  display:flex;
+  width:max-content;
+  gap:60px;
+  padding:0 36px;
+  will-change:transform;
 }
 .service-panel{
   position:relative;
-  padding:60px 0;
-  border-top:1px solid var(--line);
+  flex:0 0 min(1340px, 90vw);
+  padding:40px 0;
+  scroll-snap-align:center;
 }
-.service-panel:first-child{border-top:0;padding-top:0;}
 .service-panel .panel-num{
   font-family:'JetBrains Mono',monospace;
   font-size:13px;letter-spacing:.2em;color:var(--text-mute);
   display:block;margin-bottom:30px;
 }
 .service-content{
-  max-width:var(--container);margin:0 auto;
+  margin:0 auto;
   display:grid;grid-template-columns:1fr 1fr;gap:80px;
   align-items:center;width:100%;
 }
@@ -667,7 +682,38 @@ body.has-cursor .cursor-glow{display:block;}
   font-size:11px;color:var(--text-mute);letter-spacing:.05em;
   margin-top:10px;max-width:280px;
 }
-.methode-steps{display:flex;flex-direction:column;gap:80px;}
+.methode-steps{display:flex;flex-direction:column;gap:80px;position:relative;}
+/* PHASE 3 — SVG line tracée le long des steps */
+.methode-line{
+  position:absolute;
+  top:0;bottom:0;
+  left:-40px;width:60px;
+  pointer-events:none;
+  overflow:visible;
+}
+.methode-line path{
+  fill:none;
+  stroke:url(#methode-line-grad);
+  stroke-width:2;
+  stroke-linecap:round;
+  filter:drop-shadow(0 0 10px rgba(124,92,252,.5));
+}
+.methode-step{
+  --glow-opacity:0;
+}
+.methode-step::after{
+  content:'';
+  position:absolute;
+  inset:-1px;
+  border-radius:inherit;
+  background:radial-gradient(circle at 0% 50%, rgba(124,92,252,.35), transparent 50%);
+  opacity:var(--glow-opacity);
+  pointer-events:none;
+  transition:opacity .2s linear;
+}
+@media (max-width:1024px){
+  .methode-line{left:-22px;width:44px;}
+}
 .methode-step{
   position:relative;
   padding:40px;border-radius:var(--r-lg);
@@ -959,6 +1005,8 @@ body.has-cursor .cursor-glow{display:block;}
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
   gap:16px;
+  perspective:1000px;  /* PHASE 3: enables 3D hover on tiles */
+  will-change:transform;
 }
 .stack-tile{
   position:relative;
@@ -972,6 +1020,7 @@ body.has-cursor .cursor-glow{display:block;}
   padding:18px 12px;
   cursor:default;
   transform-origin:center;
+  transform-style:preserve-3d;  /* PHASE 3: 3D hover */
   will-change:transform;
   transition:border-color .35s,background-color .35s;
   overflow:hidden;
@@ -1050,6 +1099,7 @@ body.has-cursor .cursor-glow{display:block;}
   max-width:880px;
   margin:0 auto;
   border-top:1px solid var(--line);
+  perspective:1200px;  /* PHASE 3: 3D rotateX entry */
 }
 .faq-item{
   border-bottom:1px solid var(--line);
@@ -1120,6 +1170,7 @@ body.has-cursor .cursor-glow{display:block;}
 .testi-head p{color:var(--text-dim);max-width:48ch;margin-inline:auto;}
 .testi-grid{
   display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+  perspective:1400px;  /* PHASE 3: parent perspective for the scrubed 3D tilt */
 }
 .testi-card{
   position:relative;padding:36px;
@@ -1267,6 +1318,17 @@ body.has-cursor .cursor-glow{display:block;}
   .profile-card{flex-basis:70vw;}
   /* Stack: tighter grid */
   .stack-grid{grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;}
+  /* PHASE 3 — SERVICES on mobile/tablet: native swipe carousel */
+  .services-rail{
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    scroll-behavior:smooth;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .services-rail::-webkit-scrollbar{display:none;}
+  .services-stack{padding:0 6vw;gap:16px;}
+  .service-panel{flex:0 0 88%;}
 }
 @media (max-width:768px){
   /* === KILL EXPENSIVE EFFECTS ON MOBILE === */
@@ -1294,10 +1356,11 @@ body.has-cursor .cursor-glow{display:block;}
   .problems-grid,.results-grid{grid-template-columns:1fr;}
   .footer-top{grid-template-columns:1fr;}
   .footer-mega{font-size:80px;}
-  /* Services stack — already vertical; just tighten the spacing */
-  .services-wrap{padding:90px 22px 60px;}
-  .services-stack{gap:60px;}
-  .service-panel{padding:50px 0;}
+  /* Services mobile carousel — even tighter */
+  .services-wrap{padding:90px 0 60px;}
+  .services-head{padding:0 22px;}
+  .services-stack{gap:14px;padding:0 4vw;}
+  .service-panel{flex:0 0 92%;padding:30px 0;}
   .preloader-logo,.preloader-logo img{height:80px;}
 
   /* Profiles: stack vertically (no horizontal carousel on mobile) */
@@ -1629,7 +1692,8 @@ body.has-cursor .cursor-glow{display:block;}
     </p>
   </div>
 
-  <div class="services-stack">
+  <div class="services-rail" id="services-rail">
+    <div class="services-stack" id="services-stack">
 
       <section class="service-panel">
         <div class="panel-num">01 / 03 — IA</div>
@@ -1773,6 +1837,7 @@ body.has-cursor .cursor-glow{display:block;}
         </div>
       </section>
 
+    </div>
   </div>
 </div>
 
@@ -1796,7 +1861,17 @@ body.has-cursor .cursor-glow{display:block;}
           <span>/04</span>
         </div>
       </div>
-      <div class="methode-steps">
+      <div class="methode-steps" id="methode-steps">
+        <svg class="methode-line" id="methode-line" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="methode-line-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"  stop-color="#4d7cff"/>
+              <stop offset="50%" stop-color="#7c5cfc"/>
+              <stop offset="100%" stop-color="#d63384"/>
+            </linearGradient>
+          </defs>
+          <path id="methode-line-path" d="M30,0 L30,1200" vector-effect="non-scaling-stroke"/>
+        </svg>
         <article class="methode-step" data-step>
           <div class="step-head">
             <div class="step-num">01</div>
@@ -1866,7 +1941,7 @@ body.has-cursor .cursor-glow{display:block;}
           <span class="line"></span>
           <span class="label">Résultats</span>
         </div>
-        <h2>Des chiffres, <span class="gradient-text italic">pas des promesses.</span></h2>
+        <h2 data-split>Des chiffres, <span class="gradient-text italic">pas des promesses.</span></h2>
         <p>Voici ce que nos clients constatent en moyenne dans les <b style="color:var(--text);">90 jours</b> qui suivent le déploiement. Mesurés, vérifiés, reproductibles.</p>
       </div>
       <div class="results-grid">
@@ -2282,14 +2357,19 @@ tlPre
 function initSite(){
   initNav();
   initScrollProgress();
+  initLenis();                  // Phase 3: Lenis universal (mobile + desktop)
   initSplitTitles();
   initSplitCta();
   initFades();
   initServiceVisuals();
+  initOrbsParallax();           // Phase 3: orbs parallax universal
 
-  /* Universal animations — identical on desktop and mobile */
-  initHero();
+  /* Universal cinematic animations — identical on desktop and mobile.
+     Each init function does its own internal mm.add() if it needs a
+     desktop/mobile variant (e.g. services horizontal scroll vs swipe). */
+  initHeroPinned();
   initProblems();
+  initProfilesCarousel();       // snap detection works on touch too
   initProfiles();
   initServices();
   initMethode();
@@ -2298,20 +2378,35 @@ function initSite(){
   initTesti();
   initFaq();
 
-  /* Desktop-only polish (smooth scroll, custom cursor, hover effects) */
+  /* Desktop-only polish (cursor, magnetic hover, 3D mouse parallax) */
   gsap.matchMedia().add(QUERY_DESKTOP, () => {
     document.body.classList.add('has-cursor');
-    initLenis();
     initCursor();
     initMagnetic();
     initTilt();
-    initOrbsParallax();
-    initProfilesCarousel();   // snap-scroll detection of active card
     return () => {
       document.body.classList.remove('has-cursor');
-      if (window.__lenis) { window.__lenis.destroy(); window.__lenis = null; }
     };
   });
+
+  /* prefers-reduced-motion: nuke all pins + scrubs + infinite loops,
+     fall back to static state. */
+  if (reducedMotion) {
+    ScrollTrigger.getAll().forEach(st => {
+      const v = st.vars || {};
+      if (v.pin || v.scrub !== undefined) st.kill();
+    });
+    gsap.set([
+      '.hero-inner', '.hero-title', '.hero-sub', '.cta-row', '.hero-stats',
+      '.orb-1', '.orb-2', '.orb-3', '.orb-4',
+      '.service-panel', '.services-stack',
+      '.methode-step', '.result-card', '.testi-card',
+      '.faq-item', '.profile-card', '.stack-tile'
+    ].join(','), { clearProps: 'all' });
+    gsap.globalTimeline.getChildren().forEach(t => {
+      if (typeof t.repeat === 'function' && t.repeat() < 0) t.kill();
+    });
+  }
 
   ScrollTrigger.refresh();
 }
@@ -2340,16 +2435,20 @@ function initScrollProgress(){
 }
 
 /* ============================================================
-   LENIS — desktop only
+   LENIS — UNIVERSAL (mobile + desktop)
+   smoothTouch: false → on garde le scroll natif des smartphones
+   (Lenis ne s'occupe que de la roue souris / trackpad côté desktop).
+   ScrollTrigger fonctionne quand même grâce à lenis.on('scroll', ...).
    ============================================================ */
 function initLenis(){
   if (reducedMotion) return;
   const lenis = new Lenis({
-    duration: 1.15,
+    duration: 1.2,
     easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
+    smoothTouch: false,      // PHASE 3: native touch scroll preserved on mobile
     wheelMultiplier: 1,
-    touchMultiplier: 1.5,
+    touchMultiplier: 2,
   });
   window.__lenis = lenis;
   lenis.on('scroll', ScrollTrigger.update);
@@ -2530,12 +2629,15 @@ function initOrbsParallax(){
 }
 
 /* ============================================================
-   HERO — entry timeline (runs once on page load, no pin, no scrub)
-   Same animation on desktop and mobile.
+   HERO — entry timeline + PINNED SCRUB (universal)
+   Entry plays once on page load, then while user scrolls, the hero
+   is pinned for ~120% (desktop) / ~80% (mobile) of viewport height
+   with content parallaxing in opposite directions for cinematic depth.
    ============================================================ */
-function initHero(){
+function initHeroPinned(){
   document.querySelectorAll('[data-hero-line]').forEach(line => new SplitType(line, { types: 'chars' }));
 
+  /* 1) ENTRY TIMELINE — runs on load, makes the hero appear */
   const tl = gsap.timeline({ delay: .15 });
   tl.from('.hero-badge', { y: 20, opacity: 0, duration: .8, ease: 'power3.out' })
     .from('[data-hero-line] .char', {
@@ -2557,6 +2659,35 @@ function initHero(){
       onUpdate: () => el.textContent = Math.round(obj.v)
     });
   });
+
+  if (reducedMotion) return;
+
+  /* 2) PINNED SCRUB — desktop and mobile both get the pin, different lengths */
+  gsap.matchMedia()
+    .add(QUERY_DESKTOP, () => buildHeroPin('+=120%'))
+    .add(QUERY_MOBILE,  () => buildHeroPin('+=80%'));
+
+  function buildHeroPin(end){
+    const heroTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.hero',
+        start: 'top top',
+        end,
+        pin: true,
+        scrub: 1,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+      }
+    });
+    heroTl
+      .to('.hero-title', { y: -80, opacity: .35, ease: 'none' }, 0)
+      .to('.hero-sub',   { y: -50, opacity: .25, ease: 'none' }, 0)
+      .to('.cta-row',    { y: 40,  opacity: .65, ease: 'none' }, 0)
+      .to('.hero-stats', { y: -30, opacity: 0,   ease: 'none' }, 0.2)
+      .to('.orb-1',      { scale: 1.4, opacity: .85, ease: 'none' }, 0)
+      .to('.orb-2',      { scale: 1.6, opacity: .75, ease: 'none' }, 0);
+    return () => heroTl.scrollTrigger?.kill();
+  }
 }
 
 /* ============================================================
@@ -2573,48 +2704,168 @@ function initProblems(){
 }
 
 /* ============================================================
-   SERVICES — vertical stack with fade-up per panel
+   SERVICES — PHASE 3
+   Desktop ≥1025px : horizontal pin scrubbed (panels translate left as user scrolls)
+   Mobile  ≤1024px : native swipe snap carousel (CSS) + internal reveal per panel
    ============================================================ */
 function initServices(){
-  gsap.utils.toArray('.service-panel').forEach((panel, i) => {
-    gsap.from(panel, {
-      y: 50, opacity: 0,
-      duration: .9, ease: 'power3.out',
-      scrollTrigger: { trigger: panel, start: 'top 85%', once: true }
+  if (reducedMotion) {
+    gsap.from('.service-panel', {
+      y: 30, opacity: 0, stagger: .08, duration: .6, ease: 'power2.out',
+      scrollTrigger: { trigger: '.services-wrap', start: 'top 80%' }
     });
-    // Service text + visual fade-in slightly staggered for a richer feel
-    const txt = panel.querySelector('.service-text');
-    const visual = panel.querySelector('.service-visual');
-    if (txt) {
-      gsap.from(txt.children, {
-        y: 24, opacity: 0, stagger: .07, duration: .65, ease: 'power3.out',
-        scrollTrigger: { trigger: panel, start: 'top 80%', once: true }
+    return;
+  }
+
+  gsap.matchMedia()
+    .add(QUERY_DESKTOP, () => {
+      const panels = gsap.utils.toArray('.service-panel');
+      const track  = document.getElementById('services-stack');
+      const wrap   = document.querySelector('.services-wrap');
+      if (!panels.length || !track || !wrap) return;
+
+      const scrollLen = () => track.scrollWidth - window.innerWidth;
+
+      const tween = gsap.to(track, {
+        x: () => -scrollLen(),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: wrap,
+          pin: true,
+          scrub: 1,
+          start: 'top top',
+          end: () => '+=' + scrollLen(),
+          invalidateOnRefresh: true,
+          anticipatePin: 1,
+          snap: 1 / Math.max(panels.length - 1, 1),
+        }
       });
-    }
-    if (visual) {
-      gsap.from(visual, {
-        y: 30, opacity: 0, duration: .85, ease: 'power3.out',
-        scrollTrigger: { trigger: panel, start: 'top 80%', once: true }
+
+      // Per-panel internal reveal triggered as the panel slides toward viewport center.
+      panels.forEach(panel => {
+        const visual = panel.querySelector('.service-visual');
+        const txtKids = panel.querySelectorAll('.service-text > *');
+        if (visual) {
+          gsap.from(visual, {
+            clipPath: 'inset(0% 100% 0% 0%)',
+            duration: 1.2, ease: 'power4.inOut',
+            scrollTrigger: {
+              trigger: panel,
+              containerAnimation: tween,
+              start: 'left 70%',
+              once: true,
+            }
+          });
+        }
+        if (txtKids.length) {
+          gsap.from(txtKids, {
+            y: 40, opacity: 0, stagger: .08, duration: .8, ease: 'back.out(1.2)',
+            scrollTrigger: {
+              trigger: panel,
+              containerAnimation: tween,
+              start: 'left 75%',
+              once: true,
+            }
+          });
+        }
       });
-    }
-  });
+    })
+    .add(QUERY_MOBILE, () => {
+      // Mobile: native swipe carousel (CSS does the work).
+      // We just animate each panel's internals when it enters viewport.
+      gsap.utils.toArray('.service-panel').forEach((panel) => {
+        const visual = panel.querySelector('.service-visual');
+        const txtKids = panel.querySelectorAll('.service-text > *');
+        if (visual) {
+          gsap.from(visual, {
+            clipPath: 'inset(0% 100% 0% 0%)',
+            duration: 1.2, ease: 'power4.inOut',
+            scrollTrigger: { trigger: panel, start: 'top 70%', once: true }
+          });
+        }
+        if (txtKids.length) {
+          gsap.from(txtKids, {
+            y: 40, opacity: 0, stagger: .08, duration: .8, ease: 'back.out(1.2)',
+            scrollTrigger: { trigger: panel, start: 'top 75%', once: true }
+          });
+        }
+      });
+    });
 }
 
 /* ============================================================
-   METHODE — progress bar fills + per-step fade-up
+   METHODE — PHASE 3
+   • SVG line se trace progressivement (strokeDashoffset scrubed)
+   • Chaque step reçoit un glow (--glow-opacity) au passage de la ligne
+   • Progress bar + label scroll-driven (déjà en place)
    ============================================================ */
 function initMethode(){
-  const steps = gsap.utils.toArray('[data-step]');
-  const fill = document.getElementById('methode-fill');
+  const steps     = gsap.utils.toArray('[data-step]');
+  const fill      = document.getElementById('methode-fill');
   const stepLabel = document.getElementById('methode-step-label');
+  const stepsBox  = document.getElementById('methode-steps');
+  const line      = document.getElementById('methode-line-path');
 
+  // Tracer la ligne SVG : on calibre son d="M30,0 L30,<height>" à la hauteur réelle du conteneur
+  if (line && stepsBox) {
+    const sync = () => {
+      const h = stepsBox.offsetHeight;
+      line.setAttribute('d', `M30,0 L30,${h}`);
+      const len = line.getTotalLength();
+      line.style.strokeDasharray = len;
+      line.style.strokeDashoffset = len;
+    };
+    sync();
+    window.addEventListener('resize', sync);
+
+    gsap.to(line, {
+      strokeDashoffset: 0,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: stepsBox,
+        start: 'top 75%',
+        end: 'bottom 25%',
+        scrub: 1,
+        invalidateOnRefresh: true,
+        onRefresh: sync,
+      }
+    });
+  }
+
+  // Fade-up entrée par step + glow scrubbed pendant le passage de la ligne
   steps.forEach((step, i) => {
     gsap.from(step, {
       y: 40, opacity: 0,
       duration: .85, ease: 'power3.out',
       scrollTrigger: { trigger: step, start: 'top 88%', once: true }
     });
-    // Progress bar fill updates as you scroll through each step
+
+    // Glow scrubed : --glow-opacity 0 → 1 → 0 quand la step passe au centre
+    gsap.fromTo(step,
+      { '--glow-opacity': 0 },
+      {
+        '--glow-opacity': 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: step,
+          start: 'top 70%',
+          end: 'center 50%',
+          scrub: 1,
+        }
+      }
+    );
+    gsap.to(step, {
+      '--glow-opacity': 0,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: step,
+        start: 'center 50%',
+        end: 'bottom 30%',
+        scrub: 1,
+      }
+    });
+
+    // Progress bar + label (gardé)
     ScrollTrigger.create({
       trigger: step,
       start: 'top 70%',
@@ -2632,7 +2883,10 @@ function initMethode(){
 }
 
 /* ============================================================
-   RESULTATS — fade-up cards + animated counters (one-shot)
+   RESULTATS — PHASE 3
+   Compteurs SCRUBÉS — les chiffres montent à mesure que l'utilisateur
+   scrolle. Universal (mobile + desktop). Pas de pin (trop bloquant),
+   juste un scrub serré sur le moment où les cards traversent l'écran.
    ============================================================ */
 function initResults(){
   const cards = gsap.utils.toArray('.result-card');
@@ -2645,35 +2899,59 @@ function initResults(){
     scrollTrigger: { trigger: '.results-grid', start: 'top 85%', once: true }
   });
 
-  // Counters mount once when results enter view
-  const counters = document.querySelectorAll('.big-counter');
-  ScrollTrigger.create({
-    trigger: '.results-grid',
-    start: 'top 80%',
-    once: true,
-    onEnter: () => {
-      counters.forEach(el => {
-        const target = +el.dataset.target;
-        const obj = { v: 0 };
-        gsap.to(obj, {
-          v: target, duration: 1.7, ease: 'power2.out',
-          onUpdate: () => el.textContent = Math.round(obj.v)
-        });
-      });
-    }
+  // Scrub-driven counters — chaque compteur a son propre tween sur scroll
+  document.querySelectorAll('.big-counter').forEach(el => {
+    const target = +el.dataset.target;
+    const obj = { v: 0 };
+    el.textContent = '0';
+    gsap.to(obj, {
+      v: target, ease: 'none',
+      scrollTrigger: {
+        trigger: '.results-grid',
+        start: 'top 85%',
+        end: 'top 20%',
+        scrub: 1,
+      },
+      onUpdate: () => { el.textContent = Math.round(obj.v); }
+    });
   });
 }
 
 /* ============================================================
-   TEMOIGNAGES — fade-up cards stagger
+   TEMOIGNAGES — PHASE 3
+   • Entry fade-up stagger
+   • 3D tilt scrubé scroll-driven (universel — fonctionne au touch)
    ============================================================ */
 function initTesti(){
-  gsap.utils.toArray('.testi-card').forEach((card, i) => {
+  const cards = gsap.utils.toArray('.testi-card');
+
+  // Entry stagger (universal)
+  cards.forEach((card, i) => {
     gsap.from(card, {
       y: 40, opacity: 0,
       duration: .85, delay: i * .1, ease: 'power3.out',
       scrollTrigger: { trigger: '.testi-grid', start: 'top 82%', once: true }
     });
+  });
+
+  if (reducedMotion) return;
+
+  // 3D tilt scrubed — chaque carte rotateY -12 → 12 et rotateX 5 → -5
+  // pendant qu'elle traverse le viewport. Universel (touch ou mouse).
+  cards.forEach(card => {
+    gsap.fromTo(card,
+      { rotationY: -12, rotationX: 5 },
+      {
+        rotationY: 12, rotationX: -5,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: card,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 1.2,
+        }
+      }
+    );
   });
 }
 
@@ -2754,68 +3032,83 @@ function initProfilesCarousel(){
 }
 
 /* ============================================================
-   STACK — irregular breathing zoom on each tile (desynchronized)
+   STACK — PHASE 3
+   • Entrée renforcée : clip-path circle reveal + scale + stagger random
+   • Zoom respiratoire désynchronisé (déjà universel, gardé)
+   • Hover 3D desktop only (rotationY/X + scale)
+   • Parallax souris desktop only (déjà en place)
    ============================================================ */
 function initStack(){
   const tiles = gsap.utils.toArray('.stack-tile');
   if (tiles.length === 0) return;
 
-  // Staggered random entry
+  // PHASE 3: clip-path circle entry — universel mobile + desktop
   gsap.from(tiles, {
-    scale: .6, opacity: 0,
-    stagger: { each: .05, from: 'random' },
-    duration: .8, ease: 'back.out(1.4)',
-    scrollTrigger: { trigger: '.stack-grid', start: 'top 78%', once: true }
+    clipPath: 'circle(0% at 50% 50%)',
+    scale: 0.6,
+    opacity: 0,
+    stagger: { each: 0.04, from: 'random' },
+    duration: 0.9,
+    ease: 'back.out(1.6)',
+    scrollTrigger: { trigger: '.stack-grid', start: 'top 80%', once: true }
   });
 
-  // Respect prefers-reduced-motion — no infinite loops in that case
+  // prefers-reduced-motion: stop here, no infinite loops
   if (reducedMotion) return;
 
-  // On a chacque tuile, son propre cycle de respiration (3-7s, scale 0.92-1.10)
-  tiles.forEach(tile => {
-    const minScale = 0.92 + Math.random() * 0.02;   // 0.92 → 0.94
-    const maxScale = 1.04 + Math.random() * 0.06;   // 1.04 → 1.10
-    const duration = 3 + Math.random() * 4;          // 3s → 7s
-    const delay    = Math.random() * 2;              // 0 → 2s
-
+  // Helper: redémarre le cycle de respiration pour une tuile
+  function startBreathing(tile){
+    const minScale = 0.92 + Math.random() * 0.02;
+    const maxScale = 1.04 + Math.random() * 0.06;
+    const duration = 3 + Math.random() * 4;
+    const delay    = Math.random() * 2;
     gsap.fromTo(tile,
       { scale: minScale },
       { scale: maxScale, duration, delay, repeat: -1, yoyo: true, ease: 'sine.inOut' }
     );
-
-    // Pause sur hover (desktop)
-    tile.addEventListener('mouseenter', () => {
-      gsap.killTweensOf(tile);
-      gsap.to(tile, { scale: 1.15, duration: .35, ease: 'power2.out' });
-    });
-    tile.addEventListener('mouseleave', () => {
-      gsap.killTweensOf(tile);
-      const ns = 0.92 + Math.random() * 0.02;
-      const xs = 1.04 + Math.random() * 0.06;
-      const d  = 3 + Math.random() * 4;
-      gsap.to(tile, { scale: ns, duration: .5, ease: 'power2.inOut',
-        onComplete: () => {
-          gsap.fromTo(tile, { scale: ns }, { scale: xs, duration: d, repeat: -1, yoyo: true, ease: 'sine.inOut' });
-        }
-      });
-    });
-  });
-
-  // Parallax souris (desktop bonus, max 8px de déplacement)
-  const grid = document.getElementById('stack-grid');
-  if (grid && window.matchMedia('(min-width: 1025px)').matches) {
-    let mx = 0, my = 0, tx = 0, ty = 0;
-    grid.addEventListener('mousemove', e => {
-      const r = grid.getBoundingClientRect();
-      mx = ((e.clientX - r.left) / r.width - .5) * -16; // max ±8px direction opposée
-      my = ((e.clientY - r.top) / r.height - .5) * -16;
-    });
-    gsap.ticker.add(() => {
-      tx += (mx - tx) * 0.08;
-      ty += (my - ty) * 0.08;
-      grid.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
-    });
   }
+
+  tiles.forEach(tile => startBreathing(tile));
+
+  // Hover 3D — desktop only (no hover on touch)
+  gsap.matchMedia().add(QUERY_DESKTOP, () => {
+    tiles.forEach(tile => {
+      const onEnter = () => {
+        gsap.killTweensOf(tile, 'scale,rotationX,rotationY');
+        gsap.to(tile, {
+          scale: 1.18, rotationY: 8, rotationX: -4,
+          duration: 0.4, ease: 'power3.out'
+        });
+      };
+      const onLeave = () => {
+        gsap.killTweensOf(tile, 'scale,rotationX,rotationY');
+        gsap.to(tile, {
+          rotationY: 0, rotationX: 0, duration: 0.5, ease: 'power2.inOut',
+          onComplete: () => startBreathing(tile)
+        });
+      };
+      tile.addEventListener('mouseenter', onEnter);
+      tile.addEventListener('mouseleave', onLeave);
+    });
+
+    // Parallax souris (desktop bonus, max 8px de déplacement)
+    const grid = document.getElementById('stack-grid');
+    if (grid) {
+      let mx = 0, my = 0, tx = 0, ty = 0;
+      grid.addEventListener('mousemove', e => {
+        const r = grid.getBoundingClientRect();
+        mx = ((e.clientX - r.left) / r.width - .5) * -16;
+        my = ((e.clientY - r.top) / r.height - .5) * -16;
+      });
+      const tick = () => {
+        tx += (mx - tx) * 0.08;
+        ty += (my - ty) * 0.08;
+        grid.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+      };
+      gsap.ticker.add(tick);
+      return () => gsap.ticker.remove(tick);
+    }
+  });
 }
 
 /* ============================================================
@@ -2825,11 +3118,14 @@ function initFaq(){
   const items = gsap.utils.toArray('.faq-item');
   if (items.length === 0) return;
 
-  // Entry animation
+  // PHASE 3: entry renforcée — rotateX -50 back.out (3D fold reveal)
   gsap.from(items, {
-    y: 24, opacity: 0,
-    stagger: .06, duration: .6, ease: 'power3.out',
-    scrollTrigger: { trigger: '.faq-list', start: 'top 82%', once: true }
+    y: 40,
+    opacity: 0,
+    rotationX: -50,
+    transformOrigin: 'top center',
+    stagger: .08, duration: .85, ease: 'back.out(1.4)',
+    scrollTrigger: { trigger: '.faq-list', start: 'top 80%', once: true }
   });
 
   items.forEach(item => {

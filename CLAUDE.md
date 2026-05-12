@@ -442,3 +442,83 @@ Inchangée : HTML + GSAP 3.12.5 (+ ScrollTrigger + ScrollToPlugin) + Lenis 1.1.1
    - Pas de pin, pas de scrub, pas de Lenis, pas de cursor custom, pas de magnetic/tilt
 6. **Numérotation affichée** : doit suivre l'ordre du scroll. Si une section est ajoutée au milieu, renuméroter celles d'après.
 7. **Anchors HTML** (`#services`, `#methode`, etc.) : ne JAMAIS changer les IDs techniques, ils sont stables. Seuls les **numéros affichés** dans `.section-eyebrow .num` bougent lors d'une renumérotation.
+
+---
+
+## PHASE 3 — RÉINJECTION CINÉMATIQUE MOBILE-FIRST (12 mai 2026)
+
+Voir `BRIEF-PHASE3-CINEMATIC.md`. **Renversement de la doctrine Phase 2** : 98% du trafic Neexus est mobile, donc **toutes les animations cinématiques (pin, scrub, reveals) tournent sur mobile ET desktop**. Seuls cursor / magnetic / 3D hover / parallax souris restent desktop-only (pas applicables au touch).
+
+### Setup global
+
+- **Lenis universel** avec `smoothTouch: false` → on garde le scroll natif des smartphones, Lenis ne pilote que roue souris / trackpad. Les `ScrollTrigger` fonctionnent quand même via `lenis.on('scroll', ScrollTrigger.update)`.
+- **`min-height: 100svh`** sur `.hero` et `.hero-inner` (fallback `100vh`) → respecte la barre de nav des smartphones (Safari iOS, Chrome Android).
+- **Guard `prefers-reduced-motion: reduce`** à la fin d'`initSite()` : kill tous les `ScrollTrigger` avec `pin` ou `scrub`, `clearProps: 'all'` sur les éléments animés, kill les boucles infinies.
+
+### Modifications majeures par section
+
+| Section | Phase 2 (avant) | Phase 3 (après) |
+|---|---|---|
+| Hero | Entry timeline seule | Entry timeline **+ pin scrubé 120% desktop / 80% mobile** : titre/sub/CTAs/stats parallaxent en directions opposées, orbs scale up |
+| Services | Stack vertical fade-up | **Desktop** : horizontal pin scrubbed (track translate X, snap entre panels) **/ Mobile** : native swipe carousel CSS (`scroll-snap-type: x mandatory`). Internal reveal par panel : visual en `clip-path inset(0% 100% 0% 0%)`, texte en `back.out` stagger |
+| Méthode | Progress bar fill au passage | **SVG line verticale tracée scrubed** (strokeDashoffset 0 → 0) + **glow scrubed par step** via CSS custom property `--glow-opacity` |
+| Résultats | Compteurs one-shot `onEnter` | **Compteurs SCRUBÉS** (`ease: 'none'`, `scrub: 1`) — les chiffres montent en continu pendant que les cards traversent l'écran |
+| Stack | Entry stagger random + zoom yoyo | **Entry `clip-path: circle(0% at 50% 50%)`** + scale + stagger random. Zoom yoyo conservé. Hover 3D `rotationY:8 rotationX:-4` **desktop only** |
+| Témoignages | Fade-up stagger | **3D tilt scrubed** (`rotationY: -12 → 12, rotationX: 5 → -5`) tied au scroll vertical — universel (touch + mouse) |
+| FAQ | Fade-up entry | **Entry `rotationX: -50` + `back.out(1.4)`** depuis `transformOrigin: top center` (effet "fold" 3D) |
+| Orbs | Parallax desktop only | **Parallax universel** (était déjà universel après Phase 2.1) |
+
+### Structures HTML modifiées
+
+- **Services** : ajout d'un wrapper `<div class="services-rail" id="services-rail">` autour de `<div class="services-stack">` pour gérer l'overflow-x mobile sans casser le pin desktop
+- **Méthode** : ajout d'un SVG `<svg class="methode-line" id="methode-line">` avec `<defs><linearGradient id="methode-line-grad">` et `<path id="methode-line-path">` injecté dans `.methode-steps`, calibré dynamiquement à la hauteur du conteneur
+- **Container parents** : ajout de `perspective: 1000px` (stack) / `perspective: 1400px` (testi) / `perspective: 1200px` (faq) + `transform-style: preserve-3d` sur les enfants concernés
+
+### Architecture JS — `initSite()` v3
+
+```js
+function initSite(){
+  initNav();
+  initScrollProgress();
+  initLenis();              // universal Lenis avec smoothTouch:false
+  initSplitTitles();
+  initSplitCta();
+  initFades();
+  initServiceVisuals();
+  initOrbsParallax();       // universal
+
+  // Cinematic universal (use mm.add() internally if needs desktop/mobile variant)
+  initHeroPinned();         // pin scrub 120%/80%
+  initProblems();
+  initProfilesCarousel();   // snap detection works on touch too
+  initProfiles();
+  initServices();           // dual: desktop pin / mobile swipe
+  initMethode();            // SVG line traced + step glow scrub
+  initResults();            // scrubed counters
+  initStack();              // clip-path circle + 3D hover desktop only
+  initTesti();              // 3D tilt scrub
+  initFaq();                // rotateX entry
+
+  // Desktop polish only
+  gsap.matchMedia().add(QUERY_DESKTOP, () => {
+    document.body.classList.add('has-cursor');
+    initCursor();
+    initMagnetic();
+    initTilt();             // hover-driven tilt (different from scrub tilt of testi)
+  });
+
+  if (reducedMotion) { /* nuke pins+scrubs+loops */ }
+  ScrollTrigger.refresh();
+}
+```
+
+### Performance — points de vigilance
+
+- **`will-change: transform`** ajouté sur `.hero`, `.services-stack`, `.stack-grid`, `.stack-tile`
+- **`transform-style: preserve-3d`** sur les containers 3D (stack-tile, testi-card via stack-grid/testi-grid)
+- Le `scrub: 1` partout : si Lighthouse Mobile descend sous 75, baisser à `0.5` voire `true`
+- Le zoom yoyo des 15 stack-tiles + le 3D tilt scrubed sur 3 testi-cards = ~18 tweens actifs simultanément. Sur smartphone milieu de gamme, devrait passer.
+
+### Commits Phase 3
+
+- (à pusher) — Phase 3 : Réinjection cinématique mobile-first (pin/scrub/reveals universels)
