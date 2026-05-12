@@ -1420,61 +1420,117 @@ body.has-cursor .cursor-glow{display:block;}
 .faq-answer-inner b{color:var(--text);font-weight:500;}
 
 /* ============================================================
-   TEMOIGNAGES
+   TEMOIGNAGES — PHASE 4 : ROUE 3D 6 CARTES (60° apart)
+   Pin + scrub : la roue tourne sens horaire (vue d'en haut)
+   sur scroll vers le bas, amenant les cartes de la droite vers le centre.
+   backface-visibility:hidden masque naturellement les cartes au dos.
    ============================================================ */
-.testi{background:var(--bg-1);position:relative;}
-.testi-head{text-align:center;margin-bottom:80px;}
+.testi{background:var(--bg-1);position:relative;overflow:hidden;}
+.testi-pin{
+  min-height:100svh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:80px 0;
+}
+.testi-head{text-align:center;margin-bottom:48px;padding:0 24px;}
 .testi-head h2{
   font-family:'Syne',sans-serif;font-weight:600;
   font-size:clamp(36px,5vw,72px);
   letter-spacing:-.025em;line-height:1;
   margin-bottom:20px;max-width:18ch;margin-inline:auto;
 }
-.testi-head p{color:var(--text-dim);max-width:48ch;margin-inline:auto;}
-.testi-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
-  perspective:1400px;  /* PHASE 3: parent perspective for the scrubed 3D tilt */
+.testi-head p{color:var(--text-dim);max-width:50ch;margin-inline:auto;}
+
+.testi-stage{
+  position:relative;width:100%;
+  height:clamp(440px,60vh,560px);
+  perspective:1500px;
+  perspective-origin:50% 50%;
+  display:grid;place-items:center;
+}
+.testi-wheel{
+  position:relative;
+  width:clamp(280px,78vw,340px);
+  height:clamp(380px,52vh,460px);
+  transform-style:preserve-3d;
+  will-change:transform;
 }
 .testi-card{
-  position:relative;padding:36px;
+  position:absolute;inset:0;
+  padding:34px 28px 28px;
   border-radius:var(--r-lg);
-  background:var(--glass);border:1px solid var(--line);
-  backdrop-filter:blur(10px);
-  transition:transform .55s cubic-bezier(.2,.8,.2,1),background-color .35s;
-  transform-style:preserve-3d;perspective:1000px;
+  background:rgba(10,14,26,.62);
+  border:1px solid var(--line);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  transform:rotateY(var(--i,0deg)) translateZ(var(--testi-r,330px));
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
   overflow:hidden;
+  display:flex;flex-direction:column;
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.6);
 }
-.testi-card::before{
+.testi-card::after{
+  /* halo bordure conic, statique, subtle */
   content:'';position:absolute;inset:-1px;border-radius:inherit;
-  background:conic-gradient(from var(--rot,0deg),transparent 0%,rgba(124,92,252,.5) 25%,transparent 50%,rgba(214,51,132,.5) 75%,transparent 100%);
+  background:conic-gradient(from 0deg,rgba(124,92,252,.35),rgba(214,51,132,.35),rgba(77,124,255,.35),rgba(124,92,252,.35));
   -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
   -webkit-mask-composite:xor;mask-composite:exclude;
-  padding:1px;opacity:0;transition:opacity .5s;
-  animation:rotateBorder 6s linear infinite;
-  pointer-events:none;z-index:2;
+  padding:1px;opacity:.5;pointer-events:none;
 }
-.testi-card:hover{background:var(--glass-strong);}
-.testi-card:hover::before{opacity:1;}
-.testi-card .quote-mark{
-  font-family:'Syne',sans-serif;font-size:64px;line-height:.5;
+.testi-card .kpi{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(26px,3.6vw,36px);
+  line-height:1;letter-spacing:-.02em;
   background:var(--grad-text);
   -webkit-background-clip:text;background-clip:text;color:transparent;
-  margin-bottom:18px;
+  margin-bottom:20px;max-width:14ch;
 }
-.testi-card .quote{font-size:15.5px;line-height:1.6;color:var(--text);margin-bottom:32px;min-height:120px;}
-.testi-card .author{display:flex;align-items:center;gap:14px;padding-top:24px;border-top:1px solid var(--line);}
+.testi-card .quote-mark{
+  font-family:'Syne',sans-serif;font-size:46px;line-height:.4;
+  color:rgba(124,92,252,.45);margin-bottom:12px;
+}
+.testi-card .quote{
+  font-size:14.5px;line-height:1.6;color:var(--text);
+  flex:1;margin-bottom:22px;
+}
+.testi-card .author{
+  display:flex;align-items:center;gap:14px;
+  padding-top:18px;border-top:1px solid var(--line);
+}
 .testi-card .av{
-  width:44px;height:44px;border-radius:50%;
+  width:42px;height:42px;border-radius:50%;
   background:var(--grad);display:grid;place-items:center;
-  font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#fff;flex:0 0 44px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#fff;flex:0 0 42px;
 }
-.testi-card .author-meta .name{font-size:14px;font-weight:500;}
-.testi-card .author-meta .role{font-size:12px;color:var(--text-dim);margin-top:2px;}
+.testi-card .author-meta .name{font-size:13.5px;font-weight:500;}
+.testi-card .author-meta .role{font-size:11.5px;color:var(--text-dim);margin-top:2px;line-height:1.3;}
 .testi-card .city{
-  position:absolute;top:24px;right:28px;
+  position:absolute;top:18px;right:22px;
   font-family:'JetBrains Mono',monospace;
   font-size:10px;letter-spacing:.1em;color:var(--text-mute);
 }
+
+.testi-progress{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:32px;
+}
+.tdot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(255,255,255,.15);
+  transition:background-color .35s,transform .35s,box-shadow .35s;
+}
+.tdot.is-active{
+  background:var(--magenta);transform:scale(1.4);
+  box-shadow:0 0 12px var(--magenta);
+}
+
+@media (max-width:1024px){ .testi-card{ --testi-r:300px; } }
+@media (max-width:640px){
+  .testi-card{ --testi-r:280px; padding:28px 22px 22px; }
+  .testi-card .quote{font-size:13.5px;}
+  .testi-card .kpi{font-size:24px;}
+}
+@media (max-width:380px){ .testi-card{ --testi-r:255px; } }
 
 /* ============================================================
    CTA FINAL
@@ -1571,7 +1627,6 @@ body.has-cursor .cursor-glow{display:block;}
     grid-template-columns:1fr;gap:40px;
   }
   .problems-grid,.results-grid{grid-template-columns:repeat(2,1fr);}
-  .testi-grid{grid-template-columns:1fr;}
   .service-content{grid-template-columns:1fr;}
   .service-visual{height:380px;}
   .methode-sticky{position:relative;top:0;}
@@ -2374,56 +2429,111 @@ body.has-cursor .cursor-glow{display:block;}
 </section>
 
 <!-- ============================================================
-     TEMOIGNAGES
+     TEMOIGNAGES — Phase 4 : roue 3D 6 cartes (60° apart)
+     Pinned, wheel rotates sens horaire on scroll down (right → center)
      ============================================================ -->
 <section class="section testi" id="temoignages">
-  <div class="container">
-    <div class="testi-head">
-      <div class="section-eyebrow" style="justify-content:center;">
-        <span class="num">07</span>
-        <span class="line"></span>
-        <span class="label">Témoignages</span>
+  <div class="testi-pin">
+    <div class="container">
+      <div class="testi-head">
+        <div class="section-eyebrow" style="justify-content:center;">
+          <span class="num">09</span>
+          <span class="line"></span>
+          <span class="label">Témoignages</span>
+        </div>
+        <h2 data-split>Ce qu'ils en disent.</h2>
+        <p data-fade>Six clients, six secteurs, un seul réflexe&nbsp;: ne plus perdre une seconde sur ce qu'une machine peut faire.</p>
       </div>
-      <h2 data-split>Ce qu'ils en disent.</h2>
-      <p data-fade>Trois clients, trois secteurs, trois pays. Une seule conviction : on ne perd plus son temps sur ce qu'une machine peut faire.</p>
-    </div>
-    <div class="testi-grid">
-      <article class="testi-card" data-tilt data-card>
-        <div class="city">GE · CH</div>
-        <div class="quote-mark">"</div>
-        <p class="quote">NEEXUS a automatisé nos réservations et notre SAV. On a récupéré 20h par semaine. Mon équipe s'est remise à sourire — ça vaut tous les ROI du monde.</p>
-        <div class="author">
-          <div class="av">MD</div>
-          <div class="author-meta">
-            <div class="name">Marc Dubois</div>
-            <div class="role">CEO · Restaurant Le Comptoir</div>
-          </div>
+      <div class="testi-stage">
+        <div class="testi-wheel" id="testi-wheel">
+          <article class="testi-card" style="--i:0deg" data-card>
+            <div class="city">LY · FR</div>
+            <div class="kpi">+35% de RDV hors heures d'ouverture</div>
+            <div class="quote-mark">"</div>
+            <p class="quote">Avant, on perdait des clientes parce que personne ne décrochait après 19h. L'agent vocal IA encaisse les réservations à 21h, le dimanche, à 7h du matin. Sans embaucher personne.</p>
+            <div class="author">
+              <div class="av">SL</div>
+              <div class="author-meta">
+                <div class="name">Sofia L.</div>
+                <div class="role">Fondatrice · Salon Atelier 9</div>
+              </div>
+            </div>
+          </article>
+          <article class="testi-card" style="--i:60deg" data-card>
+            <div class="city">GE · CH</div>
+            <div class="kpi">3 ETP économisés en 6 mois</div>
+            <div class="quote-mark">"</div>
+            <p class="quote">On a automatisé le traitement des commandes, les relances et le suivi livraison. Trois équivalents temps plein redéployés sur le commercial. Le ROI était positif à la fin du trimestre.</p>
+            <div class="author">
+              <div class="av">VT</div>
+              <div class="author-meta">
+                <div class="name">Vincent T.</div>
+                <div class="role">Directeur ops · Helvetia Logistique</div>
+              </div>
+            </div>
+          </article>
+          <article class="testi-card" style="--i:120deg" data-card>
+            <div class="city">PA · FR</div>
+            <div class="kpi">Temps de résolution -64%</div>
+            <div class="quote-mark">"</div>
+            <p class="quote">Notre support croulait. Le chatbot a pris 60% des demandes de niveau 1 et appris à escalader les vraies urgences. Le NPS est remonté sans qu'on touche à l'équipe.</p>
+            <div class="author">
+              <div class="av">CD</div>
+              <div class="author-meta">
+                <div class="name">Camille D.</div>
+                <div class="role">Head of Support · Quanteo</div>
+              </div>
+            </div>
+          </article>
+          <article class="testi-card" style="--i:180deg" data-card>
+            <div class="city">BX · FR</div>
+            <div class="kpi">+31% de panier moyen</div>
+            <div class="quote-mark">"</div>
+            <p class="quote">Les emails de relance manuels, c'était fini. L'automatisation envoie le bon message au bon moment selon le parcours. Plus de panier moyen, zéro charge mentale en plus.</p>
+            <div class="author">
+              <div class="av">LK</div>
+              <div class="author-meta">
+                <div class="name">Léa K.</div>
+                <div class="role">CMO · Naoura Lifestyle</div>
+              </div>
+            </div>
+          </article>
+          <article class="testi-card" style="--i:240deg" data-card>
+            <div class="city">LS · CH</div>
+            <div class="kpi">-42% de churn annuel</div>
+            <div class="quote-mark">"</div>
+            <p class="quote">Les relances de renouvellement étaient bâclées par manque de temps. Maintenant elles sont personnalisées, programmées, suivies. Nos forfaits récurrents tiennent enfin la route.</p>
+            <div class="author">
+              <div class="av">JV</div>
+              <div class="author-meta">
+                <div class="name">Jean-Marc V.</div>
+                <div class="role">Associé · Cabinet Altéo</div>
+              </div>
+            </div>
+          </article>
+          <article class="testi-card" style="--i:300deg" data-card>
+            <div class="city">MS · FR</div>
+            <div class="kpi">Turnover ÷ 2 en 12 mois</div>
+            <div class="quote-mark">"</div>
+            <p class="quote">On a digitalisé l'onboarding, les briefings quotidiens, les notes de service. Mes équipes ne lâchent plus l'entreprise au bout de quatre mois. Un avant/après brutal.</p>
+            <div class="author">
+              <div class="av">MB</div>
+              <div class="author-meta">
+                <div class="name">Mehdi B.</div>
+                <div class="role">DRH · Maillon Bleu</div>
+              </div>
+            </div>
+          </article>
         </div>
-      </article>
-      <article class="testi-card" data-tilt data-card>
-        <div class="city">LY · FR</div>
-        <div class="quote-mark">"</div>
-        <p class="quote">Leur chatbot gère 70% de nos demandes de premier contact. Mon équipe peut enfin se concentrer sur les dossiers — ceux qui paient nos factures.</p>
-        <div class="author">
-          <div class="av">SM</div>
-          <div class="author-meta">
-            <div class="name">Sophie Martin</div>
-            <div class="role">Directrice · Cabinet Martin &amp; Associés</div>
-          </div>
-        </div>
-      </article>
-      <article class="testi-card" data-tilt data-card>
-        <div class="city">ZH · CH</div>
-        <div class="quote-mark">"</div>
-        <p class="quote">Le ROI a été visible dès le premier mois. Les automatisations Make ont changé notre façon de travailler. Sincèrement, on aurait dû le faire trois ans plus tôt.</p>
-        <div class="author">
-          <div class="av">TK</div>
-          <div class="author-meta">
-            <div class="name">Thomas Keller</div>
-            <div class="role">Fondateur · TK Immobilier</div>
-          </div>
-        </div>
-      </article>
+      </div>
+      <div class="testi-progress" id="testi-progress">
+        <span class="tdot is-active"></span>
+        <span class="tdot"></span>
+        <span class="tdot"></span>
+        <span class="tdot"></span>
+        <span class="tdot"></span>
+        <span class="tdot"></span>
+      </div>
     </div>
   </div>
 </section>
@@ -3260,35 +3370,57 @@ function initResults(){
    • 3D tilt scrubé scroll-driven (universel — fonctionne au touch)
    ============================================================ */
 function initTesti(){
+  const wheel = document.getElementById('testi-wheel');
   const cards = gsap.utils.toArray('.testi-card');
+  const dots  = gsap.utils.toArray('#testi-progress .tdot');
+  if (!wheel || cards.length === 0) return;
 
-  // Entry stagger (universal)
-  cards.forEach((card, i) => {
-    gsap.from(card, {
-      y: 40, opacity: 0,
-      duration: .85, delay: i * .1, ease: 'power3.out',
-      scrollTrigger: { trigger: '.testi-grid', start: 'top 82%', once: true }
-    });
+  // Entry fade-up des éléments du head (universal)
+  gsap.from('.testi-head > *', {
+    y: 24, opacity: 0, stagger: .08,
+    duration: .7, ease: 'power3.out',
+    scrollTrigger: { trigger: '.testi', start: 'top 75%', once: true }
   });
 
-  if (reducedMotion) return;
+  if (reducedMotion){
+    // Fallback : empile les cartes verticalement, désactive perspective
+    const stage = document.querySelector('.testi-stage');
+    if (stage){
+      stage.style.height = 'auto';
+      stage.style.perspective = 'none';
+    }
+    wheel.style.cssText += 'width:100%;height:auto;display:flex;flex-direction:column;gap:20px;';
+    cards.forEach(c => {
+      c.style.cssText += 'position:relative;inset:auto;transform:none;width:100%;max-width:340px;margin:0 auto;';
+    });
+    return;
+  }
 
-  // 3D tilt scrubed — chaque carte rotateY -12 → 12 et rotateX 5 → -5
-  // pendant qu'elle traverse le viewport. Universel (touch ou mouse).
-  cards.forEach(card => {
-    gsap.fromTo(card,
-      { rotationY: -12, rotationX: 5 },
-      {
-        rotationY: 12, rotationX: -5,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: card,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.2,
-        }
-      }
-    );
+  // Roue 3D : rotation -300° sur 4 viewports de scroll (pas 360 pour ne pas
+  // revenir à la carte 0). 6 cartes × 60° = positions ; on s'arrête à -300°
+  // pour finir face à la 6ᵉ. Sens horaire vu d'en haut = rotationY négatif.
+  const TOTAL = cards.length;            // 6
+  const STEP  = 360 / TOTAL;             // 60°
+  const END_ROT = -STEP * (TOTAL - 1);   // -300°
+
+  ScrollTrigger.create({
+    trigger: '.testi-pin',
+    start: 'top top',
+    end: () => `+=${window.innerHeight * 3.2}`,
+    pin: true,
+    pinSpacing: true,
+    scrub: 1,
+    invalidateOnRefresh: true,
+    onUpdate: self => {
+      const rot = END_ROT * self.progress;
+      gsap.set(wheel, { rotationY: rot });
+      // Carte active = celle dont l'angle final est le plus proche de 0°
+      const idx = Math.min(
+        TOTAL - 1,
+        Math.max(0, Math.round(self.progress * (TOTAL - 1)))
+      );
+      dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
+    }
   });
 }
 
