@@ -3234,7 +3234,13 @@ a[href="#faq"]{
     <p data-fade>
       30 minutes d'appel. Aucun engagement. À la fin, vous repartez avec une cartographie claire de ce qui peut être automatisé chez vous, et l'estimation du gain associé. Que vous travailliez avec Neexus ensuite ou pas.
     </p>
-    <form class="cta-form" id="cta-form" novalidate data-fade>
+    <form class="cta-form" id="cta-form" data-fade>
+      <!-- Web3Forms : champs caches, ne pas modifier sauf rotation de cle -->
+      <input type="hidden" name="access_key" value="41b7e11d-5766-4490-8fcc-6acc82086b49">
+      <input type="hidden" name="subject" value="Nouvelle demande d'audit NEEXUS">
+      <input type="hidden" name="from_name" value="NEEXUS Website">
+      <!-- Honeypot anti-spam : si rempli (par un bot qui fill tout), Web3Forms rejette -->
+      <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
       <div class="cta-form-grid">
         <label class="cta-field">
           <span>Nom</span>
@@ -3889,51 +3895,79 @@ function initMission(){
 }
 
 /* ============================================================
-   CTA FORM — PHASE 4
-   Formulaire visuel uniquement (pas de backend pour l'instant).
-   Datepicker natif HTML5 + valeur par défaut J+1 à 14h.
-   Submit → feedback visuel temporaire, pas d'envoi réseau.
+   CTA FORM — Phase 6.x (Web3Forms POST integration)
+   Datepicker natif HTML5 + valeur par defaut J+1 a 14h.
+   Submit → POST async vers api.web3forms.com → email a smartdigitalsolution.info@gmail.com.
+   Feedback visuel : "Envoi en cours…" → "Envoye ✓" ou "Erreur — reessayez".
    ============================================================ */
 function initCTAForm(){
   const form = document.getElementById('cta-form');
   if (!form) return;
 
-  // Valeur par défaut datepicker : demain 14h00, et min = maintenant
+  // Helper : (re)init datepicker a demain 14h, min = maintenant
   const dt = form.querySelector('input[type="datetime-local"]');
-  if (dt){
-    const pad = n => String(n).padStart(2, '0');
+  const pad = n => String(n).padStart(2, '0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const setDefaultDate = () => {
+    if (!dt) return;
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setDate(now.getDate() + 1);
     tomorrow.setHours(14, 0, 0, 0);
-    const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     dt.value = fmt(tomorrow);
     dt.min = fmt(now);
-  }
+  };
+  setDefaultDate();
 
-  // Feedback visuel uniquement — pas d'envoi backend
-  form.addEventListener('submit', e => {
+  // POST async vers Web3Forms
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const btn = form.querySelector('button[type="submit"]');
     if (!btn || btn.disabled) return;
     const original = btn.innerHTML;
-    btn.innerHTML = 'Envoyé — on vous rappelle ✓';
+
+    // UI loading state
     btn.disabled = true;
     btn.style.opacity = '.75';
-    setTimeout(() => {
-      btn.innerHTML = original;
-      btn.disabled = false;
-      btn.style.opacity = '';
-      form.reset();
-      // Réinitialise la date après reset
-      if (dt){
-        const pad = n => String(n).padStart(2, '0');
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(14, 0, 0, 0);
-        dt.value = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth()+1)}-${pad(tomorrow.getDate())}T${pad(tomorrow.getHours())}:${pad(tomorrow.getMinutes())}`;
+    btn.innerHTML = 'Envoi en cours…';
+
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: new FormData(form)
+      });
+      const data = await res.json();
+
+      if (data.success){
+        btn.innerHTML = 'Envoyé — on vous rappelle ✓';
+        setTimeout(() => {
+          btn.innerHTML = original;
+          btn.disabled = false;
+          btn.style.opacity = '';
+          form.reset();
+          setDefaultDate();    // re-init la date apres reset
+        }, 3500);
+      } else {
+        // Web3Forms a repondu mais avec une erreur (cle invalide, quota, validation, etc.)
+        console.error('Web3Forms error:', data);
+        btn.innerHTML = 'Erreur — réessayez';
+        setTimeout(() => {
+          btn.innerHTML = original;
+          btn.disabled = false;
+          btn.style.opacity = '';
+        }, 3500);
       }
-    }, 3500);
+    } catch (err){
+      // Erreur reseau (offline, CORS, timeout, etc.)
+      console.error('Network error:', err);
+      btn.innerHTML = 'Erreur réseau — réessayez';
+      setTimeout(() => {
+        btn.innerHTML = original;
+        btn.disabled = false;
+        btn.style.opacity = '';
+      }, 3500);
+    }
   });
 
   // Entry fade-up du formulaire
