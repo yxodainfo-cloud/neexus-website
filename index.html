@@ -2283,12 +2283,15 @@ a[href="#faq"]{
   <a href="#cta" class="gradient-text">Audit gratuit →</a>
 </div>
 
-<!-- Phase 6 : video de fond + overlay PARALLAX (fixed dans le viewport)
-     Placés au niveau body (hors de .hero) car .hero crée un containing
-     block (via will-change) qui empecherait position:fixed d'echapper
-     a la section. Video joue en autoplay loop, opacity fade quand on
-     quitte le Hero (classe .no-hero-bg toggled par ScrollTrigger).
-     muted + playsinline = obligatoire iOS Safari pour autoplay decode -->
+<!-- ============================================================
+     PHASE 6 VIDEO DISABLED (13 mai 2026)
+     -----------------------------------------------------------------
+     Pour REACTIVER : decommenter le bloc <video> + overlay ci-dessous
+     ET decommenter le bloc JS marque PHASE 6 VIDEO INIT dans initHeroPinned().
+     La CSS (.hero-bg-video, .hero-bg-overlay, body.no-hero-bg) est restee
+     en place, prete a etre reutilisee. Les fichiers MP4/JPG sont commits.
+     ============================================================ -->
+<!--
 <video class="hero-bg-video"
        muted
        playsinline
@@ -2301,6 +2304,8 @@ a[href="#faq"]{
   <source src="hero-bg-desktop.mp4" type="video/mp4">
 </video>
 <div class="hero-bg-overlay"></div>
+-->
+<!-- === END PHASE 6 VIDEO DISABLED ============================== -->
 
 <!-- ============================================================
      HERO
@@ -3751,20 +3756,15 @@ function initHeroPinned(){
 
   if (reducedMotion) return;
 
-  /* Phase 6 : VIDEO PARALLAX FIXED + FADE OUT
+  /* ============================================================
+     PHASE 6 VIDEO INIT — DISABLED (13 mai 2026)
      -----------------------------------------------------------------
-     Plus de pin Hero, plus de scrub video. La video joue en autoplay
-     loop sur TOUS les devices (iOS + Android + desktop). Elle est
-     position:fixed dans le viewport (cf CSS) → reste collee a l'ecran
-     pendant que le Hero scroll par dessus = parallax classique.
-     Une ScrollTrigger toggle body.no-hero-bg quand on quitte le Hero
-     pour fader proprement vers les sections suivantes.
-     ----------------------------------------------------------------- */
+     Pour REACTIVER : decommenter le bloc entre /* DISABLED { */ et /* } */
+     ET decommenter le HTML <video> + overlay marque PHASE 6 VIDEO DISABLED.
+     ============================================================ */
+  /* DISABLED {
   const video = document.querySelector('.hero-bg-video');
   if (video){
-    /* attributs deja en HTML (autoplay loop muted playsinline) mais on
-       reaffirme via JS pour fiabilite + on appelle play() explicitement
-       apres canplay au cas ou iOS aurait bloque l'autoplay HTML natif. */
     video.muted = true;
     video.playsInline = true;
     video.loop = true;
@@ -3772,25 +3772,20 @@ function initHeroPinned(){
     if (video.readyState >= 3) tryPlay();
     else video.addEventListener('canplay', tryPlay, { once: true });
   }
-
-  /* Toggle body.no-hero-bg pour fader video+overlay en sortie de Hero.
-     onLeave : bottom du Hero touche top viewport → fade out + pause.
-     onEnterBack : on remonte dans le Hero → fade in + play.
-     Pas de onEnter / onLeaveBack : au load on est deja dans le Hero,
-     CSS default = opacity:1, classe absente. */
   ScrollTrigger.create({
     trigger: '.hero',
     start: 'top top',
     end: 'bottom top',
     onLeave: () => {
       document.body.classList.add('no-hero-bg');
-      if (video) video.pause();   /* gain CPU/batterie hors viewport */
+      if (video) video.pause();
     },
     onEnterBack: () => {
       document.body.classList.remove('no-hero-bg');
       if (video) video.play().catch(()=>{});
     }
   });
+  } DISABLED END */
 }
 
 /* ============================================================
