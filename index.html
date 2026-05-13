@@ -2156,6 +2156,49 @@ body.has-cursor .cursor-glow{display:block;}
   .faq-answer-inner{padding:0 8px 22px;font-size:14.5px;}
   .faq-icon{flex-basis:30px;width:30px;height:30px;}
 }
+
+/* =============================================================================
+   PHASE 5.x — SECTIONS MASQUÉES (Pour Qui, Services, Résultats, Stack, FAQ)
+   -----------------------------------------------------------------------------
+   ⚠️ Pour RÉACTIVER : supprimer entièrement ce bloc CSS, rien d'autre à faire.
+   Le HTML, le JS et les ScrollTriggers de ces sections sont intacts.
+   Seul l'affichage est désactivé — display:none suffit à neutraliser
+   pin/scrub/IntersectionObservers (l'élément n'a plus de bounding rect).
+   ============================================================================= */
+#profils,
+#services,
+#resultats,
+#stack,
+#faq{
+  display:none !important;
+}
+/* Navbar desktop + menu mobile : liens internes vers ces sections */
+a[href="#profils"],
+a[href="#services"],
+a[href="#resultats"],
+a[href="#stack"],
+a[href="#faq"]{
+  display:none !important;
+}
+/* Footer "Services" : colonne entière pointe vers #services → masquée */
+.footer-col:has(a[href="#services"]){
+  display:none !important;
+}
+/* Footer "Ressources" : masquer uniquement le <li> de la FAQ */
+.footer-col li:has(> a[href="#faq"]){
+  display:none !important;
+}
+/* Safety net : neutraliser les pin-spacers GSAP autour des sections pinnées
+   (Profils deck, Services desktop, Résultats roue 3D). Sinon le pin-spacer
+   peut réserver de la hauteur fantôme = trou de scroll. */
+.pin-spacer:has(> #profils),
+.pin-spacer:has(> #services),
+.pin-spacer:has(> #resultats),
+.pin-spacer:has(> #stack),
+.pin-spacer:has(> #faq){
+  display:none !important;
+}
+/* === END PHASE 5.x HIDDEN ==================================================== */
 </style>
 </head>
 <body class="lenis lenis-smooth">
