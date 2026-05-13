@@ -1408,3 +1408,132 @@ Refactor au passage : `setDefaultDate()` extrait en helper, utilisé au boot + a
 **Pages légales accessibles** : `/mentions-legales.html`, `/cgv.html`, `/cgu.html`, `/confidentialite.html`. Liens depuis le footer principal `.footer-bottom`.
 
 **Formulaire fonctionnel** : Web3Forms key `41b7e11d-5766-4490-8fcc-6acc82086b49` → emails arrivent sur `smartdigitalsolution.info@gmail.com` (confirmé par user après marquage spam Gmail).
+
+---
+
+## PHASE 7 — Animations simplifiées avec toggle global (13 mai 2026)
+
+Demande user : "enregistrer les animations, et réaliser les sections avec des apparitions très simplifiées". Objectif = calmer le site, garder le code cinématique en réserve, passer à des fade-up sobres et performants.
+
+### Approche : flag global + early-exit pattern
+
+Ajout au top du script principal (après `const reducedMotion`) :
+
+```js
+/* ============================================================
+   GLOBAL TOGGLE — Phase 7 animations simplifiees
+   ============================================================
+   true  = fade-up + leger scale, layout simple, pas de pin/scrub/3D
+   false = animations cinematiques d'origine
+
+   Section affectee : Methode uniquement.
+   EXEMPTIONS (decision user) : Constat, Mission, Temoignages = cinematique.
+   ============================================================ */
+const SIMPLIFIED_ANIMATIONS = true;
+```
+
+Dans chaque `init*()` affecté, un branchement early-exit :
+```js
+if (SIMPLIFIED_ANIMATIONS || reducedMotion){
+  // Reset layout (reuse de la branche reducedMotion existante)
+  // + fade-up + scale stagger
+  return;
+}
+// Code cinematique d'origine preserve dessous (jamais execute si flag true)
+```
+
+**Avantage clé** : aucun code cinématique n'est supprimé. Pour réactiver = changer le flag à `false` ou retirer `SIMPLIFIED_ANIMATIONS ||` d'une section spécifique.
+
+### Paramètres harmonisés du fade-up Phase 7
+
+```js
+gsap.from(cards, {
+  y: 30, opacity: 0, scale: 0.96, stagger: 0.08,
+  duration: 0.6, ease: 'power3.out',
+  scrollTrigger: { trigger: '.section', start: 'top 80%', once: true }
+});
+```
+
+Choix `scale: 0.96 → 1` (très léger, ~4%) plutôt que pur fade — donne un peu de vie sans tomber dans l'animé. Stagger 0.08s entre cards (rapide). Duration 0.6s (court, pas de traînée). Ease `power3.out` (sortie ferme, pas d'élasticité).
+
+### Phase 7 — Itération 1 (commit `cb54350`) : 4 sections simplifiées
+
+Toutes les sections actives passent en simplifié :
+- **Constat** : reuse fallback `reducedMotion` (flex-wrap + `.is-focus` sur cards) + fade-up scale
+- **Mission** : reuse fallback (stage height auto + cards en colonne flex) + fade-up scale
+- **Méthode** : déjà avait un fallback simple, upgrade vers fade-up + scale + `power3.out` (était `power2.out` sans scale)
+- **Témoignages** : reuse fallback (stage height auto + cards en colonne flex) + fade-up scale
+
+### Phase 7 — Itération 2 (commit `b0a600a`) : Mission EXEMPTÉE
+
+**Bug user signalé** : "Section mission, on ne voit plus les cartes". Les 3 cards Mission devenaient invisibles en simplifié.
+
+**Hypothèse** : conflit entre la CSS `.mission-card { position:absolute; inset:0; transform:rotateX(...) translateZ(...) }` et le reset inline `transform:none` + `gsap.from({ opacity:0 })`. Probablement timing : `gsap.from` set initial state `opacity:0` mais le ScrollTrigger `start: 'top 80%'` ne firait pas correctement (peut-être à cause du DOM reflow après l'application des inline styles).
+
+**Décision user** : "remet l'animation comme c'était, c'est le seul qui revient comme il était". Mission revert au cinématique Ferris wheel.
+
+**Fix** : retire `SIMPLIFIED_ANIMATIONS ||` de la condition de `initMission()`. Le `if (reducedMotion)` reste pour le fallback a11y, le code cinématique s'exécute normalement.
+
+### Phase 7 — Itération 3 (commit `ca30f71`) : Constat + Témoignages EXEMPTÉS aussi
+
+**Bug user signalé** : "la section constat sur smartphone est noir on ne voit rien".
+
+**Cause probable** :
+1. `.constat-pin` a `min-height: 100svh` → réserve full viewport height même sans pin
+2. `gsap.from({opacity:0})` met les cards en état invisible initial
+3. Sans le pin/scrub cinématique qui pilotait la translate-X de la track, la track avec `flex-wrap: wrap` + 4 cards mobile (`flex-basis: min(82vw, 320px)`) wrappe sur 4 lignes — mais les cards restent à `opacity:0`
+4. Soit le ScrollTrigger `start: 'top 80%'` fire trop tôt (avant que le DOM ait fini son reflow), soit pas du tout sur certains mobiles, soit le pin-spacer cinématique GSAP reste configuré
+5. Résultat visuel : section haute, head visible, dessous = noir (cards invisibles)
+
+**Décision user** : revert Constat ET Témoignages au cinématique aussi. Témoignages : pas de bug spécifique, juste "remets la comme elle était sur smartphone et sur desktop" = préférence cinématique.
+
+**Fix** : retire `SIMPLIFIED_ANIMATIONS ||` des conditions de `initConstat()` et `initTesti()`.
+
+### État final Phase 7
+
+| Section | Animation finale |
+|---|---|
+| Hero | Entry timeline (preloader + char split) — inchangé |
+| **Constat** | **Cinématique** — pin + scrub horizontal 4 blocs (exempté Phase 7) |
+| **Mission** | **Cinématique** — roue 3D Ferris wheel axe X (exempté Phase 7) |
+| Méthode | **Simplifié** — fade-up scale stagger (seule section sous flag SIMPLIFIED) |
+| **Témoignages** | **Cinématique** — roue 3D 6 cards axe Y (exempté Phase 7) |
+| CTA Form | Inchangé (déjà simple) |
+
+**Le flag `SIMPLIFIED_ANIMATIONS = true` n'affecte plus que Méthode**. Mais on garde la structure pour permettre une réactivation rapide si on change d'avis sur d'autres sections.
+
+### Apprentissages Phase 7
+
+1. **`gsap.from()` met le initial state à l'application immédiate** (avant que le ScrollTrigger fire). Si on combine ça avec un reset de layout inline (`element.style.cssText += ...`) qui change la taille/position de l'élément, ScrollTrigger peut ne pas se recalibrer correctement → l'élément reste à `opacity:0` indefiniment. Solutions possibles :
+   - `gsap.set()` d'abord pour figer le from-state, puis `gsap.to()` pour le tween (deux étapes au lieu d'une)
+   - Appeler `ScrollTrigger.refresh()` après le reset de layout
+   - Utiliser `gsap.fromTo(...)` au lieu de `gsap.from(...)`
+   - **Solution choisie ici** : abandonner la simplification pour ces sections, garder l'animation d'origine qui était cohérente avec le CSS
+
+2. **`min-height: 100svh` sur un wrapper de section pinnée crée des trous fantômes** quand on désactive le pin. Le wrapper réserve toujours 100vh mais le contenu interne (cards en `opacity:0`) ne le remplit pas → section noire. Si on désactive un pin, il faut aussi neutraliser le `min-height` du wrapper.
+
+3. **Architecture toggle global + early-exit est robuste pour préserver du code**. Plus propre que `/* commentaire géant */` (qui a causé le bug écran noir Phase 6.3). Le code "désactivé" reste tested, syntaxiquement valide, juste skippé par un `return`. Coût zéro à la maintenance.
+
+4. **Le fallback `reducedMotion` est un excellent point de départ pour une version simplifiée** d'une section cinématique. Il est déjà testé, déjà fait pour reset les transforms 3D, déjà accessible. Il suffit souvent d'élargir sa condition à `SIMPLIFIED || reducedMotion` et d'ajouter un fade-up par-dessus.
+
+### Commits Phase 7 (3 commits, 13 mai 2026)
+
+| Commit | Description |
+|---|---|
+| `cb54350` | Phase 7 init : 4 sections simplifiées + flag global `SIMPLIFIED_ANIMATIONS = true` |
+| `b0a600a` | Mission EXEMPTÉE — cards invisibles en simplifié → revert au Ferris wheel cinématique |
+| `ca30f71` | Constat + Témoignages EXEMPTÉS — Constat noir mobile → revert au pin/scrub + roue 3D |
+
+### Pour réactiver des animations cinématiques sur d'autres sections plus tard
+
+**Option A — Une section spécifique** : retirer `SIMPLIFIED_ANIMATIONS ||` de la condition du `if` de la section. Exemple pour Méthode :
+```js
+if (reducedMotion){  // au lieu de SIMPLIFIED_ANIMATIONS || reducedMotion
+```
+
+**Option B — Toutes en cinématique d'un coup** : passer le flag global à `false` :
+```js
+const SIMPLIFIED_ANIMATIONS = false;
+```
+
+Méthode retrouvera son notebook flip 3D, ainsi que toute section qu'on aurait ré-ajoutée au toggle.
