@@ -3689,26 +3689,41 @@ function initHeroPinned(){
     .add(QUERY_MOBILE,  () => buildHeroPin('+=80%'));
 
   function buildHeroPin(end){
-    /* Phase 5 : SCROLL-SCRUB VIDEO setup universel (mobile + desktop)
-       - removeAttribute autoplay/loop : on prend le controle JS total
-       - muted + playsInline : iOS Safari obligatoire pour decoder sans
-         interaction utilisateur (mute deja en HTML, on reaffirme JS)
-       - pause + currentTime=0 : video bloquee au premier frame jusqu'au scroll
-       - readyState 1 = HAVE_METADATA (duration disponible). Si pas encore
-         charge, on attend l'evt loadedmetadata before activating le scrub. */
+    /* Phase 5.1 : SCRUB VIDEO avec FALLBACK iOS autoplay-loop
+       iOS Safari refuse de scrub video.currentTime de facon fluide (bug
+       WebKit historique). Detect iOS -> autoplay loop fallback. Android
+       + desktop = vrai scrub. C'est le pattern des sites premium pour iOS. */
     const video = document.querySelector('.hero-bg-video');
     let videoReady = false;
-    if (video){
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const useScrub = !isIOS;
+
+    if (video && !reducedMotion){
       video.muted = true;
       video.playsInline = true;
-      video.removeAttribute('autoplay');
-      video.removeAttribute('loop');
-      const onMeta = () => {
-        try { video.pause(); video.currentTime = 0; } catch(e){}
-        videoReady = true;
-      };
-      if (video.readyState >= 1) onMeta();
-      else video.addEventListener('loadedmetadata', onMeta, { once:true });
+
+      if (useScrub){
+        /* Android + desktop : on prend le controle JS pour scrub */
+        video.removeAttribute('autoplay');
+        video.removeAttribute('loop');
+        const onMeta = () => {
+          try { video.pause(); video.currentTime = 0; } catch(e){}
+          videoReady = true;
+        };
+        if (video.readyState >= 1) onMeta();
+        else video.addEventListener('loadedmetadata', onMeta, { once:true });
+      } else {
+        /* iOS : autoplay loop fallback. La video joue en continu en
+           arriere-plan du Hero sans reagir au scroll. C'est cinematique
+           quand meme. On reaffirme les attributs et on force play() apres
+           canplay au cas ou iOS aurait bloque l'autoplay HTML natif. */
+        video.loop = true;
+        video.autoplay = true;
+        const tryPlay = () => video.play().catch(()=>{});
+        if (video.readyState >= 3) tryPlay();
+        else video.addEventListener('canplay', tryPlay, { once: true });
+      }
     }
 
     const heroTl = gsap.timeline({
@@ -3721,10 +3736,9 @@ function initHeroPinned(){
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: self => {
-          /* Scrub video universel : video.currentTime = duration * progress.
-             Le seuil 0.016 (1 frame @ 60Hz) evite de spammer le decoder
-             quand le delta est imperceptible (optim iOS Safari). */
-          if (video && videoReady && video.duration){
+          /* Scrub seulement si !iOS. iOS = video joue en autoplay loop,
+             pas touchee par le scroll (volontairement, sinon stutter). */
+          if (useScrub && video && videoReady && video.duration){
             const target = video.duration * self.progress;
             if (Math.abs(video.currentTime - target) > 0.016){
               video.currentTime = target;
