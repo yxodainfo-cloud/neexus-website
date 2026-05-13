@@ -1049,4 +1049,362 @@ User signale : sur tablet Android, en scrollant **vers le bas** tout est OK. En 
 
 - **`9f8408d`** — Phase 5 commit 1 : video scroll-scrubbed sur Hero (mobile + desktop), 3 fichiers MP4+JPG, modifs HTML/CSS/JS
 - **`8694d3e`** — Phase 5.1 : fallback iOS Safari = autoplay loop (scrub bloqué par WebKit)
-- (à venir Phase 5.2) — fix bug tablet "decalage gauche au scroll up"
+
+⚠️ **Le bug tablet décalage-gauche au scroll-up est toujours OUVERT** (pas fixé en Phase 5.2 ni 6). Il deviendra prioritaire seulement quand la vidéo et certaines sections seront réactivées (cf Phase 6.3).
+
+---
+
+## PHASE 5.2 + 6 — Cleanup, parallax, refonte Mission, pages légales, form réel (13 mai 2026)
+
+Cette phase enchaîne **~10 commits** sur la même journée, regroupant : masquage de sections, simplification massive de l'intégration vidéo, ajout des 4 pages légales, refonte d'une section, et passage du formulaire CTA en envoi réel via Web3Forms.
+
+### Phase 5.2 — Masquage CSS de 5 sections (commit `654ffb2`)
+
+Demande user : masquer temporairement Profils, Services, Résultats, Stack, FAQ pour focus marketing court — mais **garder le HTML/JS intacts** pour réactivation rapide.
+
+Bloc CSS unique placé juste avant `</style>`, encadré par un marqueur `=== PHASE 5.x — SECTIONS MASQUÉES ===` :
+
+```css
+#profils, #services, #resultats, #stack, #faq{ display:none !important; }
+
+/* Liens navbar + menu mobile pointant vers ces sections */
+a[href="#profils"], a[href="#services"], a[href="#resultats"],
+a[href="#stack"], a[href="#faq"]{ display:none !important; }
+
+/* Footer "Services" : colonne entière pointe vers #services */
+.footer-col:has(a[href="#services"]){ display:none !important; }
+
+/* Footer "Ressources" : masquer uniquement le <li> de la FAQ */
+.footer-col li:has(> a[href="#faq"]){ display:none !important; }
+
+/* Safety net : pin-spacers GSAP des sections pinnées (profils deck,
+   services desktop, résultats roue) sinon trou de scroll fantôme */
+.pin-spacer:has(> #profils), .pin-spacer:has(> #services),
+.pin-spacer:has(> #resultats), .pin-spacer:has(> #stack),
+.pin-spacer:has(> #faq){ display:none !important; }
+```
+
+**Pour réactiver** : supprimer entièrement ce bloc. Le HTML, le JS, les ScrollTriggers sont inchangés (juste neutralisés par `display:none` → bounding rect = 0 → pin engagé jamais → animation interne jamais déclenchée).
+
+**Résultat navbar** : `Constat · Mission · Méthode · Témoignages` + CTA. Flux scroll = `Hero → Constat → Mission → Méthode → Témoignages → CTA → Footer`.
+
+**Pourquoi `:has(.pin-spacer)`** : sans cette règle, GSAP crée des pin-spacers pour les ScrollTriggers `pin: true` même si la section enfant est `display:none`. Le pin-spacer peut réserver de la hauteur fantôme → trou de scroll. La règle `.pin-spacer:has(> #xxx) { display:none }` les neutralise (support `:has()` OK sur tous navigateurs modernes).
+
+### WhatsApp Click-to-Chat (commit `8a5ff6e`)
+
+Téléphone footer remplacé par lien WhatsApp officiel :
+
+```html
+<a href="https://wa.me/19178142210" target="_blank" rel="noopener"
+   aria-label="Contacter NEEXUS par WhatsApp">WhatsApp · +1 917 814 2210</a>
+```
+
+`wa.me/<countrycode><number>` (sans `+`, sans espaces) = URL officielle Click-to-Chat. Un clic ouvre directement la conversation WhatsApp (mobile) ou WhatsApp Web (desktop). Le label "WhatsApp · …" signale clairement le canal au visiteur.
+
+**Note** : Le numéro n'était pas encore activé sur WhatsApp au moment du commit. User a fait l'activation le lendemain (14 mai). Pas de modification de code nécessaire — le lien fonctionne dès que WhatsApp Business est configuré sur le numéro.
+
+### Phase 6 — Refonte intégration vidéo Hero (commit `0a1c48c`)
+
+**Renversement de doctrine Phase 5** : abandon du scroll-scrub au profit d'un **autoplay loop + parallax fixed**. Raison principale : simplicité + iOS supporte naturellement, plus de branche `isIOS` à maintenir.
+
+| | Phase 5 (scrub) | Phase 6 (loop + parallax) |
+|---|---|---|
+| **Comportement** | Vidéo scrubbed sur scroll, Hero pinné 80-120% | Vidéo autoplay loop, Hero scroll naturel |
+| **iOS** | Fallback autoplay loop (scrub bloqué WebKit) | Autoplay loop universel — branche `isIOS` supprimée |
+| **Position vidéo** | `position: absolute` dans `.hero` (avec `will-change: transform`) | `position: fixed` au body level → reste collée au viewport |
+| **Sortie Hero** | n/a (pin garde le Hero en viewport) | Fade out propre via `body.no-hero-bg` toggled par ScrollTrigger |
+| **Encoding** | Keyframe-per-frame `-g 1` (scrub fluide) | GOP standard (loop fluide, fichiers plus petits) |
+| **Mobile MP4** | 2.5 MB | 700K (-72%) puis 621K avec tunnel (-75% au total) |
+| **Desktop MP4** | 6.2 MB | 2.5 MB (-60%) puis 1.7 MB avec tunnel (-73% au total) |
+
+**Architecture finale** :
+
+```html
+<!-- AVANT (Phase 5) : video DANS .hero -->
+<section class="hero">
+  <video class="hero-bg-video" muted playsinline autoplay loop>...</video>
+  <div class="hero-bg-overlay"></div>
+  <div class="hero-grid-bg"></div>
+  <div class="hero-inner">...</div>
+</section>
+
+<!-- APRÈS (Phase 6) : video AU BODY LEVEL (sortie du containing block) -->
+<video class="hero-bg-video" ...>...</video>
+<div class="hero-bg-overlay"></div>
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-inner">...</div>
+</section>
+```
+
+⚠️ **Point critique** : `position: fixed` ne fonctionne PAS si un ancêtre a `transform`, `filter`, `perspective` ou `will-change: transform`. La règle CSS `.hero { will-change: transform }` (héritage Phase 3 pin) créait un containing block qui empêchait l'échappement de la vidéo au viewport. **Sortir la vidéo de `.hero` était nécessaire**.
+
+**CSS** :
+```css
+.hero-bg-video{
+  position:fixed; inset:0;
+  width:100vw; height:100vh;
+  object-fit:cover; z-index:0; pointer-events:none;
+  opacity:1; transition:opacity .55s ease;
+  background:var(--bg-1);  /* fallback navy avant chargement */
+}
+.hero-bg-overlay{ /* idem fixed, z-index:1 */ ... }
+body.no-hero-bg .hero-bg-video,
+body.no-hero-bg .hero-bg-overlay{ opacity:0; }
+
+.hero{
+  /* Phase 6 : retire will-change:transform + isolation:isolate */
+  /* (no more pin, no need for GPU promotion ni stacking context) */
+}
+```
+
+**JS** (remplace `buildHeroPin()` complètement) :
+```js
+const video = document.querySelector('.hero-bg-video');
+if (video){
+  video.muted = true;
+  video.playsInline = true;
+  video.loop = true;
+  const tryPlay = () => video.play().catch(()=>{});
+  if (video.readyState >= 3) tryPlay();
+  else video.addEventListener('canplay', tryPlay, { once: true });
+}
+ScrollTrigger.create({
+  trigger: '.hero',
+  start: 'top top',
+  end: 'bottom top',
+  onLeave: () => {
+    document.body.classList.add('no-hero-bg');
+    if (video) video.pause();   /* gain CPU/batterie hors viewport */
+  },
+  onEnterBack: () => {
+    document.body.classList.remove('no-hero-bg');
+    if (video) video.play().catch(()=>{});
+  }
+});
+```
+
+**Pipeline d'encodage Phase 6** (simplifié, plus de keyframe-per-frame) :
+
+```bash
+# Mobile : crop centré + scale 720x1280, CRF 24
+ffmpeg -i source.mp4 \
+  -vf "crop=608:1080:656:0,scale=720:1280" \
+  -c:v libx264 -crf 24 -preset slow -profile:v high -level 4.1 -pix_fmt yuv420p \
+  -an -movflags +faststart \
+  hero-bg-mobile.mp4
+
+# Desktop : 1920x1080 natif, CRF 22
+ffmpeg -i source.mp4 \
+  -c:v libx264 -crf 22 -preset slow -profile:v high -level 4.1 -pix_fmt yuv420p \
+  -an -movflags +faststart \
+  hero-bg-desktop.mp4
+
+# Poster
+ffmpeg -i source.mp4 -ss 0 -frames:v 1 -q:v 5 hero-poster.jpg
+```
+
+Flags retirés vs Phase 5 : `-g 1 -keyint_min 1 -sc_threshold 0 -x264opts "no-scenecut"`. Pour un autoplay loop, le GOP standard est plus efficace.
+
+### Phase 6.1 — Swap vidéo "neexus vide tunnel" (commit `ab19326`)
+
+User fournit `neexus vide tunnel.mp4` (1920×1080, 30fps, 3.67s, 3.18 MB source). Tunnel = contenu plus uniforme = compresse encore mieux que la précédente :
+
+| File | Phase 6 (neexus video) | Phase 6.1 (tunnel) |
+|---|---|---|
+| Mobile | 700K | **621K** |
+| Desktop | 2.5 MB | **1.7 MB** |
+| Poster | 226K | **73K** |
+
+Pipeline identique. Aucune modif HTML/CSS/JS — mêmes noms de fichiers servis depuis Vercel.
+
+### Pages légales — 4 nouvelles pages dédiées (commit `f9617df`)
+
+User fournit le contenu textuel complet de 4 documents légaux. Création de 4 pages HTML séparées + 1 feuille de style partagée.
+
+**Fichiers créés** :
+- `legal.css` — feuille partagée, dark theme cohérent (fonts Syne+DM Sans, palette gradient), typographie optimisée lecture longue (max-width 880px, line-height 1.7, font-size 15.5px)
+- `mentions-legales.html` — 10 sections (éditeur SDS Smart Digital Solution LLC Wyoming, registered agent, hébergement Vercel, IP, données, cookies, responsabilité, juridiction)
+- `cgv.html` — 15 articles (objet, services 4 catégories, processus commande, tarifs/paiement 30/40/30, exécution, IP, confidentialité, responsabilité, résiliation, garanties)
+- `cgu.html` — 14 articles (accès, utilisation, formulaires, RGPD, cookies, IP, liens, responsabilité, mineurs, sécurité, juridiction)
+- `confidentialite.html` — 12 sections (collecte, finalités, base légale, partage, transferts US, conservation, sécurité, droits RGPD)
+
+**Architecture** :
+- Chaque page a une **nav top** avec logo NEEXUS (lien retour `index.html`) + bouton `← Retour à l'accueil`
+- Chaque page a un **footer mini-nav** : `Mentions légales · CGV · CGU · Politique de confidentialité` avec la page courante marquée via classe `.current`
+- **Pas de GSAP, Lenis, video, orbs** — HTML statique + CSS partagée + 2 fonts Google. Chargement instantané.
+- Email contact : `smartdigitalsolution@gmail.com` (différent de l'email forms — cf section CTA Form)
+- Liens WhatsApp dans les blocs info-box (cohérent avec footer principal)
+
+**Footer principal** (`index.html`) : placeholder `Mentions légales · Politique de confidentialité · CGV` remplacé par 4 vrais liens cliquables + ajout d'un style hover `.footer-bottom a:hover { color: var(--text); }`.
+
+### Phase 6.2 — Mission roue 3D AXE X (commit `f28597b`)
+
+User demande "adapter le mouvement de rotation de Résultats à Mission". Mission passe de **Lazy Susan axe Y** (cartes tournent latéralement) à **Ferris wheel axe X** (cartes basculent verticalement par-dessus) — pattern miroir de Résultats.
+
+3 modifications chirurgicales :
+
+**1. CSS `.mission-stage`** :
+- `height: clamp(420px,52vh,500px)` → `clamp(500px,68vh,620px)` (TALL pour amplitude verticale)
+- `perspective: 1400px` → `1500px` (match Résultats)
+
+**2. CSS `.mission-platter` + `.mission-card`** :
+- platter `width: clamp(280px,76vw,360px)` → `clamp(320px,84vw,440px)`
+- card `transform: rotateY(var(--i)) translateZ(...)` → `rotateX(var(--i)) translateZ(...)`
+- `--mission-r` aligné sur `--results-r` : 240/220/190/170 (était 260/240/205/185)
+- Mobile breakpoint `.mission-stage` height : `clamp(360-420px)` → `clamp(420-520px)`
+
+**3. JS `initMission()` onUpdate** :
+```js
+gsap.set(platter, { rotationY: rot }) → gsap.set(platter, { rotationX: rot })
+```
+
+**Inchangé** : 3 cartes × 120° apart, pin 2.4 vh, scrub 1, rotation totale `0 → -240°`, `backface-visibility: hidden`. Même comportement de scroll — seul l'axe de rotation a changé.
+
+### Phase 6.3 — Désactivation vidéo (commits `1e045a0` + `87a6085` URGENT FIX)
+
+User demande : "enlève la vidéo, laisse juste le fond comme c'était, on reverra ça plus tard". Désactivation propre avec marqueurs de réactivation.
+
+**Approche initiale (BROKEN — commit `1e045a0`)** : commentaires `/* DISABLED { ... } DISABLED END */` autour du bloc JS.
+
+🚨 **BUG CRITIQUE → écran noir total**. La doc du commentaire contenait `/* DISABLED { */ et /* } */` — le `*/` interne **fermait prématurément** le commentaire externe `/* ============= ... ============= */`. Le texte qui suivait (`et /* } */ ET ...`) devenait du JS invalide → `ReferenceError` sur `et` → `initSite()` crash → preloader jamais caché → écran noir.
+
+**FIX (commit `87a6085`)** : remplacement de `/* DISABLED { ... } */` par **`if (false) { ... }`**, syntaxiquement bulletproof :
+
+```js
+// PHASE 6 VIDEO INIT — DISABLED (13 mai 2026)
+// Pour REACTIVER : changer if(false) en if(true).
+if (false) {
+  const video = document.querySelector('.hero-bg-video');
+  // ... toute la logique video init + ScrollTrigger fade ...
+}
+```
+
+**Comme pour les sections cachées Phase 5.2**, tout est conservé : fichiers MP4/JPG dans le repo, CSS `.hero-bg-video`/`.hero-bg-overlay`/`body.no-hero-bg` en place (inerte, harmless). HTML `<video>` + overlay entre `<!-- PHASE 6 VIDEO DISABLED -->` et `<!-- END -->` HTML comments (qui supportent eux le nesting de `-->` contrairement à `*/`).
+
+**Résultat** : Hero retrouve aspect Phase 4.5/4.6 (body bg navy + orbs flottants + grid subtile + contenu).
+
+### CTA Form — Intégration Web3Forms (commits `2b18fcb` + `47558b9`)
+
+Le formulaire CTA passe de **placeholder visuel** à **envoi réel d'email** vers `smartdigitalsolution.info@gmail.com` (note : email différent de celui des pages légales `smartdigitalsolution@gmail.com`).
+
+**Choix du service** : Web3Forms (gratuit illimité, pas de signup compte, juste une clé d'accès UUID activée via email de confirmation). Alternative envisagée : Formspree (gratuit 50/mois mais signup compte). Vercel Serverless + Resend était plus pro mais sur-engineering pour le besoin.
+
+**Workflow user** :
+1. User va sur web3forms.com, entre `smartdigitalsolution.info@gmail.com`
+2. Web3Forms envoie un email de confirmation avec une clé UUID
+3. User clique sur le lien → clé activée
+4. User paste la clé `41b7e11d-5766-4490-8fcc-6acc82086b49` dans le chat
+5. Intégration immédiate côté code
+
+**HTML modifications** (sur le `<form>`) :
+- Retire `novalidate` → browser valide les champs `required` avant submit
+- Ajoute 3 inputs cachés :
+  ```html
+  <input type="hidden" name="access_key" value="41b7e11d-5766-4490-8fcc-6acc82086b49">
+  <input type="hidden" name="subject" value="Nouvelle demande d'audit NEEXUS">
+  <input type="hidden" name="from_name" value="NEEXUS Website">
+  ```
+- Ajoute un honeypot anti-spam :
+  ```html
+  <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+  ```
+  Les bots qui fillent automatiquement tous les champs cochent ce honeypot caché → Web3Forms détecte et rejette. Invisible pour les vrais visiteurs.
+- Passe le champ message en `required` (était optionnel)
+
+**JS `initCTAForm()` rewrite** :
+```js
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = form.querySelector('button[type="submit"]');
+  if (!btn || btn.disabled) return;
+  const original = btn.innerHTML;
+  btn.disabled = true; btn.style.opacity = '.75';
+  btn.innerHTML = 'Envoi en cours…';
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: new FormData(form)
+    });
+    const data = await res.json();
+    if (data.success){
+      btn.innerHTML = 'Envoyé — on vous rappelle ✓';
+      setTimeout(() => { /* restore + reset + re-init datepicker */ }, 3500);
+    } else {
+      console.error('Web3Forms error:', data);
+      btn.innerHTML = 'Erreur — réessayez';
+      setTimeout(() => { /* restore */ }, 3500);
+    }
+  } catch (err){
+    console.error('Network error:', err);
+    btn.innerHTML = 'Erreur réseau — réessayez';
+    setTimeout(() => { /* restore */ }, 3500);
+  }
+});
+```
+
+Refactor au passage : `setDefaultDate()` extrait en helper, utilisé au boot + après reset.
+
+**Premier test : "ça ne marche pas"** → diagnostic via 3 questions :
+1. Bouton affiche "Envoyé ✓" (Web3Forms accepté)
+2. User a cliqué sur l'email de confirmation Web3Forms (clé active)
+3. Test sur neexusds.com production (build à jour)
+
+→ Cause : **email en spam Gmail** (cause #1 dans 90% des cas pour services type Web3Forms/Formspree). User marque "Non spam" sur le premier email reçu, ajoute `mailer@web3forms.com` aux contacts. Confirme ensuite "c'est bon ça marche !"
+
+**Anti-spam Web3Forms** : honeypot suffit pour les bots basiques. Si spam massif plus tard, Web3Forms supporte aussi reCAPTCHA v3 (via attribut `data-recaptcha`) et hCaptcha. Pour l'instant le honeypot suffit.
+
+---
+
+### Apprentissages techniques critiques de cette phase
+
+1. **Les commentaires multilignes `/* ... */` en JavaScript ne supportent PAS le nesting de `*/`**. Si tu écris `/* texte avec /* sous-bloc */ encore du texte */`, le premier `*/` ferme le commentaire externe, et le texte qui suit devient du JS. **Pour désactiver un bloc de code, utiliser `if (false) { ... }`** au lieu de `/* ... */` quand le bloc contient des `*/` ou de la doc-as-comment qui en contient. Sinon : crash silencieux qui peut tuer toute la page (preloader bloqué = écran noir).
+
+   Contre-exemple : les commentaires HTML `<!-- ... -->` supportent eux le nesting (le parser HTML cherche le `-->` final, pas le premier). Donc commenter du HTML avec marqueurs de doc est safe.
+
+2. **`position: fixed` est contraint par les ancêtres avec `transform`, `filter`, `perspective` ou `will-change`** sur ces props. Ils créent un "containing block" qui empêche `fixed` de s'échapper au viewport. Pour qu'un élément reste collé au viewport, il faut :
+   - Soit le sortir de l'arbre des ancêtres "transformés"
+   - Soit retirer les props transform/filter/will-change de ces ancêtres
+
+3. **Pin-spacers GSAP réservent de la hauteur même si la section enfant est `display:none`**. Pour neutraliser proprement une section pinnée masquée, ajouter `.pin-spacer:has(> #section-id) { display:none }`. Support `:has()` OK sur Chrome/Edge/Firefox/Safari récents.
+
+4. **Web3Forms emails arrivent quasi systématiquement en spam Gmail à la première soumission**. Toujours documenter cette étape pour le user : "Vérifie ton dossier spam, marque comme 'Non spam', ajoute `mailer@web3forms.com` aux contacts."
+
+5. **Pour debugger un bug de form submission** : ouvrir DevTools → Network → soumettre → trouver la requête `api.web3forms.com/submit` → Response onglet. Le JSON `{success:true, message:"...", email:"..."}` indique sur quelle adresse Web3Forms a envoyé (utile si typo lors de l'inscription).
+
+### Commits Phase 5.2 + 6 (10 commits, 13 mai 2026)
+
+| Commit | Description |
+|---|---|
+| `654ffb2` | Phase 5.2 : masquage CSS de 5 sections (`#profils`, `#services`, `#resultats`, `#stack`, `#faq`) + liens navbar/footer correspondants + pin-spacers GSAP |
+| `8a5ff6e` | Footer : téléphone → lien WhatsApp `wa.me/19178142210` avec label "WhatsApp · …" |
+| `0a1c48c` | Phase 6 : refonte vidéo Hero — scroll-scrub → autoplay loop + parallax fixed + fade-out via `body.no-hero-bg`. Nouveau pipeline ffmpeg sans `-g 1`. -65% mobile / -57% desktop payload |
+| `ab19326` | Swap vidéo `neexus video` → `neexus vide tunnel` (3.67s, compresse mieux). Mobile 621K / Desktop 1.7MB |
+| `f9617df` | 4 pages légales dédiées (`mentions-legales.html`, `cgv.html`, `cgu.html`, `confidentialite.html`) + feuille partagée `legal.css`. Footer principal links updated |
+| `1e045a0` | Désactivation vidéo Hero (commentaires marqueurs `/* DISABLED { ... } */`) **← BROKEN** |
+| `87a6085` | **URGENT FIX écran noir** : commentaires JS imbriqués `*/` cassaient le bloc → ReferenceError. Remplacement par `if (false) { ... }` |
+| `f28597b` | Mission : Lazy Susan axe Y → Ferris wheel axe X (pattern miroir Résultats). 3 modifs : CSS stage TALL + transform rotateX + JS rotationX |
+| `2b18fcb` | CTA Form : intégration Web3Forms réelle (POST → email vers `smartdigitalsolution.info@gmail.com`). Hidden inputs `access_key`/`subject`/`from_name` + honeypot `botcheck` + fetch async + UI states loading/success/error |
+| `47558b9` | CTA Form : champ "Votre contexte" passe en `required` (tous les champs maintenant obligatoires) |
+
+### État final après cette phase
+
+**Navbar visible** : `Constat · Mission · Méthode · Témoignages` + CTA "Audit gratuit"
+
+**Sections actives** (en flux scroll) :
+1. Hero (fond dark + orbs, **vidéo désactivée**)
+2. Constat (carousel pinné)
+3. Mission (**roue 3D axe X** Ferris wheel — changé en Phase 6.2)
+4. Méthode (notebook flip 3D)
+5. Témoignages (roue 3D 6 cards axe Y)
+6. CTA Final (formulaire **réel** Web3Forms)
+7. Footer (4 colonnes + bottom bar avec liens légaux)
+
+**Sections masquées** (HTML/JS/CSS intacts, juste cachées via CSS) : Profils, Services, Résultats, Stack, FAQ
+
+**Vidéo désactivée** : code commenté via `if(false)`, fichiers `hero-bg-mobile.mp4` / `hero-bg-desktop.mp4` / `hero-poster.jpg` conservés dans le repo. Réactivation = changer `if(false)` en `if(true)` + décommenter le HTML `<video>`.
+
+**Pages légales accessibles** : `/mentions-legales.html`, `/cgv.html`, `/cgu.html`, `/confidentialite.html`. Liens depuis le footer principal `.footer-bottom`.
+
+**Formulaire fonctionnel** : Web3Forms key `41b7e11d-5766-4490-8fcc-6acc82086b49` → emails arrivent sur `smartdigitalsolution.info@gmail.com` (confirmé par user après marquage spam Gmail).
