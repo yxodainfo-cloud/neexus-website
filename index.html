@@ -326,10 +326,33 @@ body.has-cursor .cursor-glow{display:block;}
   padding:0 36px;
   overflow:hidden;
   z-index:2;
+  isolation:isolate;      /* Phase 5 : stacking context propre pour la video */
   will-change:transform;  /* hero is pinned + scrubbed, force GPU */
+}
+/* Phase 5 : background video scroll-scrubbed */
+.hero-bg-video{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  z-index:0;
+  pointer-events:none;
+  background:var(--bg-1);    /* fallback navy avant chargement video */
+}
+.hero-bg-overlay{
+  position:absolute;inset:0;
+  z-index:1;
+  pointer-events:none;
+  /* darker vers le bas : fade fluide vers le fond du Constat */
+  background:linear-gradient(180deg,
+    rgba(7,10,20,.35) 0%,
+    rgba(7,10,20,.55) 50%,
+    rgba(7,10,20,.90) 92%,
+    rgba(10,14,26,1)  100%
+  );
 }
 .hero-grid-bg{
   position:absolute;inset:0;
+  z-index:2;       /* Phase 5 : au-dessus de la video + overlay */
   background-image:
     linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
     linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
@@ -345,6 +368,7 @@ body.has-cursor .cursor-glow{display:block;}
   min-height:100svh;      /* PHASE 3: match smartphone visible viewport */
   display:flex;flex-direction:column;justify-content:center;
   position:relative;
+  z-index:3;              /* Phase 5 : contenu au-dessus de video(0) + overlay(1) + grid(2) */
   padding-top:clamp(100px,13vh,140px);   /* fix bug Hero : breathing sous la navbar (logo) */
   padding-bottom:48px;
   will-change:transform,opacity;
@@ -2205,6 +2229,20 @@ body.has-cursor .cursor-glow{display:block;}
      HERO
      ============================================================ -->
 <section class="hero" id="hero">
+  <!-- Phase 5 : video de fond scroll-scrubbed (mobile + desktop)
+       2 sources via media query : mobile = 720x1280 / desktop = 1920x1080
+       muted + playsinline = obligatoire iOS Safari pour autoplay/decode
+       pas de "loop" ni "autoplay" : on contrôle via JS (pause + scrub) -->
+  <video class="hero-bg-video"
+         muted
+         playsinline
+         webkit-playsinline
+         preload="auto"
+         poster="hero-poster.jpg">
+    <source src="hero-bg-mobile.mp4" type="video/mp4" media="(max-width:1024px)">
+    <source src="hero-bg-desktop.mp4" type="video/mp4">
+  </video>
+  <div class="hero-bg-overlay"></div>
   <div class="hero-grid-bg"></div>
   <div class="hero-inner">
     <h1 class="hero-title">
@@ -3651,6 +3689,28 @@ function initHeroPinned(){
     .add(QUERY_MOBILE,  () => buildHeroPin('+=80%'));
 
   function buildHeroPin(end){
+    /* Phase 5 : SCROLL-SCRUB VIDEO setup universel (mobile + desktop)
+       - removeAttribute autoplay/loop : on prend le controle JS total
+       - muted + playsInline : iOS Safari obligatoire pour decoder sans
+         interaction utilisateur (mute deja en HTML, on reaffirme JS)
+       - pause + currentTime=0 : video bloquee au premier frame jusqu'au scroll
+       - readyState 1 = HAVE_METADATA (duration disponible). Si pas encore
+         charge, on attend l'evt loadedmetadata before activating le scrub. */
+    const video = document.querySelector('.hero-bg-video');
+    let videoReady = false;
+    if (video){
+      video.muted = true;
+      video.playsInline = true;
+      video.removeAttribute('autoplay');
+      video.removeAttribute('loop');
+      const onMeta = () => {
+        try { video.pause(); video.currentTime = 0; } catch(e){}
+        videoReady = true;
+      };
+      if (video.readyState >= 1) onMeta();
+      else video.addEventListener('loadedmetadata', onMeta, { once:true });
+    }
+
     const heroTl = gsap.timeline({
       scrollTrigger: {
         trigger: '.hero',
@@ -3660,6 +3720,17 @@ function initHeroPinned(){
         scrub: 1,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+        onUpdate: self => {
+          /* Scrub video universel : video.currentTime = duration * progress.
+             Le seuil 0.016 (1 frame @ 60Hz) evite de spammer le decoder
+             quand le delta est imperceptible (optim iOS Safari). */
+          if (video && videoReady && video.duration){
+            const target = video.duration * self.progress;
+            if (Math.abs(video.currentTime - target) > 0.016){
+              video.currentTime = target;
+            }
+          }
+        }
       }
     });
     /* fix : parallax adouci pour garder le texte lisible
