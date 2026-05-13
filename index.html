@@ -686,17 +686,22 @@ body.no-hero-bg .hero-bg-overlay{
   color:var(--text-dim);max-width:68ch;margin-inline:auto;
   margin-top:22px;line-height:1.65;font-size:15px;
 }
+/* Phase 6.x : Mission passe en ROUE 3D AXE X (Ferris wheel) — pattern
+   miroir de Resultats. Les cartes basculent VERTICALEMENT par-dessus
+   l'axe horizontal traversant l'ecran. Stage TALL pour accueillir
+   l'amplitude verticale du mouvement. */
 .mission-stage{
   position:relative;width:100%;
-  height:clamp(420px,52vh,500px);
-  perspective:1400px;perspective-origin:50% 50%;
+  height:clamp(500px,68vh,620px);
+  perspective:1500px;perspective-origin:50% 50%;
   display:grid;place-items:center;
 }
 .mission-platter{
   position:relative;
-  width:clamp(280px,76vw,360px);
-  height:clamp(360px,46vh,420px);
+  width:clamp(320px,84vw,440px);
+  height:clamp(340px,46vh,400px);
   transform-style:preserve-3d;
+  -webkit-transform-style:preserve-3d;
   will-change:transform;
 }
 .mission-card{
@@ -707,7 +712,7 @@ body.no-hero-bg .hero-bg-overlay{
   border:1px solid var(--line);
   backdrop-filter:blur(18px) saturate(140%);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
-  transform:rotateY(var(--i,0deg)) translateZ(var(--mission-r,260px));
+  transform:rotateX(var(--i,0deg)) translateZ(var(--mission-r,240px));
   -webkit-backface-visibility:hidden;backface-visibility:hidden;
   display:flex;flex-direction:column;justify-content:center;
   box-shadow:0 24px 60px -20px rgba(0,0,0,.55);
@@ -726,20 +731,20 @@ body.no-hero-bg .hero-bg-overlay{
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .mission-card p{color:var(--text);font-size:15px;line-height:1.6;}
-@media(max-width:1024px){ .mission-card{--mission-r:240px;} }
+@media(max-width:1024px){ .mission-card{--mission-r:220px;} }
 @media(max-width:640px){
-  /* fix : cartes coupees en bas -> reduit stage / platter + sub-titre desormais court */
+  /* roue 3D axe X mobile : stage TALL pour amplitude verticale */
   .mission-pin{padding:24px 0;}
   .mission-head{margin-bottom:22px;}
   .mission-head p{font-size:13.5px;margin-top:12px;}
-  .mission-stage{height:clamp(360px,44vh,420px);}
-  .mission-platter{height:clamp(320px,40vh,380px);}
-  .mission-card{--mission-r:205px;padding:26px 22px;}
+  .mission-stage{height:clamp(420px,58vh,520px);}
+  .mission-platter{height:clamp(280px,40vh,340px);width:clamp(260px,82vw,340px);}
+  .mission-card{--mission-r:190px;padding:26px 22px;}
   .mission-card h3{font-size:24px;margin-bottom:14px;}
   .mission-card p{font-size:13.5px;line-height:1.55;}
   .mission-card .m-num{margin-bottom:16px;}
 }
-@media(max-width:380px){ .mission-card{--mission-r:185px;} }
+@media(max-width:380px){ .mission-card{--mission-r:170px;} }
 
 /* ============================================================
    SERVICES — PHASE 3
@@ -3840,8 +3845,9 @@ function initConstat(){
 }
 
 /* ============================================================
-   NOTRE MISSION — PHASE 4
-   Plaque tournante : 3 cartes pivotent groupées sur axe Y (-240°)
+   NOTRE MISSION — Roue 3D AXE X (Phase 6.x — etait axe Y en Phase 4)
+   3 cartes basculent VERTICALEMENT par-dessus (Ferris wheel),
+   pattern miroir de Resultats. Rotation 0 → -240° sur 2.4 vh.
    ============================================================ */
 function initMission(){
   const platter = document.getElementById('mission-platter');
@@ -3865,7 +3871,8 @@ function initMission(){
     return;
   }
 
-  // 3 cartes × 120° = full cycle. Rotation 0 → -240° pour finir face à carte 3
+  // 3 cartes × 120° = full cycle. Rotation 0 → -240° pour finir face à carte 3.
+  // Axe X (Ferris wheel) : les cartes basculent verticalement par-dessus.
   ScrollTrigger.create({
     trigger: '.mission-pin',
     start: 'top top',
@@ -3876,7 +3883,7 @@ function initMission(){
     invalidateOnRefresh: true,
     onUpdate: self => {
       const rot = -240 * self.progress;
-      gsap.set(platter, { rotationY: rot });
+      gsap.set(platter, { rotationX: rot });
     }
   });
 }
