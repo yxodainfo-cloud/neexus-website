@@ -20,5 +20,6 @@ npm-debug.log*
 # Note : hero-bg-*.mp4 et hero-poster.jpg sont commits car servis par le site.
 # Les sources brutes restent locales.
 scroll scrub neexus.mp4
+neexus video.mp4
 *-source.mp4
 _preview-*.jpg

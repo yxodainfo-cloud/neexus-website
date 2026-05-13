@@ -326,22 +326,30 @@ body.has-cursor .cursor-glow{display:block;}
   padding:0 36px;
   overflow:hidden;
   z-index:2;
-  isolation:isolate;      /* Phase 5 : stacking context propre pour la video */
-  will-change:transform;  /* hero is pinned + scrubbed, force GPU */
+  /* Phase 6 : will-change retiré (plus de pin), isolation retirée
+     (video maintenant au body level, pas besoin de stacking context). */
 }
-/* Phase 5 : background video scroll-scrubbed */
+/* Phase 6 : video + overlay PARALLAX (fixed dans le viewport, hors flow Hero).
+   La video reste collée au viewport pendant que le Hero scroll par dessus
+   = effet parallax classique. Opacity fade quand on quitte le Hero (la classe
+   .no-hero-bg sur body est toggled par ScrollTrigger). */
 .hero-bg-video{
-  position:absolute;inset:0;
-  width:100%;height:100%;
+  position:fixed;inset:0;
+  width:100vw;height:100vh;
   object-fit:cover;
   z-index:0;
   pointer-events:none;
+  opacity:1;
+  transition:opacity .55s ease;
   background:var(--bg-1);    /* fallback navy avant chargement video */
 }
 .hero-bg-overlay{
-  position:absolute;inset:0;
+  position:fixed;inset:0;
+  width:100vw;height:100vh;
   z-index:1;
   pointer-events:none;
+  opacity:1;
+  transition:opacity .55s ease;
   /* darker vers le bas : fade fluide vers le fond du Constat */
   background:linear-gradient(180deg,
     rgba(7,10,20,.35) 0%,
@@ -349,6 +357,11 @@ body.has-cursor .cursor-glow{display:block;}
     rgba(7,10,20,.90) 92%,
     rgba(10,14,26,1)  100%
   );
+}
+/* Fade-out propre quand on quitte le Hero (toggled par initHero() en JS) */
+body.no-hero-bg .hero-bg-video,
+body.no-hero-bg .hero-bg-overlay{
+  opacity:0;
 }
 .hero-grid-bg{
   position:absolute;inset:0;
@@ -2268,24 +2281,29 @@ a[href="#faq"]{
   <a href="#cta" class="gradient-text">Audit gratuit →</a>
 </div>
 
+<!-- Phase 6 : video de fond + overlay PARALLAX (fixed dans le viewport)
+     Placés au niveau body (hors de .hero) car .hero crée un containing
+     block (via will-change) qui empecherait position:fixed d'echapper
+     a la section. Video joue en autoplay loop, opacity fade quand on
+     quitte le Hero (classe .no-hero-bg toggled par ScrollTrigger).
+     muted + playsinline = obligatoire iOS Safari pour autoplay decode -->
+<video class="hero-bg-video"
+       muted
+       playsinline
+       webkit-playsinline
+       autoplay
+       loop
+       preload="auto"
+       poster="hero-poster.jpg">
+  <source src="hero-bg-mobile.mp4" type="video/mp4" media="(max-width:1024px)">
+  <source src="hero-bg-desktop.mp4" type="video/mp4">
+</video>
+<div class="hero-bg-overlay"></div>
+
 <!-- ============================================================
      HERO
      ============================================================ -->
 <section class="hero" id="hero">
-  <!-- Phase 5 : video de fond scroll-scrubbed (mobile + desktop)
-       2 sources via media query : mobile = 720x1280 / desktop = 1920x1080
-       muted + playsinline = obligatoire iOS Safari pour autoplay/decode
-       pas de "loop" ni "autoplay" : on contrôle via JS (pause + scrub) -->
-  <video class="hero-bg-video"
-         muted
-         playsinline
-         webkit-playsinline
-         preload="auto"
-         poster="hero-poster.jpg">
-    <source src="hero-bg-mobile.mp4" type="video/mp4" media="(max-width:1024px)">
-    <source src="hero-bg-desktop.mp4" type="video/mp4">
-  </video>
-  <div class="hero-bg-overlay"></div>
   <div class="hero-grid-bg"></div>
   <div class="hero-inner">
     <h1 class="hero-title">
@@ -3726,82 +3744,46 @@ function initHeroPinned(){
 
   if (reducedMotion) return;
 
-  /* 2) PINNED SCRUB — desktop and mobile both get the pin, different lengths */
-  gsap.matchMedia()
-    .add(QUERY_DESKTOP, () => buildHeroPin('+=120%'))
-    .add(QUERY_MOBILE,  () => buildHeroPin('+=80%'));
-
-  function buildHeroPin(end){
-    /* Phase 5.1 : SCRUB VIDEO avec FALLBACK iOS autoplay-loop
-       iOS Safari refuse de scrub video.currentTime de facon fluide (bug
-       WebKit historique). Detect iOS -> autoplay loop fallback. Android
-       + desktop = vrai scrub. C'est le pattern des sites premium pour iOS. */
-    const video = document.querySelector('.hero-bg-video');
-    let videoReady = false;
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const useScrub = !isIOS;
-
-    if (video && !reducedMotion){
-      video.muted = true;
-      video.playsInline = true;
-
-      if (useScrub){
-        /* Android + desktop : on prend le controle JS pour scrub */
-        video.removeAttribute('autoplay');
-        video.removeAttribute('loop');
-        const onMeta = () => {
-          try { video.pause(); video.currentTime = 0; } catch(e){}
-          videoReady = true;
-        };
-        if (video.readyState >= 1) onMeta();
-        else video.addEventListener('loadedmetadata', onMeta, { once:true });
-      } else {
-        /* iOS : autoplay loop fallback. La video joue en continu en
-           arriere-plan du Hero sans reagir au scroll. C'est cinematique
-           quand meme. On reaffirme les attributs et on force play() apres
-           canplay au cas ou iOS aurait bloque l'autoplay HTML natif. */
-        video.loop = true;
-        video.autoplay = true;
-        const tryPlay = () => video.play().catch(()=>{});
-        if (video.readyState >= 3) tryPlay();
-        else video.addEventListener('canplay', tryPlay, { once: true });
-      }
-    }
-
-    const heroTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: '.hero',
-        start: 'top top',
-        end,
-        pin: true,
-        scrub: 1,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onUpdate: self => {
-          /* Scrub seulement si !iOS. iOS = video joue en autoplay loop,
-             pas touchee par le scroll (volontairement, sinon stutter). */
-          if (useScrub && video && videoReady && video.duration){
-            const target = video.duration * self.progress;
-            if (Math.abs(video.currentTime - target) > 0.016){
-              video.currentTime = target;
-            }
-          }
-        }
-      }
-    });
-    /* fix : parallax adouci pour garder le texte lisible
-       (avant : sub opacity .25 -> illisible / cta-row y:40 -> decale visible).
-       Maintenant tout reste lisible meme en mi-scrub. */
-    heroTl
-      .to('.hero-title',       { y: -50, opacity: .8,  ease: 'none' }, 0)
-      .to('.hero-sub',         { y: -30, opacity: .75, ease: 'none' }, 0)
-      .to('.cta-row',          { y: 18,  opacity: .85, ease: 'none' }, 0)
-      .to('.hero-micro-proof', { y: -10, opacity: .9, ease: 'none' }, 0.2)   /* fix : restent visibles pendant scrub */
-      .to('.orb-1',            { scale: 1.4, opacity: .85, ease: 'none' }, 0)
-      .to('.orb-2',            { scale: 1.6, opacity: .75, ease: 'none' }, 0);
-    return () => heroTl.scrollTrigger?.kill();
+  /* Phase 6 : VIDEO PARALLAX FIXED + FADE OUT
+     -----------------------------------------------------------------
+     Plus de pin Hero, plus de scrub video. La video joue en autoplay
+     loop sur TOUS les devices (iOS + Android + desktop). Elle est
+     position:fixed dans le viewport (cf CSS) → reste collee a l'ecran
+     pendant que le Hero scroll par dessus = parallax classique.
+     Une ScrollTrigger toggle body.no-hero-bg quand on quitte le Hero
+     pour fader proprement vers les sections suivantes.
+     ----------------------------------------------------------------- */
+  const video = document.querySelector('.hero-bg-video');
+  if (video){
+    /* attributs deja en HTML (autoplay loop muted playsinline) mais on
+       reaffirme via JS pour fiabilite + on appelle play() explicitement
+       apres canplay au cas ou iOS aurait bloque l'autoplay HTML natif. */
+    video.muted = true;
+    video.playsInline = true;
+    video.loop = true;
+    const tryPlay = () => video.play().catch(()=>{});
+    if (video.readyState >= 3) tryPlay();
+    else video.addEventListener('canplay', tryPlay, { once: true });
   }
+
+  /* Toggle body.no-hero-bg pour fader video+overlay en sortie de Hero.
+     onLeave : bottom du Hero touche top viewport → fade out + pause.
+     onEnterBack : on remonte dans le Hero → fade in + play.
+     Pas de onEnter / onLeaveBack : au load on est deja dans le Hero,
+     CSS default = opacity:1, classe absente. */
+  ScrollTrigger.create({
+    trigger: '.hero',
+    start: 'top top',
+    end: 'bottom top',
+    onLeave: () => {
+      document.body.classList.add('no-hero-bg');
+      if (video) video.pause();   /* gain CPU/batterie hors viewport */
+    },
+    onEnterBack: () => {
+      document.body.classList.remove('no-hero-bg');
+      if (video) video.play().catch(()=>{});
+    }
+  });
 }
 
 /* ============================================================
