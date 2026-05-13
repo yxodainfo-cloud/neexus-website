@@ -845,7 +845,7 @@ Aucune solution one-liner type CSS zoom n'existe — c'est du vrai travail. Ne p
 
 ### Commits Phase 4.5 / 4.6
 
-État final pushé : `df31f2b` (revert du zoom).
+État final Phase 4.5 : `df31f2b` (revert du zoom). Continué en Phase 5 plus bas.
 
 Approximativement 25 commits, dont les majeurs :
 - Hero : `c6d4732`, `e26f29f`, `a00978e`, `7b6375e`, `892dc91`
@@ -858,3 +858,195 @@ Approximativement 25 commits, dont les majeurs :
 - Stack refonte : `2a56d69`, `c8da569`
 - 4 fixes finaux (témoignages + gagner + rassurance + footer-mega) : `db1e640`, `dd02cfe`
 - ❌ Zoom desktop tenté + reverted : `53c20e0` + `df31f2b`
+
+---
+
+## PHASE 5 — Background vidéo scroll-scrubbed sur Hero (13 mai 2026)
+
+**Objectif** : intégrer une vidéo de fond avec scroll-scrub UNIQUEMENT sur le Hero. Reste du site inchangé (fond dark + orbs comme avant). Concentre le wow factor sur la première impression sans charge réseau ni complexité supplémentaire ailleurs.
+
+### Pipeline d'encodage
+
+**Source fournie par user** : `scroll scrub neexus.mp4` (3.8 MB, 1920×1080, H.264 High yuv420p, 30fps, 4s, 120 frames). Contenu : circuit board avec puce "AI" centrale qui s'illumine progressivement, palette navy/magenta/cyan/violet matching brand. Composition centrée → crop mobile preserve l'AI chip.
+
+**Sources gardées localement, ignorées par git** (`.gitignore` updated) :
+```
+scroll scrub neexus.mp4
+*-source.mp4
+_preview-*.jpg
+```
+
+**3 fichiers committés et servis depuis Vercel** :
+
+| Fichier | Dimensions | FPS | CRF | Keyframes | Size |
+|---|---|---|---|---|---|
+| `hero-bg-mobile.mp4` | 720×1280 portrait | 24 | 24 | 96/96 (every frame) | **2.5 MB** |
+| `hero-bg-desktop.mp4` | 1920×1080 paysage | 24 | 22 | 96/96 (every frame) | **6.2 MB** |
+| `hero-poster.jpg` | 1920×1080 first frame, q=3 | — | — | — | **99 KB** |
+
+**Commandes ffmpeg utilisées** (à reproduire si vidéo source change) :
+
+```bash
+# ffmpeg installé via : winget install --id Gyan.FFmpeg -e
+# Path: c:/Users/faycal/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-8.1.1-full_build/bin/
+
+# Mobile (cible 2-5 MB, crop centré + keyframe-per-frame)
+ffmpeg -i "source.mp4" \
+  -vf "crop=608:1080:656:0,scale=720:1280,fps=24" \
+  -c:v libx264 -crf 24 -preset slow -profile:v high -level 4.1 -pix_fmt yuv420p \
+  -g 1 -keyint_min 1 -sc_threshold 0 -x264opts "no-scenecut" \
+  -an -movflags +faststart \
+  hero-bg-mobile.mp4
+
+# Desktop (cible 5-8 MB, keyframe-per-frame)
+ffmpeg -i "source.mp4" \
+  -vf "fps=24" \
+  -c:v libx264 -crf 22 -preset slow -profile:v high -level 4.1 -pix_fmt yuv420p \
+  -g 1 -keyint_min 1 -sc_threshold 0 -x264opts "no-scenecut" \
+  -an -movflags +faststart \
+  hero-bg-desktop.mp4
+
+# Poster (~50-100 KB)
+ffmpeg -i "source.mp4" -ss 0 -frames:v 1 -q:v 3 hero-poster.jpg
+```
+
+**Flags critiques** :
+- `-g 1 -keyint_min 1 -sc_threshold 0` : chaque frame est un keyframe I-frame indépendant — **indispensable pour scrub fluide** (sans ça, le decoder doit reprendre depuis le dernier keyframe à chaque change de currentTime → stutter brutal)
+- `-pix_fmt yuv420p` + `-profile:v high -level 4.1` : compat iOS Safari obligatoire
+- `-an` : pas d'audio (gain ~30% taille)
+- `-movflags +faststart` : metadata en début de fichier → vidéo démarre avant fin du download
+- `crop=608:1080:656:0` : prend les 608 pixels centraux (sur les 1920) pour faire le 9:16 portrait mobile
+
+### Structure HTML
+
+Dans `.hero`, avant `.hero-grid-bg` :
+```html
+<video class="hero-bg-video"
+       muted playsinline webkit-playsinline
+       preload="auto"
+       poster="hero-poster.jpg">
+  <source src="hero-bg-mobile.mp4" type="video/mp4" media="(max-width:1024px)">
+  <source src="hero-bg-desktop.mp4" type="video/mp4">
+</video>
+<div class="hero-bg-overlay"></div>
+```
+
+- `muted` + `playsinline` + `webkit-playsinline` : iOS Safari obligatoire (sans muted/playsinline → autoplay refusé, sans webkit-playsinline → fullscreen forcé sur iOS < 13)
+- **Pas d'`autoplay` ni `loop` en HTML** : on contrôle via JS (selon iOS/non-iOS, voir Phase 5.1 plus bas)
+- `<source media="(max-width:1024px)">` : mobile + tablet téléchargent UNIQUEMENT la version mobile, jamais la desktop (et vice-versa)
+
+### CSS — z-index strict + isolation
+
+```css
+.hero{
+  isolation:isolate;       /* stacking context propre pour la vidéo */
+  /* + existing : position:relative, min-height:100svh, padding, overflow:hidden, z-index:2 */
+}
+.hero-bg-video{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  z-index:0;
+  pointer-events:none;
+  background:var(--bg-1);    /* fallback navy avant chargement */
+}
+.hero-bg-overlay{
+  position:absolute; inset:0;
+  z-index:1; pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(7,10,20,.35) 0%,
+    rgba(7,10,20,.55) 50%,
+    rgba(7,10,20,.90) 92%,
+    rgba(10,14,26,1)  100%);   /* fade vers le bas pour transition propre vers Constat */
+}
+.hero-grid-bg{ z-index:2; /* au-dessus de la video + overlay */ }
+.hero-inner{ z-index:3; /* contenu au-dessus de tout */ }
+```
+
+**Ordre z-index dans `.hero`** : video(0) → overlay(1) → grid-bg(2) → contenu(3). Le `isolation:isolate` confine ces z-index dans le hero (n'affecte pas le z-index global du site).
+
+### JS — Phase 5 (initiale)
+
+Le scrub est ajouté DANS `buildHeroPin()` existant (modif chirurgicale) :
+- Setup vidéo AVANT le timeline (pause + currentTime=0, attendre `loadedmetadata`)
+- `onUpdate` du ScrollTrigger pin : `video.currentTime = video.duration * self.progress`
+- Seuil `0.016s` (1 frame @ 60Hz) pour éviter spam decoder
+
+### ❌ PHASE 5.1 — Fallback iOS (Safari refuse scrub fluide)
+
+**Bug constaté** : ami avec iPhone test confirme que le scroll-scrub **ne marche pas sur iOS Safari**. C'était documenté en Phase 4.5 comme risque #1 ("iOS Safari peut stuttering / video.currentTime ne scrub pas de façon fluide").
+
+**Cause** : bug WebKit historique. Le decoder iOS Safari refuse de servir les frames intermédiaires à la vitesse demandée par les changements rapides de `currentTime`. Même avec keyframe-per-frame, le résultat reste saccadé ou complètement bloqué sur iOS.
+
+**Solution livrée (commit `8694d3e`)** : pattern de détection iOS avec fallback autoplay loop :
+
+```js
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const useScrub = !isIOS;
+
+if (video && !reducedMotion){
+  video.muted = true;
+  video.playsInline = true;
+
+  if (useScrub){
+    /* Android + desktop : controle JS pour scrub */
+    video.removeAttribute('autoplay');
+    video.removeAttribute('loop');
+    /* pause + currentTime=0 + listen loadedmetadata */
+  } else {
+    /* iOS : autoplay loop fallback. play() apres canplay (au cas ou iOS bloque l'autoplay natif). */
+    video.loop = true;
+    video.autoplay = true;
+    const tryPlay = () => video.play().catch(()=>{});
+    if (video.readyState >= 3) tryPlay();
+    else video.addEventListener('canplay', tryPlay, { once: true });
+  }
+}
+
+// Dans onUpdate du ScrollTrigger pin :
+if (useScrub && video && videoReady && video.duration){
+  /* scrub */
+}
+// Else : video joue en loop natif, pas pilotee par le scroll
+```
+
+**UX par device** :
+| Device | Comportement |
+|---|---|
+| iPhone / iPad (iOS) | Vidéo en autoplay loop, joue en continu en arrière-plan du Hero. **Pas réactive au scroll** mais reste cinématique. |
+| Android | Scroll-scrub fonctionnel (testé OK par user) |
+| Desktop Chrome/Edge/Firefox/Safari | Scroll-scrub fonctionnel |
+
+**Détection iPadOS** : depuis iPadOS 13, l'iPad reporte `navigator.platform === 'MacIntel'`. Le `maxTouchPoints > 1` permet de le distinguer d'un vrai Mac. Pattern de détection robuste.
+
+**Si scrub iOS devient critique plus tard** : option B = canvas + sprite sheet de 96 JPG frames préchargés. Bulletproof iOS car le canvas dessine juste l'image N selon progress, sans toucher au video decoder. ~5-10x plus de travail à implémenter mais aucun risque WebKit.
+
+### Specs de calage (mémoire pour futurs ajustements)
+
+| Paramètre | Mobile (≤1024) | Desktop (≥1025) |
+|---|---|---|
+| Pin Hero length | `+=80%` viewport | `+=120%` viewport |
+| Vidéo durée | 4s (96 frames @ 24fps) | 4s (96 frames @ 24fps) |
+| Vidéo dimensions | 720×1280 portrait | 1920×1080 landscape |
+| Cible scrub UX | Mobile portrait = 1 swipe complet ≈ vidéo entière | Desktop = scroll molette ≈ 2-3s naturel |
+
+### 🐛 BUG TABLET CONNU NON FIXÉ (à investiguer en Phase 5.2+)
+
+User signale : sur tablet Android, en scrollant **vers le bas** tout est OK. En scrollant **vers le haut**, **les sections "fond noir" se décalent à gauche et on voit le fond coloré (orbs/body bg) à droite**. La navbar reste correctement alignée centrée.
+
+**Hypothèses non encore testées** :
+
+1. **Constat track translate-X résiduel** : `initConstat()` fait `gsap.set(track, { x: -distance() * progress })` dans `onUpdate`. La fonction `distance()` recalcule à chaque frame `track.scrollWidth - window.innerWidth + 60`. Sur tablet, si `window.innerWidth` change pendant le scroll (URL bar mobile/tablet qui apparaît/disparaît, scrollbar landscape), `distance()` change → `x` appliqué devient incohérent. Le track reste à `x = -ancienne_distance` même au scroll inverse.
+2. **Services zigzag from-state ré-appliqué** : `initServices()` mobile branch fait `gsap.from(panel, { x: ±100vw, once: true })`. Le from-state (`-100vw` ou `+100vw`) est SET dès la registration du trigger. Si `ScrollTrigger.refresh()` se déclenche (e.g., metadata vidéo chargée), le from peut se ré-appliquer aux panels — animation déjà marquée done par `once: true`, donc ne se rejoue pas → panels coincés à ±100vw.
+3. **Pin-spacer de ScrollTrigger** sur tablet a un comportement de re-engagement weird en scroll inverse.
+
+**À tester en priorité** : ajouter `onLeaveBack: () => gsap.set(track, { x: 0 })` sur le ScrollTrigger Constat. Si ça fix, c'était bien Constat. Sinon investigation continue.
+
+**Symptôme matching** : sections déplacées à gauche = `transform: translateX(-X)` résiduel. Fond coloré visible à droite = body background ou orbs visibles dans la zone où la section devrait être. Pas la navbar parce qu'elle est `position:fixed` (immune aux transforms des sections).
+
+### Commits Phase 5
+
+- **`9f8408d`** — Phase 5 commit 1 : video scroll-scrubbed sur Hero (mobile + desktop), 3 fichiers MP4+JPG, modifs HTML/CSS/JS
+- **`8694d3e`** — Phase 5.1 : fallback iOS Safari = autoplay loop (scrub bloqué par WebKit)
+- (à venir Phase 5.2) — fix bug tablet "decalage gauche au scroll up"
