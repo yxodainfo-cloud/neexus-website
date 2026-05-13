@@ -3354,13 +3354,16 @@ const QUERY_MOBILE  = '(max-width: 1024px)';
    true  = fade-up + leger scale, layout simple, pas de pin/scrub/3D
    false = animations cinematiques d'origine
 
-   Sections affectees : Constat, Methode, Temoignages.
-   MISSION EXEMPTEE : garde toujours sa roue 3D Ferris wheel (decision user).
-   Hero entry timeline + CTA Form = inchanges.
+   Section affectee : Methode uniquement.
+   EXEMPTIONS (decision user, 13 mai 2026) :
+   - Constat = pin + scrub horizontal d'origine (bug noir mobile en simplifie)
+   - Mission = roue 3D Ferris wheel d'origine
+   - Temoignages = roue 3D 6 cards d'origine
+   Hero entry timeline + CTA Form = inchanges (deja simples).
    Sections masquees (Profils/Services/Resultats/Stack/FAQ) = inchangees
    (leur code cinematique est intact, sera reutilise si on les reactive).
 
-   Pour reactiver les animations cinematiques : passer ce flag a false.
+   Pour reactiver l'animation cinematique de Methode : passer ce flag a false.
    ============================================================ */
 const SIMPLIFIED_ANIMATIONS = true;
 
@@ -3836,18 +3839,13 @@ function initConstat(){
     scrollTrigger: { trigger: '.constat', start: 'top 75%', once: true }
   });
 
-  /* Phase 7 : layout simple + fade-up scale (skip pin/scrub horizontal) */
-  if (SIMPLIFIED_ANIMATIONS || reducedMotion){
+  /* Constat : EXEMPTEE de Phase 7 simplification — garde son pin + scrub horizontal
+     d'origine (bug rendu mobile en simplifie : noir/cards invisibles avec min-height:100svh
+     du .constat-pin). */
+  if (reducedMotion){
     track.style.flexWrap = 'wrap';
     track.style.justifyContent = 'center';
     cards.forEach(c => c.classList.add('is-focus'));
-    if (!reducedMotion){
-      gsap.from(cards, {
-        y: 30, opacity: 0, scale: 0.96, stagger: 0.08,
-        duration: 0.6, ease: 'power3.out',
-        scrollTrigger: { trigger: '.constat', start: 'top 80%', once: true }
-      });
-    }
     return;
   }
 
@@ -4268,8 +4266,10 @@ function initTesti(){
     scrollTrigger: { trigger: '.testi', start: 'top 75%', once: true }
   });
 
-  /* Phase 7 : layout simple + fade-up scale (skip roue 3D 6 cards) */
-  if (SIMPLIFIED_ANIMATIONS || reducedMotion){
+  /* Temoignages : EXEMPTEE de Phase 7 simplification — garde sa roue 3D 6 cards
+     d'origine (decision user). */
+  if (reducedMotion){
+    // Fallback : empile les cartes verticalement, désactive perspective
     const stage = document.querySelector('.testi-stage');
     if (stage){
       stage.style.height = 'auto';
@@ -4279,13 +4279,6 @@ function initTesti(){
     cards.forEach(c => {
       c.style.cssText += 'position:relative;inset:auto;transform:none;width:100%;max-width:340px;margin:0 auto;';
     });
-    if (!reducedMotion){
-      gsap.from(cards, {
-        y: 30, opacity: 0, scale: 0.96, stagger: 0.08,
-        duration: 0.6, ease: 'power3.out',
-        scrollTrigger: { trigger: '.testi', start: 'top 80%', once: true }
-      });
-    }
     return;
   }
 
