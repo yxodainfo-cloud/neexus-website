@@ -3349,6 +3349,22 @@ const QUERY_DESKTOP = '(min-width: 1025px)';
 const QUERY_MOBILE  = '(max-width: 1024px)';
 
 /* ============================================================
+   GLOBAL TOGGLE — Phase 7 animations simplifiees
+   ============================================================
+   true  = fade-up + leger scale, layout simple, pas de pin/scrub/3D
+   false = animations cinematiques d'origine (constat horizontal scrub,
+           mission Ferris wheel, methode notebook flip, testi roue 3D)
+
+   Sections affectees : Constat, Mission, Methode, Temoignages.
+   Hero entry timeline + CTA Form = inchanges.
+   Sections masquees (Profils/Services/Resultats/Stack/FAQ) = inchangees
+   (leur code cinematique est intact, sera reutilise si on les reactive).
+
+   Pour reactiver les animations cinematiques : passer ce flag a false.
+   ============================================================ */
+const SIMPLIFIED_ANIMATIONS = true;
+
+/* ============================================================
    PRELOADER — 3s cinematic
    ============================================================ */
 const preloader = document.getElementById('preloader');
@@ -3820,10 +3836,18 @@ function initConstat(){
     scrollTrigger: { trigger: '.constat', start: 'top 75%', once: true }
   });
 
-  if (reducedMotion){
+  /* Phase 7 : layout simple + fade-up scale (skip pin/scrub horizontal) */
+  if (SIMPLIFIED_ANIMATIONS || reducedMotion){
     track.style.flexWrap = 'wrap';
     track.style.justifyContent = 'center';
     cards.forEach(c => c.classList.add('is-focus'));
+    if (!reducedMotion){
+      gsap.from(cards, {
+        y: 30, opacity: 0, scale: 0.96, stagger: 0.08,
+        duration: 0.6, ease: 'power3.out',
+        scrollTrigger: { trigger: '.constat', start: 'top 80%', once: true }
+      });
+    }
     return;
   }
 
@@ -3867,13 +3891,21 @@ function initMission(){
     scrollTrigger: { trigger: '.mission', start: 'top 75%', once: true }
   });
 
-  if (reducedMotion){
+  /* Phase 7 : layout simple + fade-up scale (skip Ferris wheel 3D) */
+  if (SIMPLIFIED_ANIMATIONS || reducedMotion){
     const stage = document.querySelector('.mission-stage');
     if (stage){ stage.style.height = 'auto'; stage.style.perspective = 'none'; }
     platter.style.cssText += 'width:100%;height:auto;display:flex;flex-direction:column;gap:20px;';
     cards.forEach(c => {
       c.style.cssText += 'position:relative;inset:auto;transform:none;width:100%;max-width:340px;margin:0 auto;';
     });
+    if (!reducedMotion){
+      gsap.from(cards, {
+        y: 30, opacity: 0, scale: 0.96, stagger: 0.08,
+        duration: 0.6, ease: 'power3.out',
+        scrollTrigger: { trigger: '.mission', start: 'top 80%', once: true }
+      });
+    }
     return;
   }
 
@@ -4087,12 +4119,20 @@ function initMethode(){
     scrollTrigger: { trigger: '.methode', start: 'top 75%', once: true }
   });
 
-  if (reducedMotion){
-    /* Fallback : simple fade-up sans 3D */
-    gsap.from(steps, {
-      y: 30, opacity: 0, stagger: .08, duration: .6, ease: 'power2.out',
-      scrollTrigger: { trigger: '.methode-steps', start: 'top 85%', once: true }
-    });
+  /* Phase 7 : fade-up scale (skip notebook flip 3D) */
+  if (SIMPLIFIED_ANIMATIONS || reducedMotion){
+    if (!reducedMotion){
+      gsap.from(steps, {
+        y: 30, opacity: 0, scale: 0.96, stagger: 0.08,
+        duration: 0.6, ease: 'power3.out',
+        scrollTrigger: { trigger: '.methode-steps', start: 'top 85%', once: true }
+      });
+    } else {
+      gsap.from(steps, {
+        y: 30, opacity: 0, stagger: .08, duration: .6, ease: 'power2.out',
+        scrollTrigger: { trigger: '.methode-steps', start: 'top 85%', once: true }
+      });
+    }
     return;
   }
 
@@ -4233,8 +4273,8 @@ function initTesti(){
     scrollTrigger: { trigger: '.testi', start: 'top 75%', once: true }
   });
 
-  if (reducedMotion){
-    // Fallback : empile les cartes verticalement, désactive perspective
+  /* Phase 7 : layout simple + fade-up scale (skip roue 3D 6 cards) */
+  if (SIMPLIFIED_ANIMATIONS || reducedMotion){
     const stage = document.querySelector('.testi-stage');
     if (stage){
       stage.style.height = 'auto';
@@ -4244,6 +4284,13 @@ function initTesti(){
     cards.forEach(c => {
       c.style.cssText += 'position:relative;inset:auto;transform:none;width:100%;max-width:340px;margin:0 auto;';
     });
+    if (!reducedMotion){
+      gsap.from(cards, {
+        y: 30, opacity: 0, scale: 0.96, stagger: 0.08,
+        duration: 0.6, ease: 'power3.out',
+        scrollTrigger: { trigger: '.testi', start: 'top 80%', once: true }
+      });
+    }
     return;
   }
 
