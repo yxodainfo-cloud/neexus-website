@@ -3756,36 +3756,37 @@ function initHeroPinned(){
 
   if (reducedMotion) return;
 
-  /* ============================================================
-     PHASE 6 VIDEO INIT — DISABLED (13 mai 2026)
-     -----------------------------------------------------------------
-     Pour REACTIVER : decommenter le bloc entre /* DISABLED { */ et /* } */
-     ET decommenter le HTML <video> + overlay marque PHASE 6 VIDEO DISABLED.
-     ============================================================ */
-  /* DISABLED {
-  const video = document.querySelector('.hero-bg-video');
-  if (video){
-    video.muted = true;
-    video.playsInline = true;
-    video.loop = true;
-    const tryPlay = () => video.play().catch(()=>{});
-    if (video.readyState >= 3) tryPlay();
-    else video.addEventListener('canplay', tryPlay, { once: true });
-  }
-  ScrollTrigger.create({
-    trigger: '.hero',
-    start: 'top top',
-    end: 'bottom top',
-    onLeave: () => {
-      document.body.classList.add('no-hero-bg');
-      if (video) video.pause();
-    },
-    onEnterBack: () => {
-      document.body.classList.remove('no-hero-bg');
-      if (video) video.play().catch(()=>{});
+  // ============================================================
+  // PHASE 6 VIDEO INIT — DISABLED (13 mai 2026)
+  // ------------------------------------------------------------
+  // Pour REACTIVER : retirer le if(false) ci-dessous (et garder
+  // l'accolade fermante). Reactiver aussi le HTML <video> + overlay
+  // marque PHASE 6 VIDEO DISABLED en haut du body.
+  // ============================================================
+  if (false) {
+    const video = document.querySelector('.hero-bg-video');
+    if (video){
+      video.muted = true;
+      video.playsInline = true;
+      video.loop = true;
+      const tryPlay = () => video.play().catch(()=>{});
+      if (video.readyState >= 3) tryPlay();
+      else video.addEventListener('canplay', tryPlay, { once: true });
     }
-  });
-  } DISABLED END */
+    ScrollTrigger.create({
+      trigger: '.hero',
+      start: 'top top',
+      end: 'bottom top',
+      onLeave: () => {
+        document.body.classList.add('no-hero-bg');
+        if (video) video.pause();
+      },
+      onEnterBack: () => {
+        document.body.classList.remove('no-hero-bg');
+        if (video) video.play().catch(()=>{});
+      }
+    });
+  }
 }
 
 /* ============================================================
