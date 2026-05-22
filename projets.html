@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#f7f8fb" />
+<title>Nos Projets du moment — NEEXUS</title>
+<meta name="description" content="Les projets en cours et realisations recentes de NEEXUS Agency." />
+
+<link rel="icon" type="image/png" href="logo.png" />
+<link rel="apple-touch-icon" href="logo.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+<style>
+:root{
+  --bg-1:#f7f8fb;
+  --text:#14182a;
+  --text-dim:#4d5571;
+  --text-mute:#7c8298;
+  --blue:#4d7cff;
+  --purple:#7c5cfc;
+  --magenta:#d63384;
+  --grad-text: linear-gradient(90deg,#3b62d6 0%,#6a48e8 50%,#c11a6a 100%);
+  --line:rgba(15,20,45,.08);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg-1);color:var(--text);min-height:100vh;}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-weight:400;line-height:1.55;
+  font-size:clamp(15px,1vw,17px);
+  display:flex;flex-direction:column;
+  position:relative;overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none;}
+
+/* Glow orbs discrets pour rappel de la home */
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.orb{
+  position:absolute;border-radius:50%;
+  filter:blur(110px);opacity:.35;
+  mix-blend-mode:multiply;
+}
+.orb-1{width:520px;height:520px;background:#4d7cff;top:-120px;left:-160px;}
+.orb-2{width:480px;height:480px;background:#d63384;bottom:-100px;right:-120px;opacity:.3;}
+
+/* Header simple — juste le logo qui ramene a la home */
+.nav{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px max(24px,4vw);
+  max-width:1340px;margin:0 auto;width:100%;
+}
+.nav .logo img{
+  height:34px;width:auto;display:block;
+  filter:drop-shadow(0 0 16px rgba(124,92,252,.18));
+}
+.nav .back{
+  font-family:'JetBrains Mono','DM Sans',monospace;
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-dim);
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 16px;border:1px solid var(--line);border-radius:100px;
+  transition:border-color .3s,color .3s,transform .3s;
+}
+.nav .back:hover{
+  border-color:var(--purple);color:var(--text);transform:translateX(-2px);
+}
+
+/* Contenu — juste le titre centre, page volontairement vide pour l'instant */
+main{
+  position:relative;z-index:5;
+  flex:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 24px;text-align:center;
+}
+.eyebrow{
+  font-family:'JetBrains Mono','DM Sans',monospace;
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--text-mute);margin-bottom:24px;
+  display:inline-flex;align-items:center;gap:10px;
+}
+.eyebrow::before{
+  content:'';width:32px;height:1px;background:var(--text-mute);opacity:.4;
+}
+h1{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(36px,6vw,82px);
+  line-height:1.05;letter-spacing:-.025em;
+  max-width:18ch;
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-fill-color:transparent;
+}
+.note{
+  margin-top:32px;color:var(--text-dim);
+  max-width:48ch;line-height:1.6;font-size:15px;
+}
+
+/* Footer minimal */
+footer{
+  position:relative;z-index:5;
+  padding:32px max(24px,4vw);
+  border-top:1px solid var(--line);
+  max-width:1340px;margin:0 auto;width:100%;
+  font-size:12px;color:var(--text-mute);
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+}
+footer a{color:var(--text-dim);transition:color .25s;}
+footer a:hover{color:var(--text);}
+
+@media(max-width:640px){
+  .nav{padding:18px 22px;}
+  .nav .logo img{height:28px;}
+  .nav .back{font-size:10.5px;padding:8px 12px;}
+  h1{font-size:clamp(32px,9vw,56px);}
+}
+</style>
+</head>
+<body>
+
+<div class="orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<header class="nav">
+  <a href="/" class="logo" aria-label="Retour a l'accueil NEEXUS">
+    <img src="logo.png" alt="NEEXUS" />
+  </a>
+  <a href="/" class="back">&larr; Accueil</a>
+</header>
+
+<main>
+  <span class="eyebrow">NEEXUS &middot; Portfolio</span>
+  <h1>Nos Projets du moment</h1>
+  <p class="note">Page en preparation &mdash; bientot, vous trouverez ici nos realisations recentes et projets en cours.</p>
+</main>
+
+<footer>
+  <div>&copy; 2026 &mdash; NEEXUS AGENCY by SDS Smart Digital Solution LLC</div>
+  <div><a href="/">Retour a l'accueil</a></div>
+</footer>
+
+</body>
+</html>
