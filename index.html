@@ -497,7 +497,7 @@ body.no-hero-bg .hero-bg-overlay{
   gap:6px;
   flex:0 0 auto;
 }
-.hero-micro-proof .proof-label{color:#d8dce6;}
+.hero-micro-proof .proof-label{color:var(--text);font-weight:500;}
 .hero-micro-proof .counter{
   font-family:'Syne',sans-serif;
   font-weight:700;
@@ -2064,6 +2064,13 @@ body.no-hero-bg .hero-bg-overlay{
   .testi-card::before,
   .result-card::before{display:none!important;}
   .problem-card,.testi-card,.result-card{background:rgba(15,20,36,.85);}
+  /* Light theme : les .testi-card gardent un fond sombre sur mobile (contraste
+     fort apprecie par l'utilisateur) — donc texte interne en clair pour lisibilite. */
+  .testi-card{color:#f5f6fa;}
+  .testi-card .quote{color:#e8eaf0;}
+  .testi-card .author-meta .name{color:#f5f6fa;}
+  .testi-card .author-meta .role{color:rgba(232,234,240,.7);}
+  .testi-card .city{color:rgba(232,234,240,.6);}
 
   .nav{padding:18px 22px;}
   .nav.is-scrolled{padding:12px 22px;}
