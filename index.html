@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#0a0e1a" />
+<meta name="theme-color" content="#f7f8fb" />
 <title>NEEXUS — Smart Digital Solution Agency</title>
 <meta name="description" content="NEEXUS — Agence d'IA, automatisation et solutions digitales. On automatise ce qui freine votre croissance pour que vous puissiez vous concentrer sur ce qui compte." />
 <meta property="og:title" content="NEEXUS — Smart Digital Solution Agency" />
@@ -32,27 +32,30 @@
    DESIGN TOKENS
    ============================================================ */
 :root{
-  --bg-0:#070a14;
-  --bg-1:#0a0e1a;
-  --bg-2:#0f1424;
-  --bg-3:#131830;
-  --line:rgba(255,255,255,.06);
-  --line-strong:rgba(255,255,255,.12);
-  --text:#e8eaf0;
-  --text-dim:#8b90a5;
-  --text-mute:#5b607a;
+  /* LIGHT THEME — inversion du palette dark.
+     bg-1 = main canvas (off-white doux teinté cool, complemente les violets).
+     text = navy fonce pour contraste max sur off-white sans etre noir brut. */
+  --bg-0:#e8ebf2;
+  --bg-1:#f7f8fb;
+  --bg-2:#eef0f5;
+  --bg-3:#e5e8f0;
+  --line:rgba(15,20,45,.08);
+  --line-strong:rgba(15,20,45,.16);
+  --text:#14182a;
+  --text-dim:#4d5571;
+  --text-mute:#7c8298;
   --blue:#4d7cff;
   --purple:#7c5cfc;
   --magenta:#d63384;
   --pink:#e8548e;
-  --green:#4ade80;
+  --green:#16a34a;
   --grad: linear-gradient(135deg,#4d7cff 0%,#7c5cfc 40%,#d63384 100%);
-  --grad-text: linear-gradient(90deg,#4d7cff 0%,#9b6dff 50%,#e8548e 100%);
-  --grad-text-bright: linear-gradient(90deg,#88a8ff 0%,#c8a4ff 50%,#ffa3c8 100%);   /* version plus claire pour Hero gradient — contraste sur fond glow */
-  --text-strong:#f5f6fa;   /* text plus contrasté pour Hero sub */
-  --grad-soft: linear-gradient(135deg,rgba(77,124,255,.14) 0%,rgba(124,92,252,.10) 50%,rgba(214,51,132,.14) 100%);
-  --glass: rgba(255,255,255,.025);
-  --glass-strong: rgba(255,255,255,.045);
+  --grad-text: linear-gradient(90deg,#3b62d6 0%,#6a48e8 50%,#c11a6a 100%);  /* legerement assombri pour contraste sur fond clair */
+  --grad-text-bright: linear-gradient(90deg,#3b62d6 0%,#6a48e8 50%,#c11a6a 100%);
+  --text-strong:#0a0e1a;
+  --grad-soft: linear-gradient(135deg,rgba(77,124,255,.10) 0%,rgba(124,92,252,.08) 50%,rgba(214,51,132,.10) 100%);
+  --glass: rgba(15,20,45,.025);
+  --glass-strong: rgba(15,20,45,.045);
   --r-md:18px;
   --r-lg:28px;
   --container:1340px;
@@ -87,10 +90,11 @@ button{font:inherit;color:inherit;background:none;border:0;}
 }
 .italic{font-style:italic;font-family:'Syne',sans-serif;font-weight:500;}
 .italic-glow{
-  /* solid pink + glow text-shadow. Visible cross-browser. */
+  /* light theme : magenta solide pour contraste max sur fond clair,
+     halo subtil pour conserver l'effet glow brand. */
   font-style:italic;font-family:'Syne',sans-serif;font-weight:500;
-  color:var(--pink);
-  text-shadow:0 0 8px rgba(214,51,132,.55);
+  color:var(--magenta);
+  text-shadow:0 0 12px rgba(214,51,132,.25);
 }
 /* fix bug 'qui' coupe : SplitType (initSplitTitles) met inline-style
    overflow:hidden sur chaque .word pour clipper le slide-up vertical.
@@ -127,7 +131,7 @@ body.has-cursor .cursor-glow{display:block;}
   mix-blend-mode:screen;
   will-change:transform;
 }
-.cursor.is-hover{width:48px;height:48px;background:transparent;border:1px solid rgba(255,255,255,.9);}
+.cursor.is-hover{width:48px;height:48px;background:transparent;border:1px solid rgba(15,20,45,.85);}
 
 /* ============================================================
    NOISE + SCROLL PROGRESS
@@ -151,14 +155,15 @@ body.has-cursor .cursor-glow{display:block;}
 .orb{
   position:absolute;
   border-radius:50%;
-  filter:blur(120px);
-  opacity:.55;
+  filter:blur(110px);
+  opacity:.4;
   will-change:transform;
+  mix-blend-mode:multiply;   /* light theme : multiply rend les couleurs visibles sur fond clair (au lieu d'eclaircir, on assombrit/teinte) */
 }
 .orb-1{width:520px;height:520px;background:#4d7cff;top:-120px;left:-160px;}
 .orb-2{width:620px;height:620px;background:#7c5cfc;top:30%;right:-200px;}
-.orb-3{width:480px;height:480px;background:#d63384;bottom:-160px;left:30%;opacity:.45;}
-.orb-4{width:380px;height:380px;background:#4d7cff;bottom:10%;right:10%;opacity:.35;}
+.orb-3{width:480px;height:480px;background:#d63384;bottom:-160px;left:30%;opacity:.35;}
+.orb-4{width:380px;height:380px;background:#4d7cff;bottom:10%;right:10%;opacity:.28;}
 
 /* ============================================================
    PRELOADER — logo PNG 120px height
@@ -216,7 +221,7 @@ body.has-cursor .cursor-glow{display:block;}
 }
 .nav.is-scrolled{
   padding:14px 36px;
-  background:rgba(10,14,26,.62);
+  background:rgba(255,255,255,.75);
   backdrop-filter:blur(18px) saturate(140%);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
   border-bottom:1px solid var(--line);
@@ -256,22 +261,22 @@ body.has-cursor .cursor-glow{display:block;}
   font-size:13px;font-weight:500;
   padding:11px 20px;border-radius:100px;
   border:1px solid var(--line-strong);
-  background:rgba(255,255,255,.02);
+  background:rgba(15,20,45,.04);
   backdrop-filter:blur(12px);
   transition:transform .35s,border-color .35s,background-color .35s;
 }
-.nav-cta:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.05);}
+.nav-cta:hover{border-color:rgba(15,20,45,.25);background:rgba(15,20,45,.07);}
 .nav-cta .arrow{display:inline-block;transition:transform .35s;}
 .nav-cta:hover .arrow{transform:translateX(4px);}
 .nav-burger{
   display:none;width:40px;height:40px;border-radius:50%;
-  border:1px solid var(--line-strong);background:rgba(255,255,255,.03);
+  border:1px solid var(--line-strong);background:rgba(15,20,45,.05);
   align-items:center;justify-content:center;flex-direction:column;gap:4px;
 }
 .nav-burger span{display:block;width:16px;height:1px;background:#fff;transition:transform .3s,opacity .3s;}
 .mobile-menu{
   position:fixed;inset:0;
-  background:rgba(7,10,20,.96);backdrop-filter:blur(24px);
+  background:rgba(247,248,251,.96);backdrop-filter:blur(24px);
   z-index:999;display:none;flex-direction:column;
   padding:100px 28px 40px;
   transform:translateY(-100%);
@@ -352,10 +357,10 @@ body.has-cursor .cursor-glow{display:block;}
   transition:opacity .55s ease;
   /* darker vers le bas : fade fluide vers le fond du Constat */
   background:linear-gradient(180deg,
-    rgba(7,10,20,.35) 0%,
-    rgba(7,10,20,.55) 50%,
-    rgba(7,10,20,.90) 92%,
-    rgba(10,14,26,1)  100%
+    rgba(247,248,251,.35) 0%,
+    rgba(247,248,251,.55) 50%,
+    rgba(247,248,251,.92) 92%,
+    rgba(247,248,251,1)  100%
   );
 }
 /* Fade-out propre quand on quitte le Hero (toggled par initHero() en JS) */
@@ -367,8 +372,8 @@ body.no-hero-bg .hero-bg-overlay{
   position:absolute;inset:0;
   z-index:2;       /* Phase 5 : au-dessus de la video + overlay */
   background-image:
-    linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+    linear-gradient(rgba(15,20,45,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(15,20,45,.06) 1px,transparent 1px);
   background-size:80px 80px;
   mask-image:radial-gradient(ellipse 75% 65% at 50% 45%,#000 25%,transparent 85%);
   -webkit-mask-image:radial-gradient(ellipse 75% 65% at 50% 45%,#000 25%,transparent 85%);
@@ -390,7 +395,7 @@ body.no-hero-bg .hero-bg-overlay{
   display:inline-flex;align-items:center;gap:10px;
   padding:8px 16px 8px 12px;
   border:1px solid var(--line-strong);
-  background:rgba(255,255,255,.025);
+  background:rgba(15,20,45,.04);
   backdrop-filter:blur(10px);
   border-radius:100px;
   font-size:12px;letter-spacing:.05em;
@@ -413,16 +418,15 @@ body.no-hero-bg .hero-bg-overlay{
   line-height:1;
   letter-spacing:-.025em;
   margin-bottom:24px;perspective:1200px;
-  /* text-shadow contraste sur fond glow violet/magenta */
-  text-shadow:0 2px 24px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.3);
+  color:var(--text-strong);
 }
 .hero-title .line{display:block;overflow:visible;perspective:1200px;}
 .hero-title .word{display:inline-block;}   /* fix : groupe les chars en mots — empêche le wrap au milieu d'un mot */
 .hero-title .line-2{
-  /* fix : blanc franc + italique (le gradient se confondait avec le fond glow).
-     Glow magenta subtil en text-shadow pour conserver la touche de marque. */
-  color:#ffffff;
-  text-shadow:0 2px 24px rgba(0,0,0,.6),0 0 32px rgba(232,84,142,.45),0 0 60px rgba(124,92,252,.25);
+  /* light theme : couleur magenta solide pour pop sur fond clair,
+     glow subtil rose/violet pour conserver la touche de marque. */
+  color:var(--magenta);
+  text-shadow:0 0 24px rgba(232,84,142,.35),0 0 48px rgba(124,92,252,.2);
   font-style:italic;
 }
 .hero-title .char{
@@ -432,12 +436,11 @@ body.no-hero-bg .hero-bg-overlay{
 }
 .hero-sub{
   font-size:clamp(14.5px,1.1vw,17px);
-  color:#ffffff;             /* fix : blanc franc pour lisibilite max sur fond glow */
+  color:var(--text);
   max-width:58ch;
   line-height:1.6;margin-bottom:40px;
-  text-shadow:0 2px 16px rgba(0,0,0,.7),0 1px 4px rgba(0,0,0,.5);
 }
-.hero-sub b{color:#ffffff;font-weight:600;}
+.hero-sub b{color:var(--text-strong);font-weight:600;}
 .cta-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:80px;}
 .btn{
   display:inline-flex;align-items:center;gap:12px;
@@ -458,7 +461,7 @@ body.no-hero-bg .hero-bg-overlay{
 }
 .btn-primary:hover{box-shadow:0 18px 50px rgba(124,92,252,.55);}
 .btn-ghost{
-  background:rgba(255,255,255,.025);color:var(--text);
+  background:rgba(15,20,45,.04);color:var(--text);
   border:1px solid var(--line-strong);
   position:relative;backdrop-filter:blur(10px);
 }
@@ -486,8 +489,7 @@ body.no-hero-bg .hero-bg-overlay{
   font-family:'JetBrains Mono',monospace;
   font-size:clamp(10.5px,.78vw,12.5px);
   letter-spacing:.04em;
-  color:#e8eaf0;                /* fix : plus clair, plus lisible */
-  text-shadow:0 1px 8px rgba(0,0,0,.55);
+  color:var(--text);
 }
 .hero-micro-proof .proof-item{
   display:inline-flex;
@@ -598,9 +600,8 @@ body.no-hero-bg .hero-bg-overlay{
   max-width:24ch;margin-inline:auto;
 }
 .constat-head p{
-  color:#ffffff;max-width:62ch;margin-inline:auto;       /* fix : sous-titre blanc + text-shadow comme hero-sub */
+  color:var(--text);max-width:62ch;margin-inline:auto;
   margin-top:16px;line-height:1.6;font-size:14.5px;
-  text-shadow:0 1px 12px rgba(0,0,0,.5);
   opacity:.88;
 }
 .constat-stage{
@@ -616,7 +617,7 @@ body.no-hero-bg .hero-bg-overlay{
   min-height:clamp(320px,46vh,400px);
   padding:36px 28px;
   border-radius:var(--r-lg);
-  background:rgba(10,14,26,.55);
+  background:rgba(255,255,255,.7);
   border:1px solid var(--line);
   backdrop-filter:blur(18px) saturate(140%);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
@@ -708,7 +709,7 @@ body.no-hero-bg .hero-bg-overlay{
   position:absolute;inset:0;
   padding:38px 30px;
   border-radius:var(--r-lg);
-  background:rgba(10,14,26,.62);
+  background:rgba(255,255,255,.75);
   border:1px solid var(--line);
   backdrop-filter:blur(18px) saturate(140%);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
@@ -851,7 +852,7 @@ body.no-hero-bg .hero-bg-overlay{
   position:relative;
   height:clamp(340px,44vh,460px);     /* fix : etait 520px fixe -> responsive */
   border-radius:var(--r-lg);
-  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+  background:linear-gradient(180deg,rgba(15,20,45,.05),rgba(15,20,45,.02));
   border:1px solid var(--line);
   overflow:hidden;backdrop-filter:blur(14px);
 }
@@ -886,7 +887,7 @@ body.no-hero-bg .hero-bg-overlay{
   font-size:13.5px;line-height:1.45;
   opacity:0;transform:translateY(12px);
 }
-.msg.user{align-self:flex-end;background:rgba(255,255,255,.06);border:1px solid var(--line);border-bottom-right-radius:6px;}
+.msg.user{align-self:flex-end;background:rgba(15,20,45,.08);border:1px solid var(--line);border-bottom-right-radius:6px;}
 .msg.ai{align-self:flex-start;background:var(--grad-soft);border:1px solid rgba(124,92,252,.25);border-bottom-left-radius:6px;}
 .msg .meta{font-size:10px;color:var(--text-mute);margin-top:4px;font-family:'JetBrains Mono',monospace;}
 .typing{
@@ -902,7 +903,7 @@ body.no-hero-bg .hero-bg-overlay{
 /* Workflow visual */
 .workflow-visual{padding:24px;display:grid;place-items:center;}   /* fix : 30 -> 24 (unifie) */
 .workflow-svg{width:100%;height:100%;max-width:460px;}
-.workflow-svg .node-w{fill:rgba(10,14,26,.9);stroke:rgba(255,255,255,.18);stroke-width:1;}
+.workflow-svg .node-w{fill:rgba(255,255,255,.95);stroke:rgba(15,20,45,.18);stroke-width:1;}
 .workflow-svg .nlabel{font-family:'JetBrains Mono',monospace;font-size:9px;fill:var(--text);text-anchor:middle;dominant-baseline:central;font-weight:500;}
 .workflow-svg .nicon{font-family:'JetBrains Mono',monospace;font-size:14px;fill:#fff;text-anchor:middle;dominant-baseline:central;}
 .workflow-svg .conn-flow{fill:none;stroke:url(#flow-grad);stroke-width:2;stroke-linecap:round;}
@@ -911,7 +912,7 @@ body.no-hero-bg .hero-bg-overlay{
 /* Code visual */
 .code-visual{padding:24px;font-family:'JetBrains Mono',monospace;}
 .code-window-bar{display:flex;align-items:center;gap:8px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:18px;}
-.code-window-bar .ddot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.15);}
+.code-window-bar .ddot{width:11px;height:11px;border-radius:50%;background:rgba(15,20,45,.2);}
 .code-window-bar .file{margin-left:14px;font-size:11px;color:var(--text-dim);}
 .code-content{font-size:12.5px;line-height:1.85;color:var(--text);}
 .code-content .ln{display:flex;gap:18px;opacity:0;}
@@ -925,7 +926,7 @@ body.no-hero-bg .hero-bg-overlay{
 @keyframes blink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
 .code-preview{margin-top:20px;padding:18px;border-radius:12px;background:var(--bg-2);border:1px solid var(--line);}
 .code-preview .pv-bar{height:4px;background:var(--grad);border-radius:100px;margin-bottom:14px;width:0;}
-.code-preview .pv-block{height:8px;background:rgba(255,255,255,.08);border-radius:4px;margin-bottom:8px;opacity:0;}
+.code-preview .pv-block{height:8px;background:rgba(15,20,45,.12);border-radius:4px;margin-bottom:8px;opacity:0;}
 .code-preview .pv-block.w-3{width:60%;}
 .code-preview .pv-block.w-2{width:40%;}
 .code-preview .pv-block.w-1{width:80%;}
@@ -958,7 +959,7 @@ body.no-hero-bg .hero-bg-overlay{
 .voice-caller{
   display:flex;align-items:center;gap:14px;
   padding:14px 16px;
-  background:rgba(255,255,255,.03);
+  background:rgba(15,20,45,.05);
   border:1px solid var(--line);
   border-radius:var(--r-md);
 }
@@ -1013,7 +1014,7 @@ body.no-hero-bg .hero-bg-overlay{
 }
 .voice-line.user{
   align-self:flex-end;max-width:88%;
-  background:rgba(255,255,255,.06);
+  background:rgba(15,20,45,.08);
   border:1px solid var(--line);
   color:var(--text);
 }
@@ -1043,7 +1044,7 @@ body.no-hero-bg .hero-bg-overlay{
 .mk-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);letter-spacing:.04em;margin-top:2px;}
 .mk-progress{
   height:3px;border-radius:100px;
-  background:rgba(255,255,255,.06);overflow:hidden;
+  background:rgba(15,20,45,.08);overflow:hidden;
 }
 .mk-progress-fill{
   height:100%;width:0;
@@ -1065,7 +1066,7 @@ body.no-hero-bg .hero-bg-overlay{
   overflow:hidden;
   opacity:0;
   transform:scale(.85);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), 0 4px 14px rgba(0,0,0,.3);
+  box-shadow:inset 0 0 0 1px rgba(15,20,45,.12), 0 4px 14px rgba(0,0,0,.3);
 }
 .mk-tile::after{
   content:'';position:absolute;inset:0;
@@ -1083,7 +1084,7 @@ body.no-hero-bg .hero-bg-overlay{
   text-align:center;
   padding:8px 4px;
   border-radius:8px;
-  background:rgba(255,255,255,.025);
+  background:rgba(15,20,45,.04);
   border:1px solid var(--line);
 }
 .mk-stat-val{
@@ -1225,7 +1226,7 @@ body.no-hero-bg .hero-bg-overlay{
 }
 .methode-step .step-deprecated-deliverables span{
   font-size:11px;color:var(--text-dim);
-  padding:6px 12px;background:rgba(255,255,255,.03);
+  padding:6px 12px;background:rgba(15,20,45,.05);
   border:1px solid var(--line);border-radius:100px;
 }
 
@@ -1245,8 +1246,8 @@ body.no-hero-bg .hero-bg-overlay{
 .results::before{
   content:'';position:absolute;inset:0;
   background-image:
-    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+    linear-gradient(rgba(15,20,45,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(15,20,45,.05) 1px,transparent 1px);
   background-size:60px 60px;
   mask-image:radial-gradient(ellipse 80% 50% at 50% 50%,#000 30%,transparent 90%);
   -webkit-mask-image:radial-gradient(ellipse 80% 50% at 50% 50%,#000 30%,transparent 90%);
@@ -1293,7 +1294,7 @@ body.no-hero-bg .hero-bg-overlay{
 }
 .rdot{
   width:8px;height:8px;border-radius:50%;
-  background:rgba(255,255,255,.15);
+  background:rgba(15,20,45,.2);
   transition:background .35s,transform .35s,box-shadow .35s;
 }
 .rdot.is-active{
@@ -1306,7 +1307,7 @@ body.no-hero-bg .hero-bg-overlay{
   position:absolute;inset:0;
   padding:44px 28px 36px;
   border-radius:var(--r-lg);
-  background:rgba(10,14,26,.62);
+  background:rgba(255,255,255,.75);
   border:1px solid var(--line);
   backdrop-filter:blur(18px) saturate(140%);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
@@ -1420,13 +1421,12 @@ body.no-hero-bg .hero-bg-overlay{
   max-width:24ch;margin:0 auto 18px;
 }
 .profiles-head .intro{
-  color:#ffffff;
+  color:var(--text);
   font-size:clamp(13.5px,1vw,15.5px);
   max-width:62ch;line-height:1.6;margin:0 auto;
-  text-shadow:0 1px 12px rgba(0,0,0,.5);
   opacity:.88;
 }
-.profiles-head .intro b{color:#ffffff;font-weight:600;opacity:1;}
+.profiles-head .intro b{color:var(--text-strong);font-weight:600;opacity:1;}
 
 /* PHASE 4 DECK 3D — 6 cartes empilees, scroll fait s'envoler la front card */
 .profiles-deck-stage{
@@ -1447,7 +1447,7 @@ body.no-hero-bg .hero-bg-overlay{
   position:absolute;left:50%;bottom:-32px;
   transform:translateX(-50%);
   width:clamp(180px,22vw,260px);height:3px;
-  background:rgba(255,255,255,.08);border-radius:3px;
+  background:rgba(15,20,45,.12);border-radius:3px;
   overflow:hidden;
 }
 .profiles-progress::before{
@@ -1461,7 +1461,7 @@ body.no-hero-bg .hero-bg-overlay{
   position:absolute;inset:0;
   padding:36px 30px;
   border-radius:var(--r-lg);
-  background:rgba(10,14,26,.78);
+  background:rgba(255,255,255,.92);
   border:1px solid var(--line);
   backdrop-filter:blur(18px) saturate(140%);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
@@ -1511,7 +1511,7 @@ body.no-hero-bg .hero-bg-overlay{
   color:#d8dce6;
   font-size:13.5px;line-height:1.55;
 }
-.profile-card .block.deploy p{color:#ffffff;}
+.profile-card .block.deploy p{color:var(--text-strong);}
 
 @media(max-width:640px){
   .profiles-pin{padding:32px 0;}
@@ -1637,7 +1637,7 @@ body.no-hero-bg .hero-bg-overlay{
   position:absolute;
   bottom:calc(100% + 12px);left:50%;
   transform:translateX(-50%) translateY(4px);
-  background:rgba(7,10,20,.95);
+  background:rgba(247,248,251,.96);
   border:1px solid var(--line-strong);
   padding:10px 14px;border-radius:10px;
   font-size:11.5px;color:var(--text);
@@ -1779,7 +1779,7 @@ body.no-hero-bg .hero-bg-overlay{
   position:absolute;inset:0;
   padding:34px 28px 28px;
   border-radius:var(--r-lg);
-  background:rgba(10,14,26,.62);
+  background:rgba(255,255,255,.75);
   border:1px solid var(--line);
   backdrop-filter:blur(18px) saturate(140%);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
@@ -1837,7 +1837,7 @@ body.no-hero-bg .hero-bg-overlay{
 }
 .tdot{
   width:8px;height:8px;border-radius:50%;
-  background:rgba(255,255,255,.15);
+  background:rgba(15,20,45,.2);
   transition:background-color .35s,transform .35s,box-shadow .35s;
 }
 .tdot.is-active{
@@ -1868,8 +1868,8 @@ body.no-hero-bg .hero-bg-overlay{
 .cta-final::before{
   content:'';position:absolute;inset:0;
   background-image:
-    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+    linear-gradient(rgba(15,20,45,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(15,20,45,.04) 1px,transparent 1px);
   background-size:80px 80px;
   mask-image:radial-gradient(ellipse 70% 50% at 50% 50%,#000,transparent 90%);
   -webkit-mask-image:radial-gradient(ellipse 70% 50% at 50% 50%,#000,transparent 90%);
@@ -1885,12 +1885,13 @@ body.no-hero-bg .hero-bg-overlay{
   max-width:24ch;margin:0 auto 28px;
 }
 .cta-final h2 .grad{
-  /* fix : etait bg-clip:text + transparent — invisible (meme cause que
-     italic-glow sur Resultats). Solid white = visible cross-browser. */
+  /* light theme : magenta solide pour pop sur fond clair (meme pattern
+     que .italic-glow). Pas de bg-clip:text car bug d'heritage avec SplitType. */
   background:none;
   -webkit-background-clip:initial;background-clip:initial;
-  color:#fff;
-  -webkit-text-fill-color:#fff;
+  color:var(--magenta);
+  -webkit-text-fill-color:var(--magenta);
+  text-shadow:0 0 8px rgba(214,51,132,.35);
 }
 /* fix bug 'gagner' italique coupe a droite : SplitType (initSplitCta) met
    inline overflow:hidden sur chaque .word pour le slide-up vertical. En
@@ -1924,7 +1925,7 @@ body.no-hero-bg .hero-bg-overlay{
 .cta-field input,
 .cta-field textarea{
   padding:14px 16px;width:100%;
-  background:rgba(10,14,26,.55);
+  background:rgba(255,255,255,.7);
   border:1px solid var(--line);
   border-radius:var(--r-md);
   color:var(--text);font-size:15px;
@@ -1937,7 +1938,7 @@ body.no-hero-bg .hero-bg-overlay{
 .cta-field textarea:focus{
   outline:none;
   border-color:var(--purple);
-  background:rgba(10,14,26,.78);
+  background:rgba(255,255,255,.92);
   box-shadow:0 0 0 3px rgba(124,92,252,.18);
 }
 .cta-field input::placeholder,
@@ -2015,7 +2016,7 @@ body.no-hero-bg .hero-bg-overlay{
   transition:border-color .35s,background-color .35s,transform .35s;
 }
 .footer-socials a:hover{
-  border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.04);
+  border-color:rgba(15,20,45,.3);background:rgba(15,20,45,.06);
   transform:translateY(-2px);
 }
 .footer-socials svg{width:14px;height:14px;}
@@ -2079,8 +2080,7 @@ body.no-hero-bg .hero-bg-overlay{
     gap:14px 10px;
     padding-top:22px;
     font-size:10.5px;
-    color:#ffffff;
-    text-shadow:0 1px 6px rgba(0,0,0,.6);
+    color:var(--text);
   }
   .hero-micro-proof .proof-sep{display:none;}
   .hero-micro-proof .proof-item{
@@ -2613,7 +2613,7 @@ a[href="#faq"]{
                 </linearGradient>
                 <radialGradient id="node-w-grad">
                   <stop offset="0%" stop-color="rgba(124,92,252,.2)"/>
-                  <stop offset="100%" stop-color="rgba(10,14,26,.95)"/>
+                  <stop offset="100%" stop-color="rgba(255,255,255,.97)"/>
                 </radialGradient>
               </defs>
               <path class="conn-flow" d="M90,80 Q230,80 230,200" data-flow/>
@@ -3008,7 +3008,7 @@ a[href="#faq"]{
       <div class="tooltip">Hébergement et infrastructure cloud</div>
     </div>
     <div class="stack-tile" data-tool>
-      <div class="mark" style="background:linear-gradient(135deg,#ffffff,#e6e6e6);color:#0a0e1a;">N</div>
+      <div class="mark" style="background:linear-gradient(135deg,#ffffff,#e6e6e6);color:#0a0e1a;border:1px solid rgba(15,20,45,.2);">N</div>
       <div class="label">Notion AI</div>
       <div class="tooltip">Productivité et knowledge base augmentée</div>
     </div>
