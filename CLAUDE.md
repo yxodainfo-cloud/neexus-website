@@ -1537,3 +1537,284 @@ const SIMPLIFIED_ANIMATIONS = false;
 ```
 
 Méthode retrouvera son notebook flip 3D, ainsi que toute section qu'on aurait ré-ajoutée au toggle.
+
+---
+
+## PHASE 8 — Polish final + LIGHT THEME + Pages produits (22 mai 2026)
+
+Grosse session — 4 chantiers en parallèle :
+1. **Polish CTA Final** (footer + spacing bouton)
+2. **Inversion DARK → LIGHT THEME** (refactor massif de la palette)
+3. **3 nouvelles pages** : `/projets.html`, `/sheetflow.html`, `/stafflow.html`
+4. **Lien navigation** dans le footer Ressources
+
+### 1. Polish CTA Final + Footer (commits `1eeadad`, `0fb0d5e`)
+
+**Footer cleanup** :
+- Suppression du bloc `.footer-socials` (3 icônes LinkedIn / Instagram / X) — pas encore actif sur ces réseaux
+- Phone `wa.me` link "WhatsApp · +1 917 814 2210" → simple `tel:+19178142210` avec affichage `+1 917 814 2210` (sans préfixe)
+
+**CTA `gagner ?` italique** — bug 2 itérations :
+- Tentative 1 : `padding-right: .4em` + `padding-left: .08em` sur `.cta-final h2 .italic .word` pour empêcher le clip italique (même bug que `.italic-glow` Phase 4.5)
+- Visible gap entre "gagner" et "?" → mots séparés en 2 `.word` spans par SplitType, chacun avec padding-right .4em → trop d'espace
+- **Fix final** (`0fb0d5e`) : ajout `margin-right: -.4em` qui compense le padding au niveau layout sans annuler son effet sur l'`overflow:hidden`. Padding garde l'italique entier, margin annule visuellement l'espace en trop.
+
+**CTA Form rassurance margin-top** :
+- 28 → 56 (Phase 4.6 `dd02cfe`) → 88 → **130px** desktop / 64 → **90px** mobile
+- Raison : le `box-shadow: 0 12px 40px rgba(124,92,252,.35)` du `.btn-primary` projette un halo violet ~50-60px sous le bouton. Le halo "mange" visuellement la moitié de la margin → à 88px, le visible était ~38px (trop tight). À 130px, le visible est ~80px.
+
+### 2. ⚠️ INVERSION DARK → LIGHT THEME (commit `17d4fea` + `a9b6420`)
+
+**Le plus gros refactor depuis le début du projet** : ~90 lignes inversées, ~50 changements de couleur dans le `:root` et hardcodés à travers le fichier.
+
+#### Nouvelle palette `:root`
+
+| Token | AVANT (dark) | APRÈS (light) |
+|---|---|---|
+| `--bg-0` | `#070a14` | `#e8ebf2` |
+| `--bg-1` | `#0a0e1a` (main canvas) | `#f7f8fb` (off-white doux teinté cool) |
+| `--bg-2` | `#0f1424` | `#eef0f5` |
+| `--bg-3` | `#131830` | `#e5e8f0` |
+| `--line` | `rgba(255,255,255,.06)` | `rgba(15,20,45,.08)` |
+| `--line-strong` | `rgba(255,255,255,.12)` | `rgba(15,20,45,.16)` |
+| `--text` | `#e8eaf0` | `#14182a` (dark navy, contraste fort sans noir brut) |
+| `--text-dim` | `#8b90a5` | `#4d5571` |
+| `--text-mute` | `#5b607a` | `#7c8298` |
+| `--text-strong` | `#f5f6fa` | `#0a0e1a` (très foncé pour titres) |
+| `--blue/purple/magenta/pink` | conservés | conservés (les accents de marque restent intacts) |
+| `--grad-text` | `#4d7cff → #9b6dff → #e8548e` | `#3b62d6 → #6a48e8 → #c11a6a` (assombri ~15% pour contraste sur fond clair) |
+| `--grad-soft` | `rgba(...,.14)` | `rgba(...,.10)` (légèrement plus dilué pour le fond clair) |
+| `--glass` | `rgba(255,255,255,.025)` | `rgba(15,20,45,.025)` |
+| `--green` | `#4ade80` | `#16a34a` (assombri pour rester visible sur clair) |
+
+`<meta name="theme-color">` : `#0a0e1a` → `#f7f8fb`.
+
+#### Stratégie de bulk-replace (par patterns)
+
+| Pattern remplacé | Nouveau | Sémantique |
+|---|---|---|
+| `rgba(10,14,26,.55)` | `rgba(255,255,255,.7)` | Card glassmorphism bg (toutes occurrences) |
+| `rgba(10,14,26,.62)` | `rgba(255,255,255,.75)` | Idem, alpha intermédiaire |
+| `rgba(10,14,26,.78)` | `rgba(255,255,255,.92)` | Idem, alpha fort |
+| `rgba(10,14,26,.9)/.95/1` | `rgba(255,255,255,.95/.97/1)` | Idem, presque opaque |
+| `rgba(7,10,20,.35/.55/.90/.95/.96)` | `rgba(247,248,251,...)` | Hero radial gradients + mobile menu |
+| `rgba(255,255,255,.01)` | `rgba(15,20,45,.02)` | Subtle overlay (alpha boosté +1 pt) |
+| `rgba(255,255,255,.02)` | `rgba(15,20,45,.04)` | Idem |
+| `rgba(255,255,255,.025)` | `rgba(15,20,45,.04)` | Idem |
+| `rgba(255,255,255,.03)` | `rgba(15,20,45,.05)` | Idem |
+| `rgba(255,255,255,.04)` | `rgba(15,20,45,.06)` | Idem |
+| `rgba(255,255,255,.05)` | `rgba(15,20,45,.07)` | Idem |
+| `rgba(255,255,255,.06)` | `rgba(15,20,45,.08)` | Idem |
+| `rgba(255,255,255,.08)` | `rgba(15,20,45,.12)` | Idem |
+
+**Règle** : sur fond clair, les overlays sombres doivent avoir un peu plus d'alpha que les overlays clairs sur fond sombre, sinon ils deviennent invisibles. D'où le `+1-2 points` systématique sur l'alpha.
+
+#### Cas particuliers laissés en `rgba(255,255,255,...)` (épargne du bulk replace)
+
+| Ligne | Contexte | Pourquoi garder |
+|---|---|---|
+| 459 | `.btn-primary::before` linear-gradient shine `.18` | Shine blanc sur fond gradient violet du bouton |
+| 1076 | Stack tile internal shine `.18` | Highlight blanc sur fond gradient sombre des tiles |
+| 2974, 2994, 2999 | Stack mark borders `.15/.18` (Eleven, Cursor, Midjourney) | Sur fond `#0a0a0a/#1a1a1a/#1c1c1e` (logos branding sombre) |
+
+#### Textes blancs → flips manuels
+
+Anciens `color:#fff` / `color:#ffffff` qui étaient "max contraste sur dark glow" :
+
+| Élément | Avant | Après |
+|---|---|---|
+| `.hero-title .line-2` | `#fff` + text-shadow noire | `var(--magenta)` solide + halo subtil rose/violet |
+| `.hero-sub` | `#fff` + text-shadow noire | `var(--text)` (dark navy) |
+| `.hero-sub b` | `#fff` | `var(--text-strong)` |
+| `.hero-title` (lines 1, 3) | text-shadow noire + couleur implicite | `var(--text-strong)` + suppression text-shadow |
+| `.constat-head p` (sous-titre) | `#fff` + text-shadow | `var(--text)` |
+| `.profiles-head .intro` + `b` | `#fff` + text-shadow | `var(--text)` / `var(--text-strong)` |
+| `.profile-card .block.deploy p` | `#fff` | `var(--text-strong)` |
+| `.cta-final h2 .grad` ("gagner ?") | `#fff` solide (workaround Phase 4.5) | `var(--magenta)` solide + text-shadow `rgba(214,51,132,.35)` |
+| `.italic-glow` (mots highlight) | `var(--pink)` + halo `.55` | `var(--magenta)` + halo `.25` (plus subtil sur fond clair) |
+| `.hero-micro-proof` desktop+mobile | `#e8eaf0` / `#ffffff` | `var(--text)` |
+| `.hero-micro-proof .proof-label` | `#d8dce6` (gris dark theme) | `var(--text)` + `font-weight:500` |
+
+**Conservés `color:#fff`** : `::selection`, `.btn-primary` (sur grad bg), `.chat-header .av` + `.testi-card .av` (sur grad bg), tous les `mark` inline du Stack (sur leurs gradients colorés).
+
+#### Glow orbs — fix critique pour fond clair
+
+Sur dark, les orbs étaient des `position:fixed; filter:blur(120px); opacity:.55` qui créaient des halos lumineux violet/bleu/magenta visibles. **Sur clair, ces halos disparaissent presque entièrement** car on ajoute de la lumière à de la lumière.
+
+**Solution** : `mix-blend-mode: multiply`. Sur fond clair, multiply teinte/assombrit la zone au lieu d'éclaircir, donc les couleurs de marque deviennent visibles sous forme de teintes subtiles bleu/violet/rose.
+
+```css
+.orb{
+  filter:blur(110px);
+  opacity:.4;
+  mix-blend-mode:multiply;  /* cle pour visibilite sur fond clair */
+}
+.orb-1{...opacity:.4;}    /* etait .55 */
+.orb-3{...opacity:.35;}   /* etait .45 */
+.orb-4{...opacity:.28;}   /* etait .35 */
+```
+
+#### Cas spéciaux conservés en dark
+
+- **Preloader background** `#000` — intro animation logo sur écran noir → KEEP, c'est dramatique et fonctionne quelle que soit la palette du site
+- **Cursor `mix-blend-mode: difference` + `background:#fff`** → KEEP, difference s'adapte automatiquement (255-clair = sombre, 255-sombre = clair). Le cursor reste visible des deux côtés.
+- **Mobile témoignages cards** — voir fix Phase 8.2 ci-dessous
+
+#### Fix Notion stack tile (mark blanc invisible sur fond clair)
+
+Le mark Notion (line 3011) a `background:linear-gradient(135deg,#ffffff,#e6e6e6)` — fond blanc qui se confondait avec la section devenue claire. Ajout d'un border :
+
+```html
+border:1px solid rgba(15,20,45,.2)
+```
+
+#### 2 fixes post-déploiement Light Theme (commit `a9b6420`)
+
+Deux problèmes remontés par l'utilisateur après le déploiement initial :
+
+1. **Hero micro-proof labels illisibles** — `.hero-micro-proof .proof-label{color:#d8dce6}` (gris très clair, résidu du dark theme) → texte quasi-invisible sur le glow lavande du hero. Fix : `color: var(--text)` + `font-weight: 500`.
+
+2. **Mobile témoignages cards** — l'override mobile à la ligne 2066 force `background:rgba(15,20,36,.85)` sur `.problem-card,.testi-card,.result-card`. Sur fond clair général, ces cards restent **noires** sur mobile. L'utilisateur **apprécie ce contraste fort** sur mobile spécifiquement pour les témoignages. Fix : on garde le fond dark, mais on flip le texte interne en clair :
+
+```css
+@media (max-width:768px){
+  .testi-card{color:#f5f6fa;}
+  .testi-card .quote{color:#e8eaf0;}
+  .testi-card .author-meta .name{color:#f5f6fa;}
+  .testi-card .author-meta .role{color:rgba(232,234,240,.7);}
+  .testi-card .city{color:rgba(232,234,240,.6);}
+}
+```
+
+Le KPI gradient (`+35% de RDV...`) reste visible nativement vu qu'il est en gradient text.
+
+#### Apprentissages Light Theme (à retenir pour Phase 9+)
+
+1. **L'overlay alpha doit être boosté d'1-2 points quand on inverse la luminosité du fond**. `rgba(255,255,255,.06)` était bien visible sur du noir, mais `rgba(0,0,0,.06)` sur du blanc est presque invisible. La perception humaine est asymétrique.
+2. **`mix-blend-mode:multiply` est indispensable pour les glow lumineux sur fond clair**. Avec un blend normal, lumière + lumière = blanc et l'effet disparaît. Multiply teinte la zone avec la couleur, ce qui donne le rendu attendu.
+3. **Les text-shadow noires en dark theme deviennent abominables sur light theme** (effet "lift sale"). Toujours auditer les `text-shadow:0 X X rgba(0,0,0,...)` lors d'un theme switch et les supprimer ou inverser.
+4. **`color:#fff` n'est presque jamais le bon choix sémantique** — utiliser `var(--text)` ou `var(--text-strong)` qui s'adapteront automatiquement. Le `#fff` reste OK quand il est SUR du gradient/violet (boutons, avatars, etc.).
+5. **Les overrides mobile peuvent garder du dark sur une page claire** pour créer des "îlots de contraste". Le user a explicitement apprécié les `.testi-card` dark sur mobile dans la light theme. Pattern viable : laisser certaines sections en dark mode local pour pop visuellement, à condition de gérer la couleur du texte interne.
+
+### 3. Trois nouvelles pages — Portfolio Neexus
+
+Toutes les pages partagent le même DS que `index.html` (light theme, fonts Syne + DM Sans + JetBrains Mono, gradient text, glow orbs `multiply`, cards glassmorphism). **Pas de GSAP/Lenis/SplitType** sur ces pages — animations légères via `IntersectionObserver` natif uniquement.
+
+#### `/projets.html` (commits `44ea204` → `d7e058f`)
+
+Page liste des projets. Deux versions successives :
+
+**v1** (`44ea204`) — page vierge avec juste H1 et placeholder note.
+
+**v2** (`d7e058f`) — refonte en grille 2 cards visuelles cliquables après ajout de SheetFlow et Stafflow :
+
+- Header : eyebrow `NEEXUS · Portfolio` + H1 `Nos Projets du moment` en gradient + page-sub
+- Grille 2 colonnes (1 col mobile) de `.project-card` cliquables :
+  - **Card SheetFlow** : visual SVG inline (mockup phone avec timesheet rows Lu-Ve + signature scribble + bouton ENVOYER gradient) + tag `Travail temporaire · Suisse` + description 3 lignes (clamp via `-webkit-line-clamp:3`) + arrow CTA
+  - **Card Stafflow** : visual SVG inline (mockup phone avec QR Code dessiné 3 corners + dots pattern + status pill vert `07:58 — ARRIVÉE` + bouton VALIDER gradient) + tag `BTP · Suisse` + description 3 lignes + arrow CTA
+- Hover card : `translateY(-4px)` + border purple + shadow violet + arrow qui s'étire et passe magenta
+- CTA bottom `Discuter de votre projet →` vers `/#cta`
+
+Les SVG mockups sont inline (pas d'images externes) — `viewBox=0 0 220 200`, gradients `<defs>`, rectangles arrondis pour le frame phone, textes Syne/JetBrains Mono pour le contenu fictif.
+
+#### `/sheetflow.html` (commit `8c986c9`)
+
+Page produit complète SheetFlow — 8 sections :
+
+| # | Section | Pattern |
+|---|---|---|
+| Hero | Eyebrow + H1 "sans le papier" en gradient + lead + 2 CTAs (démo gratuite vers `https://sheetflow.ch` + scroll `#howitworks`) + mention | `.hero-ctas` flex wrap |
+| 1 — Problème | H2 "Vous reconnaissez ce scénario&nbsp;?" + lead + `<ol class="steps-list">` (7 li numérotés via `counter-increment` + cercle gradient `::before`) + conclusion italique avec border-left magenta | List counter CSS |
+| 2 — Solution | H2 + lead + `.cards-3` (3 cards glassmorphism : 📱 temporaire / 🧑‍💼 agence / 🔐 direction, chacune avec icon + h3 + ul liste à puces gradient) | `cards-3` grid |
+| 3 — Comment ça marche | H2 + `.howit-steps` (3 cards avec gros numéro `01/02/03` en gradient text + h3 + p) | `howit-step` grid |
+| 4 — Pourquoi SheetFlow | H2 + `.bullets` grid 2 colonnes (8 bullets avec `<span class="check">` cercle gradient + texte en `<b>` gras) | `bullets` grid |
+| 5 — Démo | H2 + lead + `.demo-cta` (bloc gradient-soft centré avec bouton primary + mention) | `demo-cta` block |
+| 6 — Tarif | H2 + `.pricing-card` centrée (max-width 440px) avec border gradient via `::before` + `mask-composite:xor`, prix `600 CHF` en gradient text huge, list `.price-features` avec ✓, bouton "Démarrer l'essai" full-width | `pricing-card` |
+| 7 — Crédit Neexus | H2 + `.neexus-credit` bloc gradient-soft avec p + question italique large + bouton vers `/#cta` | `neexus-credit` |
+| 8 — FAQ | H2 + `.faq-list` (5 items accordion mutuellement exclusif, button `.faq-q` + icon `+` qui rotate 45° en `×` + `.faq-a` avec `max-height` transition) | `faq-item` + JS toggle |
+
+Vanilla JS : `IntersectionObserver` pour fade-in + accordion FAQ (clic = ferme tous les ouverts, ouvre celui cliqué si fermé).
+
+#### `/stafflow.html` (commit `ea63710`)
+
+Page produit complète Stafflow — 9 sections, même pattern que SheetFlow avec quelques particularités :
+
+| # | Section | Différence vs SheetFlow |
+|---|---|---|
+| Hero | Identique pattern | CTAs : démo vers `https://stafflow.ch` + démo personnalisée vers `/#cta` |
+| 1 — Problème | `.pain-list` grid 2 colonnes (5 cards avec emoji + h3 + p court) | Pattern "pain cards" au lieu de liste numérotée |
+| 2 — Solution | `.cards-4` (4 piliers : QR Code / Double validation / Export Excel / Journal) en grille responsive 1/2/4 cols | 4 cards au lieu de 3 — nouveau pattern `cards-4` |
+| 3 — Features | `.bullets` grid 2 cols (13 bullets ✓) | 13 items au lieu de 8 |
+| 4 — Pour qui | `.cards-3` (3 profils positifs : Entreprises générales / Artisans / Promoteurs) + `.card.card-neg` avec border dashed magenta et bg rose pâle pour le "Stafflow n'est pas pour vous si..." | Nouveau pattern `.card-neg` (border dashed magenta) |
+| 5 — Comment ça marche | `.howit-steps` grid responsive 1/2/5 cols (5 étapes au lieu de 3) | 5 cols desktop pour la timeline |
+| 6 — Tarif | `.pricing-custom` (pas de prix unique) — 2 listes `.price-block` "Ce qui est toujours inclus" et "Ce qui peut s'ajouter selon vos besoins" + CTA "Demander un devis adapté" vers `/#cta` | **Pattern différent** : sur-mesure au lieu de prix unique |
+| 7 — FAQ | `.faq-list` (7 items) | Identique mais 7 questions |
+| 8 — CTA Final | `.final-cta` bloc gradient-soft centré avec p + `.ctas` 2 boutons + reassurance italique | Nouveau bloc CTA dédié |
+
+**Particularité copywriting** : tous les `?` et `:` en typo française précédés d'un `&nbsp;` (espace insécable) dès la création — évite l'orphan typographique du `?` qui partait à la ligne (bug rencontré sur sheetflow.html avant fix `9a9a049`).
+
+#### Fix nbsp sheetflow (commit `9a9a049`)
+
+User feedback : "Vous reconnaissez ce scénario" + saut de ligne + "?" tout seul à gauche. Bug typo classique français.
+
+Fix : `replace_all` de ` ?` → `&nbsp;?` sur l'ensemble du fichier (6 occurrences). Le `&nbsp;` est non-breaking → empêche le wrap entre le mot et le `?`. Stafflow.html a été écrit directement avec les `&nbsp;` (pas de fix nécessaire).
+
+#### Footer index.html — lien Ressources (commit `44ea204`)
+
+Ajout d'un `<li><a href="/projets.html">Nos projets du moment</a></li>` dans la colonne `.footer-col` Ressources, entre "Études de cas" et "Blog". Discret comme demandé par le user (peu de projets pour l'instant).
+
+### 4. Settings & permissions (workflow)
+
+Modifs hors code, faites pour fluidifier le workflow :
+
+- `.claude/settings.json` (project) : ajout permission `Bash(git push)` + `Bash(git push *)` + règle `autoMode.allow` pour autoriser le push sur main sans prompt classifier. **L'édition de settings.json est un hard rule du classifier (self-modification protégée)** — j'ai dû demander au user de l'éditer à la main.
+
+### Apprentissages Phase 8 — workflow
+
+1. **Le classifier auto-mode bloque certaines opérations même quand le user les autorise verbalement** : `git push` sur main, `git reset --hard`, édition de `.claude/settings.json`. Les 2 premiers sont déblocables via une `AskUserQuestion` explicite. Le 3ème est un **hard rule non-contournable** — il faut demander au user d'éditer manuellement.
+
+2. **Pour pusher depuis Windows PowerShell** : `cd C:\Users\faycal\Documents\Neexus\neexus-website` puis `git push`. Pas besoin de gestionnaire d'identifiants — Windows Credential Manager gère le token GitHub stocké.
+
+3. **Pour les pages secondaires (sheetflow, stafflow, projets)** : pas besoin de reproduire le full stack GSAP/Lenis/SplitType de l'index.html. Un simple `IntersectionObserver` + transitions CSS suffit largement et garde les pages légères (~14-22 Ko chacune contre 178 Ko pour index.html).
+
+4. **Pattern de mini-mockup SVG inline** pour les visuels d'app sans utiliser de stock photo :
+   - `<svg viewBox="0 0 220 200">` (ratio phone-like)
+   - Frame en `<rect rx="18">` blanc avec border
+   - Header band en gradient (via `<defs><linearGradient>`)
+   - Contenu : rows de texte, dots de QR code, icônes émojis ou paths SVG
+   - `filter: drop-shadow()` sur le svg parent pour le détacher du fond
+   - Léger et stylisé — communique l'app sans copier l'UI
+
+### Commits Phase 8 (9 commits, 22 mai 2026)
+
+| # | Commit | Description |
+|---|---|---|
+| 1 | `1eeadad` | Footer + CTA : 4 polish fixes (suppression socials, retire WhatsApp prefix, margin rassurance 56→88, padding gagner italique) |
+| 2 | `0fb0d5e` | CTA Final 2 fixes (gagner spacing margin-right -.4em, rassurance margin 88→130/64→90) |
+| 3 | `17d4fea` | **Theme: inversion dark → light** (off-white + dark navy, ~90 lignes inversées) |
+| 4 | `a9b6420` | Light theme 2 fixes lisibilité (proof-label dark navy, testi-card mobile texte clair sur fond dark conservé) |
+| 5 | `44ea204` | Ajout `/projets.html` (v1 vierge) + lien footer Ressources |
+| 6 | `8c986c9` | **SheetFlow** : page produit complète + lien depuis projets.html |
+| 7 | `9a9a049` | SheetFlow : `&nbsp;` avant les `?` (typo française, fix orphan) |
+| 8 | `ea63710` | **Stafflow** : page produit complète + lien depuis projets.html |
+| 9 | `d7e058f` | Projets : refonte en 2 cards visuelles avec mini-mockups SVG (timesheet + QR Code) |
+
+### État final Phase 8
+
+| Page | URL | État |
+|---|---|---|
+| Home | `/` | Light theme complet, 12 sections cinématiques (avec Phase 7 simplification sur Méthode uniquement) |
+| Projets | `/projets.html` | 2 cards visuelles cliquables vers les pages produits |
+| SheetFlow | `/sheetflow.html` | Page produit 8 sections, light theme aligned |
+| Stafflow | `/stafflow.html` | Page produit 9 sections, light theme aligned |
+
+**Le site est désormais light theme**. La doc Phase 1 à 7 (sections "Dark theme premium") reste pertinente pour comprendre l'historique et le pattern d'animations, mais la palette actuelle est documentée ici en Phase 8.
+
+### Pour Phase 9+ — pistes ouvertes
+
+- Backend pour le formulaire CTA (Formspree / Vercel Functions / n8n webhook) — actuellement c'est un placeholder UX visuel uniquement
+- Remplir le contenu réel des pages produits avec captures d'écran (actuellement les SVG mockups sont stylisés mais fictifs)
+- Optimiser `logo.png` (1.2 Mo → WebP, gain ~80%)
+- Si envie de revenir au dark theme : tous les tokens sont centralisés dans `:root`, l'inversion est documentée ici (Phase 8 §2)
+- Intégration vidéo de fond (toujours préparée via le glassmorphism des cards, snippet HTML+CSS dans la doc Phase 4.5/4.6)
+- Page blog si besoin (lien footer existe déjà mais pointe sur `#`)
