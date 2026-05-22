@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#f7f8fb" />
+<title>Stafflow — Vos chantiers, vos heures, votre équipe · NEEXUS</title>
+<meta name="description" content="Stafflow remplace fiches d'heures papier, WhatsApp et Excel par une plateforme tout-en-un pour les entreprises BTP suisses de 5 à 50 collaborateurs." />
+
+<link rel="icon" type="image/png" href="logo.png" />
+<link rel="apple-touch-icon" href="logo.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+:root{
+  --bg-1:#f7f8fb;
+  --bg-2:#eef0f5;
+  --text:#14182a;
+  --text-strong:#0a0e1a;
+  --text-dim:#4d5571;
+  --text-mute:#7c8298;
+  --blue:#4d7cff;
+  --purple:#7c5cfc;
+  --magenta:#d63384;
+  --pink:#e8548e;
+  --grad: linear-gradient(135deg,#4d7cff 0%,#7c5cfc 40%,#d63384 100%);
+  --grad-text: linear-gradient(90deg,#3b62d6 0%,#6a48e8 50%,#c11a6a 100%);
+  --grad-soft: linear-gradient(135deg,rgba(77,124,255,.10) 0%,rgba(124,92,252,.08) 50%,rgba(214,51,132,.10) 100%);
+  --line:rgba(15,20,45,.08);
+  --line-strong:rgba(15,20,45,.16);
+  --r-md:18px;
+  --r-lg:28px;
+  --container:1180px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg-1);color:var(--text);}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth;}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-weight:400;line-height:1.6;
+  font-size:clamp(15px,1vw,17px);
+  position:relative;overflow-x:hidden;
+}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
+::selection{background:rgba(124,92,252,.25);color:var(--text-strong);}
+
+/* Glow orbs subtils */
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);mix-blend-mode:multiply;}
+.orb-1{width:520px;height:520px;background:#4d7cff;top:-160px;left:-180px;opacity:.32;}
+.orb-2{width:580px;height:580px;background:#7c5cfc;top:35%;right:-220px;opacity:.28;}
+.orb-3{width:440px;height:440px;background:#d63384;bottom:-160px;left:25%;opacity:.22;}
+
+/* NAV */
+.nav{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px max(24px,4vw);
+  max-width:var(--container);margin:0 auto;width:100%;
+}
+.nav .logo img{height:34px;width:auto;filter:drop-shadow(0 0 16px rgba(124,92,252,.18));}
+.nav .back{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-dim);
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 16px;border:1px solid var(--line);border-radius:100px;
+  transition:border-color .3s,color .3s,transform .3s;
+}
+.nav .back:hover{border-color:var(--purple);color:var(--text);transform:translateX(-2px);}
+
+/* LAYOUT */
+main{position:relative;z-index:5;}
+section{padding:80px max(24px,4vw);max-width:var(--container);margin:0 auto;}
+@media(min-width:900px){ section{padding:120px max(24px,4vw);} }
+
+.eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--text-mute);margin-bottom:24px;
+  display:inline-flex;align-items:center;gap:10px;
+}
+.eyebrow::before{
+  content:'';width:32px;height:1px;background:var(--text-mute);opacity:.5;
+}
+h1{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(32px,5.4vw,68px);
+  line-height:1.08;letter-spacing:-.025em;
+  max-width:22ch;margin-bottom:24px;color:var(--text-strong);
+}
+h1 .grad{
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-fill-color:transparent;
+}
+h2{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:clamp(26px,3.8vw,46px);
+  line-height:1.12;letter-spacing:-.02em;
+  max-width:24ch;margin-bottom:24px;color:var(--text-strong);
+}
+h3{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(18px,1.6vw,22px);
+  letter-spacing:-.01em;margin-bottom:16px;color:var(--text-strong);
+}
+p{color:var(--text);line-height:1.7;}
+p + p{margin-top:14px;}
+.lead{font-size:clamp(15.5px,1.2vw,18px);color:var(--text-dim);max-width:62ch;line-height:1.65;}
+
+/* HERO */
+.hero{padding-top:60px;}
+@media(min-width:900px){ .hero{padding-top:80px;} }
+.hero p.lead{margin-bottom:36px;}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:16px 26px;border-radius:100px;
+  font-size:14px;font-weight:500;letter-spacing:.01em;
+  transition:transform .3s,box-shadow .3s;
+}
+.btn-primary{
+  background:var(--grad);color:#fff;
+  box-shadow:0 10px 30px rgba(124,92,252,.28);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(124,92,252,.4);}
+.btn-ghost{
+  background:rgba(15,20,45,.04);color:var(--text);
+  border:1px solid var(--line-strong);
+}
+.btn-ghost:hover{background:rgba(15,20,45,.07);border-color:var(--purple);}
+.hero-mention{
+  font-size:13px;color:var(--text-mute);max-width:54ch;line-height:1.55;margin-top:8px;
+  font-style:italic;
+}
+
+/* PROBLEM — pain cards (5 cards stack) */
+.pain-list{
+  display:grid;gap:16px;margin-top:36px;
+  grid-template-columns:1fr;
+}
+@media(min-width:900px){ .pain-list{grid-template-columns:repeat(2,1fr);gap:20px;} }
+.pain{
+  padding:24px 22px;
+  background:rgba(255,255,255,.72);
+  border:1px solid var(--line);border-radius:var(--r-lg);
+  backdrop-filter:blur(12px) saturate(140%);
+}
+.pain .icon{font-size:28px;margin-bottom:10px;display:block;}
+.pain h3{margin-bottom:8px;font-size:17px;}
+.pain p{color:var(--text-dim);font-size:14.5px;line-height:1.6;}
+
+/* SOLUTION — 4 piliers */
+.cards-4{
+  display:grid;gap:20px;margin-top:36px;
+  grid-template-columns:1fr;
+}
+@media(min-width:700px){ .cards-4{grid-template-columns:repeat(2,1fr);gap:22px;} }
+@media(min-width:1100px){ .cards-4{grid-template-columns:repeat(4,1fr);gap:20px;} }
+.card{
+  padding:28px 24px;
+  background:rgba(255,255,255,.78);
+  border:1px solid var(--line);border-radius:var(--r-lg);
+  backdrop-filter:blur(14px) saturate(140%);
+  box-shadow:0 4px 20px rgba(15,20,45,.04);
+}
+.card .icon{
+  font-size:30px;margin-bottom:14px;display:block;
+  filter:drop-shadow(0 4px 10px rgba(124,92,252,.18));
+}
+.card p{color:var(--text-dim);font-size:14px;line-height:1.6;}
+
+/* CARDS-3 (Pour qui) */
+.cards-3{
+  display:grid;gap:20px;margin-top:36px;
+  grid-template-columns:1fr;
+}
+@media(min-width:900px){ .cards-3{grid-template-columns:repeat(3,1fr);gap:24px;} }
+.card-neg{
+  background:rgba(214,51,132,.05);
+  border:1px dashed rgba(214,51,132,.3);
+  margin-top:32px;
+}
+.card-neg ul{list-style:none;padding:0;margin-top:8px;}
+.card-neg ul li{
+  padding:8px 0 8px 22px;position:relative;font-size:14px;line-height:1.55;color:var(--text-dim);
+}
+.card-neg ul li::before{
+  content:'';position:absolute;left:0;top:14px;
+  width:8px;height:8px;border-radius:50%;background:var(--magenta);opacity:.7;
+}
+
+/* FEATURES — bullet grid */
+.bullets{
+  display:grid;gap:14px;margin-top:32px;
+  grid-template-columns:1fr;
+}
+@media(min-width:900px){ .bullets{grid-template-columns:1fr 1fr;gap:14px 24px;} }
+.bullet{
+  display:flex;gap:14px;padding:16px 18px;
+  background:rgba(255,255,255,.6);
+  border:1px solid var(--line);border-radius:var(--r-md);
+  backdrop-filter:blur(8px);
+}
+.bullet .check{
+  flex-shrink:0;width:24px;height:24px;border-radius:50%;
+  background:var(--grad);display:grid;place-items:center;
+  color:#fff;font-size:13px;font-weight:700;
+  box-shadow:0 4px 12px rgba(124,92,252,.25);
+}
+.bullet p{font-size:14.5px;line-height:1.6;color:var(--text);}
+.bullet p b{color:var(--text-strong);font-weight:600;}
+
+/* HOW IT WORKS — timeline 5 etapes */
+.howit-steps{
+  display:grid;gap:22px;margin-top:32px;
+  grid-template-columns:1fr;
+}
+@media(min-width:700px){ .howit-steps{grid-template-columns:repeat(2,1fr);gap:24px;} }
+@media(min-width:1100px){ .howit-steps{grid-template-columns:repeat(5,1fr);gap:18px;} }
+.howit-step{
+  padding:26px 22px;
+  background:rgba(255,255,255,.7);
+  border:1px solid var(--line);border-radius:var(--r-lg);
+  backdrop-filter:blur(10px);position:relative;
+}
+.howit-step .num{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:36px;line-height:1;
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:12px;display:block;
+}
+.howit-step h3{margin-bottom:8px;font-size:16.5px;}
+.howit-step p{color:var(--text-dim);font-size:13.5px;line-height:1.6;}
+
+/* PRICING — custom (sur-mesure) */
+.pricing-wrap{
+  display:grid;place-items:center;margin-top:36px;
+}
+.pricing-custom{
+  width:100%;max-width:680px;
+  padding:40px 32px;
+  background:rgba(255,255,255,.85);
+  border:1px solid var(--line-strong);border-radius:var(--r-lg);
+  backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 20px 50px rgba(124,92,252,.12);
+  position:relative;
+}
+.pricing-custom::before{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;
+  padding:1px;background:var(--grad);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;opacity:.6;
+}
+.pricing-custom > p{margin-bottom:24px;color:var(--text);}
+.price-block{margin-bottom:24px;}
+.price-block h4{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:15px;color:var(--text-strong);margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.price-block h4::before{
+  content:'';width:6px;height:6px;border-radius:50%;background:var(--grad);
+  box-shadow:0 0 0 3px rgba(124,92,252,.15);
+}
+.price-block ul{list-style:none;padding:0;margin:0;}
+.price-block ul li{
+  padding:8px 0 8px 26px;position:relative;font-size:14px;color:var(--text);
+  border-bottom:1px solid var(--line);
+}
+.price-block ul li:last-child{border-bottom:0;}
+.price-block ul li::before{
+  content:'';position:absolute;left:0;top:14px;width:14px;height:2px;
+  background:var(--purple);border-radius:2px;
+}
+.pricing-cta-wrap{margin-top:24px;text-align:center;}
+
+/* FAQ — accordion */
+.faq-list{margin-top:32px;display:flex;flex-direction:column;gap:12px;}
+.faq-item{
+  background:rgba(255,255,255,.7);
+  border:1px solid var(--line);border-radius:var(--r-md);
+  backdrop-filter:blur(8px);overflow:hidden;
+}
+.faq-q{
+  width:100%;padding:18px 22px;text-align:left;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  font-family:'Syne',sans-serif;font-weight:600;font-size:15.5px;
+  color:var(--text-strong);
+}
+.faq-q .icon{
+  flex-shrink:0;width:24px;height:24px;border-radius:50%;
+  background:rgba(124,92,252,.12);color:var(--purple);
+  display:grid;place-items:center;font-size:18px;font-weight:600;
+  transition:transform .3s,background-color .3s;
+}
+.faq-item.is-open .faq-q .icon{transform:rotate(45deg);background:rgba(214,51,132,.18);color:var(--magenta);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.faq-item.is-open .faq-a{max-height:600px;}
+.faq-a-inner{padding:0 22px 20px;color:var(--text-dim);font-size:14.5px;line-height:1.7;}
+
+/* FINAL CTA */
+.final-cta{
+  padding:48px 32px;text-align:center;
+  background:var(--grad-soft);
+  border:1px solid var(--line-strong);border-radius:var(--r-lg);
+  backdrop-filter:blur(12px);margin-top:24px;
+}
+.final-cta p{color:var(--text);max-width:62ch;margin:0 auto 24px;font-size:15.5px;}
+.final-cta .ctas{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:18px;}
+.final-cta .reass{font-size:13px;color:var(--text-dim);font-style:italic;}
+
+/* FOOTER */
+footer{
+  position:relative;z-index:5;
+  padding:32px max(24px,4vw);
+  border-top:1px solid var(--line);
+  max-width:var(--container);margin:32px auto 0;
+  font-size:12px;color:var(--text-mute);
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+}
+footer a{color:var(--text-dim);transition:color .25s;}
+footer a:hover{color:var(--text);}
+
+/* FADE-IN */
+.fade{opacity:0;transform:translateY(20px);transition:opacity .8s ease,transform .8s ease;will-change:opacity,transform;}
+.fade.is-visible{opacity:1;transform:translateY(0);}
+.fade.delay-1{transition-delay:.08s;}
+.fade.delay-2{transition-delay:.16s;}
+.fade.delay-3{transition-delay:.24s;}
+.fade.delay-4{transition-delay:.32s;}
+@media (prefers-reduced-motion:reduce){
+  .fade,.fade.is-visible{opacity:1;transform:none;transition:none;}
+}
+
+@media(max-width:640px){
+  .nav{padding:18px 22px;}
+  .nav .logo img{height:28px;}
+  .nav .back{font-size:10.5px;padding:8px 12px;}
+  section{padding:64px 22px;}
+  .hero{padding-top:32px;}
+}
+</style>
+</head>
+<body>
+
+<div class="orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<header class="nav">
+  <a href="/" class="logo" aria-label="Retour à l'accueil NEEXUS">
+    <img src="logo.png" alt="NEEXUS" />
+  </a>
+  <a href="/projets.html" class="back">&larr; Nos projets</a>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <span class="eyebrow fade">Une réalisation Neexus Agency</span>
+    <h1 class="fade delay-1">Vos chantiers, vos heures, votre équipe — réunis dans <span class="grad">une seule application</span>.</h1>
+    <p class="lead fade delay-2">Stafflow remplace les fiches d'heures papier, les notes WhatsApp et les fichiers Excel par une plateforme tout-en-un pensée pour les entreprises BTP suisses de 5 à 50 collaborateurs.</p>
+    <div class="hero-ctas fade delay-3">
+      <a class="btn btn-primary" href="https://stafflow.ch" target="_blank" rel="noopener">Tester la démo gratuitement &rarr;</a>
+      <a class="btn btn-ghost" href="/#cta">Demander une démo personnalisée</a>
+    </div>
+    <p class="hero-mention fade delay-4">Aucune installation. Fonctionne dans le navigateur. Données hébergées en Suisse.</p>
+  </section>
+
+  <!-- PROBLEME -->
+  <section class="problem">
+    <h2 class="fade">Le quotidien d'un patron BTP, c'est aussi ça&nbsp;:</h2>
+    <div class="pain-list">
+      <div class="pain fade delay-1">
+        <span class="icon" aria-hidden="true">🗒️</span>
+        <h3>Vos salariés perdent ou oublient leurs fiches d'heures papier.</h3>
+        <p>Un cahier mouillé sur le chantier, une fiche froissée au fond d'une poche, et c'est la galère pour le calcul de paie.</p>
+      </div>
+      <div class="pain fade delay-1">
+        <span class="icon" aria-hidden="true">📱</span>
+        <h3>Votre chef de chantier passe son samedi matin à courir après tout le monde sur WhatsApp.</h3>
+        <p>« Envoie-moi tes heures de la semaine&nbsp;! » 12 messages, 4 réponses, 8 relances.</p>
+      </div>
+      <div class="pain fade delay-2">
+        <span class="icon" aria-hidden="true">🧮</span>
+        <h3>Votre comptable ressaisit 50 fiches à la main, chaque mois.</h3>
+        <p>Heures mal lues, calculs faussés, paniers repas oubliés. Une heure de boulot devient trois.</p>
+      </div>
+      <div class="pain fade delay-2">
+        <span class="icon" aria-hidden="true">⏰</span>
+        <h3>Vous découvrez les heures supplémentaires 15 jours trop tard.</h3>
+        <p>Quand la paie est faite, vous ne pouvez plus négocier. Vous payez, et basta.</p>
+      </div>
+      <div class="pain fade delay-3">
+        <span class="icon" aria-hidden="true">📸</span>
+        <h3>Vous n'avez aucune trace photo d'un chantier en cas de litige.</h3>
+        <p>Le journal du chef est dans son cahier, lui-même dans sa camionnette, elle-même partie pour 3 mois en Italie.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section class="solution">
+    <h2 class="fade">Stafflow remplace tout ça par un système simple et fiable.</h2>
+    <div class="cards-4">
+      <div class="card fade delay-1">
+        <span class="icon" aria-hidden="true">📱</span>
+        <h3>Pointage par QR Code dynamique</h3>
+        <p>Vos salariés scannent un QR avec leur téléphone à l'arrivée et au départ. Le QR se renouvelle automatiquement pour empêcher le partage de captures. Heures enregistrées à la minute près, sans intervention.</p>
+      </div>
+      <div class="card fade delay-2">
+        <span class="icon" aria-hidden="true">✓</span>
+        <h3>Double validation en cascade</h3>
+        <p>Le chef de chantier valide les heures sur place (niveau 1). Votre technicien re-valide au bureau (niveau 2). Vous récupérez uniquement les fiches déjà contrôlées deux fois.</p>
+      </div>
+      <div class="card fade delay-3">
+        <span class="icon" aria-hidden="true">📊</span>
+        <h3>Export Excel comptable en 1 clic</h3>
+        <p>Génération automatique d'un fichier Excel propre, prêt pour votre comptable. Une colonne « Extras » indique les heures hors horaires standard à payer en bonus, ou pas — c'est vous qui décidez.</p>
+      </div>
+      <div class="card fade delay-4">
+        <span class="icon" aria-hidden="true">📔</span>
+        <h3>Journal, livraisons et congés digitalisés</h3>
+        <p>Photos de chantier, incidents, réceptions de livraison avec signature numérique, demandes de congés en un clic. Tout est horodaté, archivé, accessible depuis n'importe quel téléphone.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <h2 class="fade">Tout ce dont vous avez besoin, rien de superflu.</h2>
+    <div class="bullets">
+      <div class="bullet fade delay-1"><span class="check">✓</span><p><b>QR Code de pointage</b> dynamique, sécurisé HMAC SHA-256, renouvelé en continu.</p></div>
+      <div class="bullet fade delay-1"><span class="check">✓</span><p><b>4 rôles utilisateurs</b> : Direction, Technicien, Chef de chantier, Salarié.</p></div>
+      <div class="bullet fade delay-2"><span class="check">✓</span><p><b>Horaires standard par chantier</b> — paiement automatique uniquement dans la fenêtre prévue.</p></div>
+      <div class="bullet fade delay-2"><span class="check">✓</span><p><b>Scan de la pause déjeuner optionnel</b> — au choix par chantier (2 ou 4 scans/jour).</p></div>
+      <div class="bullet fade delay-2"><span class="check">✓</span><p><b>Fiches d'heures générées automatiquement</b> à partir des pointages QR.</p></div>
+      <div class="bullet fade delay-2"><span class="check">✓</span><p><b>Validation double niveau</b> (chef → technicien) avec signature électronique.</p></div>
+      <div class="bullet fade delay-3"><span class="check">✓</span><p><b>Journal de chantier</b> : notes, photos, incidents, horodatés.</p></div>
+      <div class="bullet fade delay-3"><span class="check">✓</span><p><b>Réception de livraisons</b> avec photo + signature du livreur.</p></div>
+      <div class="bullet fade delay-3"><span class="check">✓</span><p><b>Demandes de congés</b> avec validation hiérarchique.</p></div>
+      <div class="bullet fade delay-3"><span class="check">✓</span><p><b>Export Excel multi-fiches</b> compatible Sage, Crésus, Bexio.</p></div>
+      <div class="bullet fade delay-4"><span class="check">✓</span><p><b>Self-inscription des salariés</b> via code d'invitation + validation par mail.</p></div>
+      <div class="bullet fade delay-4"><span class="check">✓</span><p><b>Mobile-first</b> : fonctionne sur tous les smartphones, même en 4G basique.</p></div>
+      <div class="bullet fade delay-4"><span class="check">✓</span><p><b>Sécurité</b> : hashage bcrypt, JWT, hébergement Suisse Infomaniak.</p></div>
+    </div>
+  </section>
+
+  <!-- POUR QUI -->
+  <section class="forwhom">
+    <h2 class="fade">Stafflow est conçu pour les entreprises BTP qui veulent professionnaliser leur gestion.</h2>
+    <div class="cards-3">
+      <div class="card fade delay-1">
+        <span class="icon" aria-hidden="true">🏗️</span>
+        <h3>Entreprises générales du bâtiment</h3>
+        <p>5 à 50 salariés. Gros œuvre, second œuvre, rénovation. Vous avez besoin d'un outil simple à déployer qui suit votre rythme de croissance.</p>
+      </div>
+      <div class="card fade delay-2">
+        <span class="icon" aria-hidden="true">🎨</span>
+        <h3>Artisans spécialisés</h3>
+        <p>Peinture, plâtrerie, électricité, plomberie, charpente. Vous gérez 2 à 10 chantiers en parallèle&nbsp;? Stafflow centralise tout sans complexité.</p>
+      </div>
+      <div class="card fade delay-3">
+        <span class="icon" aria-hidden="true">🏘️</span>
+        <h3>Promoteurs et entreprises de rénovation</h3>
+        <p>Plusieurs équipes, plusieurs chantiers, plusieurs clients. Vous avez besoin de visibilité sans paperasse.</p>
+      </div>
+    </div>
+    <div class="card card-neg fade delay-4">
+      <h3>Stafflow n'est pas pour vous si&hellip;</h3>
+      <ul>
+        <li>Vous êtes seul indépendant sans salariés (l'outil sera surdimensionné).</li>
+        <li>Vous avez plus de 200 salariés (un ERP métier sera plus adapté).</li>
+        <li>Vous travaillez exclusivement à la journée sans organisation par chantier.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- COMMENT CA MARCHE -->
+  <section class="howit" id="howitworks">
+    <h2 class="fade">De la signature du chantier à la paie, en 5 étapes&nbsp;:</h2>
+    <div class="howit-steps">
+      <div class="howit-step fade delay-1">
+        <span class="num">01</span>
+        <h3>Création du chantier</h3>
+        <p>Votre technicien crée le projet en 2 minutes : nom, client, lieu, dates, horaires standard. Il assigne un chef de chantier et son équipe.</p>
+      </div>
+      <div class="howit-step fade delay-2">
+        <span class="num">02</span>
+        <h3>Pointage quotidien</h3>
+        <p>Vos salariés scannent un QR à l'arrivée et au départ avec leur téléphone. Le chef de chantier supervise depuis sa tablette en temps réel.</p>
+      </div>
+      <div class="howit-step fade delay-3">
+        <span class="num">03</span>
+        <h3>Journal et livraisons</h3>
+        <p>Le chef ajoute notes, photos, incidents au fil de la semaine. Il réceptionne les livraisons fournisseurs avec signature numérique.</p>
+      </div>
+      <div class="howit-step fade delay-4">
+        <span class="num">04</span>
+        <h3>Validation des heures</h3>
+        <p>En fin de semaine, Stafflow génère automatiquement les fiches. Le chef valide niveau 1, votre technicien valide niveau 2.</p>
+      </div>
+      <div class="howit-step fade delay-4">
+        <span class="num">05</span>
+        <h3>Export comptable</h3>
+        <p>Un clic pour générer le fichier Excel. Vous l'envoyez à votre comptable. La paie est faite en quelques minutes, pas en quelques heures.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing">
+    <h2 class="fade">Un tarif unique, sur-mesure pour votre entreprise.</h2>
+    <p class="lead fade delay-1">Stafflow n'est pas un SaaS générique vendu au volume. C'est une solution sur-mesure développée par Neexus Agency, déployée sous votre nom, avec vos couleurs, à votre domaine. Le tarif dépend de la taille de votre équipe et des éventuelles personnalisations souhaitées.</p>
+    <div class="pricing-wrap">
+      <div class="pricing-custom fade delay-2">
+        <div class="price-block">
+          <h4>Ce qui est toujours inclus</h4>
+          <ul>
+            <li>Installation complète sur votre propre domaine</li>
+            <li>Migration de vos données existantes (employés, chantiers en cours)</li>
+            <li>Formation de votre équipe (1 session de 1h)</li>
+            <li>Hébergement Suisse sécurisé pendant 12 mois</li>
+            <li>Support technique et corrections de bugs</li>
+          </ul>
+        </div>
+        <div class="price-block">
+          <h4>Ce qui peut s'ajouter selon vos besoins</h4>
+          <ul>
+            <li>Intégration directe avec votre logiciel de paie</li>
+            <li>Branding personnalisé (logo, couleurs, nom de domaine)</li>
+            <li>Modules supplémentaires (devis, facturation, planning)</li>
+            <li>Maintenance et évolutions au-delà de la 1ère année</li>
+          </ul>
+        </div>
+        <div class="pricing-cta-wrap">
+          <a class="btn btn-primary" href="/#cta">Demander un devis adapté &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <h2 class="fade">Vous vous demandez peut-être&hellip;</h2>
+    <div class="faq-list">
+      <div class="faq-item fade delay-1">
+        <button class="faq-q" type="button" aria-expanded="false">Mes salariés doivent installer une application&nbsp;?<span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Non. Stafflow fonctionne directement dans le navigateur (Chrome, Safari, Firefox). Ils peuvent ajouter un raccourci à leur écran d'accueil pour que ça ressemble à une appli, mais aucune installation depuis un App Store.</div></div>
+      </div>
+      <div class="faq-item fade delay-1">
+        <button class="faq-q" type="button" aria-expanded="false">Et la connexion internet sur le chantier&nbsp;?<span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">La 4G suffit largement. Stafflow est conçu pour fonctionner même avec une connexion lente. Pour les chantiers en zone blanche, un mode hors-ligne permet de pointer sans réseau et de synchroniser au retour du signal.</div></div>
+      </div>
+      <div class="faq-item fade delay-2">
+        <button class="faq-q" type="button" aria-expanded="false">Mes données sont-elles en sécurité&nbsp;?<span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Oui. Hébergement Suisse chez Infomaniak (entreprise certifiée ISO 27001), chiffrement HTTPS, mots de passe hashés bcrypt cost 12, authentification JWT. Chaque entreprise a son environnement totalement isolé. Aucune donnée n'est partagée avec un tiers.</div></div>
+      </div>
+      <div class="faq-item fade delay-2">
+        <button class="faq-q" type="button" aria-expanded="false">Combien de temps pour la mise en place&nbsp;?<span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Comptez environ 5 heures de notre côté pour l'installation et la configuration + 1 heure de formation pour vous et votre équipe. Vous êtes opérationnel en moins d'une journée.</div></div>
+      </div>
+      <div class="faq-item fade delay-3">
+        <button class="faq-q" type="button" aria-expanded="false">J'ai déjà un logiciel de paie. C'est compatible&nbsp;?<span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Oui. L'export Excel de Stafflow est compatible avec tous les logiciels de paie suisses (Sage, Crésus, Bexio, Abacus). Sur demande, on peut développer une intégration directe pour automatiser le transfert.</div></div>
+      </div>
+      <div class="faq-item fade delay-3">
+        <button class="faq-q" type="button" aria-expanded="false">Et si je veux personnaliser l'application&nbsp;?<span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">C'est notre métier. Stafflow est développé sur-mesure pour chaque client : logo, couleurs, nom de domaine, fonctionnalités spécifiques. On adapte l'outil à votre organisation, pas l'inverse.</div></div>
+      </div>
+      <div class="faq-item fade delay-4">
+        <button class="faq-q" type="button" aria-expanded="false">Que se passe-t-il si Neexus Agency disparaît&nbsp;?<span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Vous récupérez l'intégralité du code source de votre instance Stafflow. C'est inclus dans la prestation. Vous n'êtes jamais prisonnier d'un éditeur.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="final">
+    <h2 class="fade">Découvrez Stafflow en 5 minutes.</h2>
+    <div class="final-cta fade delay-1">
+      <p>Aucune inscription, aucun engagement. Cliquez sur le bouton ci-dessous, choisissez un rôle (Direction, Technicien, Chef de chantier ou Salarié) et explorez librement l'application avec des données fictives.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="https://stafflow.ch" target="_blank" rel="noopener">Tester la démo maintenant &rarr;</a>
+        <a class="btn btn-ghost" href="/#cta">Demander une démo par visio</a>
+      </div>
+      <p class="reass">Nous reviendrons vers vous sous 24h ouvrées. Aucune obligation de souscription après le rendez-vous.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div>&copy; 2026 — NEEXUS AGENCY by SDS Smart Digital Solution LLC</div>
+  <div><a href="/">Retour à l'accueil</a> · <a href="https://stafflow.ch" target="_blank" rel="noopener">stafflow.ch</a></div>
+</footer>
+
+<script>
+// Fade-in IntersectionObserver — leger, no GSAP
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('is-visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade').forEach(el => fadeObserver.observe(el));
+
+// FAQ accordion (ouverture mutuellement exclusive)
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.closest('.faq-item');
+    const isOpen = item.classList.contains('is-open');
+    document.querySelectorAll('.faq-item.is-open').forEach(o => {
+      o.classList.remove('is-open');
+      o.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+    });
+    if (!isOpen) {
+      item.classList.add('is-open');
+      q.setAttribute('aria-expanded', 'true');
+    }
+  });
+});
+</script>
+
+</body>
+</html>
