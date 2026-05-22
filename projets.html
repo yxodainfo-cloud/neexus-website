@@ -97,9 +97,23 @@ h1{
   -webkit-background-clip:text;background-clip:text;color:transparent;
   -webkit-text-fill-color:transparent;
 }
-.note{
-  margin-top:32px;color:var(--text-dim);
-  max-width:48ch;line-height:1.6;font-size:15px;
+.projects-list{
+  list-style:none;padding:0;margin:48px 0 0;
+  display:flex;flex-direction:column;gap:14px;align-items:center;
+}
+.projects-list a{
+  display:inline-flex;align-items:center;gap:12px;
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:clamp(18px,2.2vw,24px);
+  padding:14px 28px;border:1px solid var(--line);border-radius:100px;
+  color:var(--text);background:rgba(255,255,255,.7);
+  transition:transform .3s,border-color .3s,color .3s,box-shadow .3s;
+}
+.projects-list a:hover{
+  transform:translateY(-2px);
+  border-color:var(--purple);
+  color:var(--magenta);
+  box-shadow:0 10px 30px rgba(124,92,252,.15);
 }
 
 /* Footer minimal */
@@ -139,7 +153,9 @@ footer a:hover{color:var(--text);}
 <main>
   <span class="eyebrow">NEEXUS &middot; Portfolio</span>
   <h1>Nos Projets du moment</h1>
-  <p class="note">Page en preparation &mdash; bientot, vous trouverez ici nos realisations recentes et projets en cours.</p>
+  <ul class="projects-list">
+    <li><a href="/sheetflow.html">SheetFlow &rarr;</a></li>
+  </ul>
 </main>
 
 <footer>
