@@ -1894,11 +1894,13 @@ body.no-hero-bg .hero-bg-overlay{
 }
 /* fix bug 'gagner' italique coupe a droite : SplitType (initSplitCta) met
    inline overflow:hidden sur chaque .word pour le slide-up vertical. En
-   italique, le glyphe final ('r' avec slant) + le '?' debordent a droite
-   la boite du mot et se font clipper. Padding scoped pour donner l'air. */
+   italique, le glyphe final ('r' avec slant) deborde a droite et se fait
+   clipper. Padding-right donne la marge interne necessaire, margin-right
+   negatif compense au niveau layout pour ne pas creer de gap visible
+   entre 'gagner' et '?'. */
 .cta-final h2 .italic .word{
   padding-right:.4em;
-  padding-left:.08em;
+  margin-right:-.4em;
 }
 .cta-final p{
   color:var(--text-dim);font-size:17px;
@@ -1960,15 +1962,17 @@ body.no-hero-bg .hero-bg-overlay{
 .cta-form-rassurance{
   text-align:center;
   font-size:13px;color:var(--text-dim);
-  /* margin-top genereux pour bien clear le box-shadow halo violet du bouton
-     (~50-60px) et donner du souffle entre le CTA et la rassurance. */
-  max-width:54ch;margin:88px auto 0;line-height:1.5;
+  /* margin-top tres genereux : le bouton .btn-primary a box-shadow
+     0 12px 40px ... qui projette un halo violet ~50-60px sous le bouton.
+     Le halo "mange" visuellement la moitie de la margin, donc on double
+     la dose pour que l'espace VISIBLE entre bouton et texte fasse ~80px. */
+  max-width:54ch;margin:130px auto 0;line-height:1.5;
 }
 @media(max-width:640px){
   .cta-form-grid{grid-template-columns:1fr;}
   .cta-final{padding:120px 22px;}
   .cta-form-submit{width:100%;justify-content:center;}
-  .cta-form-rassurance{margin-top:64px;}
+  .cta-form-rassurance{margin-top:90px;}
 }
 
 /* ============================================================
