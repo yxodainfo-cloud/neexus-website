@@ -447,24 +447,6 @@ section {
   pointer-events: none;
 }
 
-/* Light beam crossing the hero */
-.hero-beam {
-  position: absolute;
-  top: 0;
-  left: 30%;
-  width: 1px;
-  height: 100%;
-  background: linear-gradient(to bottom, transparent, var(--accent-bright), transparent);
-  opacity: 0.4;
-  animation: beamSweep 8s ease-in-out infinite;
-  pointer-events: none;
-}
-.hero-beam:nth-of-type(2) {
-  left: 70%;
-  animation-delay: 4s;
-  background: linear-gradient(to bottom, transparent, var(--accent-violet), transparent);
-}
-
 @keyframes orbDrift1 {
   0%, 100% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(40px, -30px) scale(1.1); }
@@ -482,11 +464,6 @@ section {
   from { background-position: 0 0; }
   to { background-position: 0 60px; }
 }
-@keyframes beamSweep {
-  0%, 100% { opacity: 0; transform: scaleY(0.6); }
-  50% { opacity: 0.5; transform: scaleY(1); }
-}
-
 .hero-grid-bg {
   position: absolute;
   inset: 0;
@@ -1566,8 +1543,6 @@ img { -webkit-user-drag: none; }
     <div class="hero-grid-bg"></div>
     <div class="hero-grid-3d"></div>
     <div class="hero-orb"></div>
-    <div class="hero-beam"></div>
-    <div class="hero-beam"></div>
   </div>
   <div class="container hero-content">
     <div class="hero-meta">
