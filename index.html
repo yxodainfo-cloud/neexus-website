@@ -1493,6 +1493,24 @@ section {
   .hero-footer { position: static; padding: 3rem var(--gutter) 0; margin-top: 3rem; }
   .scroll-cue { display: none; }
 }
+/* ============================================
+   ANTI-COPY (smart : laisse passer email/tel/inputs)
+============================================ */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+input, textarea, select,
+a[href^="mailto:"], a[href^="tel:"],
+.allow-select, .allow-select * {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+img { -webkit-user-drag: none; }
 </style>
 </head>
 <body>
@@ -1998,6 +2016,16 @@ section {
   </div>
 </footer>
 
+<script>
+/* Anti-copy : bloque copy/cut/contextmenu sauf sur inputs et liens contact */
+(function () {
+  const allowSelector = 'input, textarea, select, a[href^="mailto:"], a[href^="tel:"], .allow-select, .allow-select *';
+  const isAllowed = (el) => el && el.matches && el.matches(allowSelector);
+  document.addEventListener('copy', (e) => { if (!isAllowed(e.target)) e.preventDefault(); });
+  document.addEventListener('cut',  (e) => { if (!isAllowed(e.target)) e.preventDefault(); });
+  document.addEventListener('contextmenu', (e) => { if (!isAllowed(e.target)) e.preventDefault(); });
+})();
+</script>
 <script>
 // ============================================
 // HEADER SCROLL STATE
