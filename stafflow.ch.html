@@ -4,8 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#07080d" />
-<title>Stafflow — Vos chantiers, vos heures, votre équipe · NEEXUS</title>
-<meta name="description" content="Stafflow remplace fiches d'heures papier, WhatsApp et Excel par une plateforme tout-en-un pour les entreprises BTP suisses de 5 à 50 collaborateurs." />
+<title>Stafflow — Reprenez le contrôle de vos chantiers · NEEXUS</title>
+<meta name="description" content="Stafflow digitalise la gestion de chantier des métiers du second œuvre en Suisse : feuilles d'heures par QR, paie, bons de livraison, contrôles et multilinguisme. Pour les entreprises de 10 à 200 salariés." />
 
 <link rel="icon" type="image/png" href="Logo_neexus.png" />
 <link rel="apple-touch-icon" href="Logo_neexus.png" />
@@ -174,6 +174,7 @@ p + p{margin-top:14px;}
   font-size:30px;margin-bottom:14px;display:block;
   filter:drop-shadow(0 4px 10px rgba(124,140,248,.35));
 }
+.card .icon svg{width:30px;height:30px;stroke:var(--magenta);}
 .card p{color:var(--text-dim);font-size:14px;line-height:1.6;}
 
 /* CARDS-3 (Pour qui) */
@@ -341,6 +342,57 @@ footer a:hover{color:var(--text);}
   .fade,.fade.is-visible{opacity:1;transform:none;transition:none;}
 }
 
+/* STATS BAND */
+.stats-band{padding-top:0;}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:8px;}
+@media(min-width:900px){ .stats-grid{grid-template-columns:repeat(4,1fr);gap:20px;} }
+.stat{
+  text-align:center;padding:26px 18px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line);border-radius:var(--r-lg);
+  backdrop-filter:blur(12px) saturate(140%);
+}
+.stat .n{
+  font-family:'Fraunces',Georgia,serif;font-weight:400;
+  font-size:clamp(28px,4.6vw,44px);line-height:1;
+  background:var(--grad-text);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-fill-color:transparent;
+}
+.stat p{color:var(--text-dim);font-size:13.5px;margin-top:10px;line-height:1.5;}
+
+/* TRADES GRID (corps de métier) */
+.trades-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:36px;}
+@media(min-width:700px){ .trades-grid{grid-template-columns:repeat(4,1fr);gap:18px;} }
+.trade{
+  text-align:center;padding:26px 16px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line);border-radius:var(--r-lg);
+  backdrop-filter:blur(10px);
+}
+.trade .ic{
+  width:46px;height:46px;margin:0 auto 14px;border-radius:50%;
+  background:var(--grad-soft);border:1px solid var(--line-strong);
+  display:grid;place-items:center;color:var(--magenta);
+}
+.trade .ic svg{width:23px;height:23px;}
+.trade span{font-size:14px;color:var(--text);font-weight:500;}
+
+/* COMPARE AVANT / APRES */
+.compare{display:grid;grid-template-columns:1fr;gap:18px;margin-top:36px;}
+@media(min-width:800px){ .compare{grid-template-columns:1fr 1fr;gap:24px;} }
+.compare-col{padding:28px 24px;border-radius:var(--r-lg);backdrop-filter:blur(10px);}
+.compare-col.neg{background:rgba(214,51,132,.06);border:1px solid rgba(214,51,132,.28);}
+.compare-col.pos{background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.30);}
+.compare-col h3{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.compare-col.neg h3{color:var(--magenta);}
+.compare-col.pos h3{color:#4ade80;}
+.compare-col ul{list-style:none;padding:0;margin:0;}
+.compare-col li{padding:10px 0 10px 28px;position:relative;font-size:14.5px;color:var(--text);line-height:1.5;border-top:1px solid var(--line);}
+.compare-col li:first-child{border-top:0;}
+.compare-col.neg li::before{content:'✕';position:absolute;left:2px;top:10px;color:var(--magenta);font-weight:700;}
+.compare-col.pos li::before{content:'✓';position:absolute;left:2px;top:10px;color:#4ade80;font-weight:700;}
+
 @media(max-width:640px){
   .nav{padding:18px 22px;}
   .nav .logo img{height:28px;}
@@ -369,234 +421,152 @@ footer a:hover{color:var(--text);}
 
   <!-- HERO -->
   <section class="hero">
-    <span class="eyebrow fade">Une réalisation Neexus Agency</span>
-    <h1 class="fade delay-1">Vos chantiers, vos heures, votre équipe — réunis dans <span class="grad">une seule application</span>.</h1>
-    <p class="lead fade delay-2">Stafflow remplace les fiches d'heures papier, les notes WhatsApp et les fichiers Excel par une plateforme tout-en-un pensée pour les entreprises BTP suisses de 5 à 50 collaborateurs.</p>
+    <span class="eyebrow fade">✓ Démo gratuite · sans inscription</span>
+    <h1 class="fade delay-1">Reprenez le contrôle <span class="grad">de vos chantiers</span></h1>
+    <p class="lead fade delay-2">Fini les fiches d'heures sur WhatsApp, les litiges fournisseurs et les heures perdues en administratif. Stafflow digitalise votre gestion de chantier et vous rend une journée par semaine.</p>
+    <p class="hero-mention fade delay-2" style="font-style:italic;margin-bottom:32px;">Pensée pour les électriciens, plombiers, plâtriers-peintres, poseurs de sol, carreleurs, menuisiers et tous les métiers du second œuvre.</p>
     <div class="hero-ctas fade delay-3">
-      <a class="btn btn-primary" href="https://stafflow.ch" target="_blank" rel="noopener">Tester la démo gratuitement &rarr;</a>
-      <a class="btn btn-ghost" href="/#cta">Demander une démo personnalisée</a>
+      <a class="btn btn-primary" href="https://app.stafflow.ch/demo" target="_blank" rel="noopener">Essayer la démo gratuite &rarr;</a>
     </div>
-    <p class="hero-mention fade delay-4">Aucune installation. Fonctionne dans le navigateur. Données hébergées en Suisse.</p>
+    <p class="hero-mention fade delay-4">Sans inscription · Sans engagement · Données hébergées en Suisse</p>
   </section>
 
-  <!-- PROBLEME -->
-  <section class="problem">
-    <h2 class="fade">Le quotidien d'un patron BTP, c'est aussi ça&nbsp;:</h2>
-    <div class="pain-list">
-      <div class="pain fade delay-1">
-        <span class="icon" aria-hidden="true">🗒️</span>
-        <h3>Vos salariés perdent ou oublient leurs fiches d'heures papier.</h3>
-        <p>Un cahier mouillé sur le chantier, une fiche froissée au fond d'une poche, et c'est la galère pour le calcul de paie.</p>
-      </div>
-      <div class="pain fade delay-1">
-        <span class="icon" aria-hidden="true">📱</span>
-        <h3>Votre chef de chantier passe son samedi matin à courir après tout le monde sur WhatsApp.</h3>
-        <p>« Envoie-moi tes heures de la semaine&nbsp;! » 12 messages, 4 réponses, 8 relances.</p>
-      </div>
-      <div class="pain fade delay-2">
-        <span class="icon" aria-hidden="true">🧮</span>
-        <h3>Votre comptable ressaisit 50 fiches à la main, chaque mois.</h3>
-        <p>Heures mal lues, calculs faussés, paniers repas oubliés. Une heure de boulot devient trois.</p>
-      </div>
-      <div class="pain fade delay-2">
-        <span class="icon" aria-hidden="true">⏰</span>
-        <h3>Vous découvrez les heures supplémentaires 15 jours trop tard.</h3>
-        <p>Quand la paie est faite, vous ne pouvez plus négocier. Vous payez, et basta.</p>
-      </div>
-      <div class="pain fade delay-3">
-        <span class="icon" aria-hidden="true">📸</span>
-        <h3>Vous n'avez aucune trace photo d'un chantier en cas de litige.</h3>
-        <p>Le journal du chef est dans son cahier, lui-même dans sa camionnette, elle-même partie pour 3 mois en Italie.</p>
-      </div>
+  <!-- CHIFFRES -->
+  <section class="stats-band">
+    <div class="stats-grid">
+      <div class="stat fade delay-1"><div class="n">1 jour</div><p>gagné par semaine sur l'administratif</p></div>
+      <div class="stat fade delay-2"><div class="n">8 à 12 h</div><p>économisées par semaine selon la CAPEB</p></div>
+      <div class="stat fade delay-3"><div class="n">0 litige</div><p>fournisseur grâce aux bons signés</p></div>
+      <div class="stat fade delay-4"><div class="n">11 langues</div><p>pour vos équipes multilingues</p></div>
     </div>
   </section>
 
-  <!-- SOLUTION -->
+  <!-- CE QUE STAFFLOW VOUS RAPPORTE -->
   <section class="solution">
-    <h2 class="fade">Stafflow remplace tout ça par un système simple et fiable.</h2>
-    <div class="cards-4">
-      <div class="card fade delay-1">
-        <span class="icon" aria-hidden="true">📱</span>
-        <h3>Pointage par QR Code dynamique</h3>
-        <p>Vos salariés scannent un QR avec leur téléphone à l'arrivée et au départ. Le QR se renouvelle automatiquement pour empêcher le partage de captures. Heures enregistrées à la minute près, sans intervention.</p>
-      </div>
-      <div class="card fade delay-2">
-        <span class="icon" aria-hidden="true">✓</span>
-        <h3>Double validation en cascade</h3>
-        <p>Le chef de chantier valide les heures sur place (niveau 1). Votre technicien re-valide au bureau (niveau 2). Vous récupérez uniquement les fiches déjà contrôlées deux fois.</p>
-      </div>
-      <div class="card fade delay-3">
-        <span class="icon" aria-hidden="true">📊</span>
-        <h3>Export Excel comptable en 1 clic</h3>
-        <p>Génération automatique d'un fichier Excel propre, prêt pour votre comptable. Une colonne « Extras » indique les heures hors horaires standard à payer en bonus, ou pas — c'est vous qui décidez.</p>
-      </div>
-      <div class="card fade delay-4">
-        <span class="icon" aria-hidden="true">📔</span>
-        <h3>Journal, livraisons et congés digitalisés</h3>
-        <p>Photos de chantier, incidents, réceptions de livraison avec signature numérique, demandes de congés en un clic. Tout est horodaté, archivé, accessible depuis n'importe quel téléphone.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- FEATURES -->
-  <section class="features">
-    <h2 class="fade">Tout ce dont vous avez besoin, rien de superflu.</h2>
-    <div class="bullets">
-      <div class="bullet fade delay-1"><span class="check">✓</span><p><b>QR Code de pointage</b> dynamique, sécurisé HMAC SHA-256, renouvelé en continu.</p></div>
-      <div class="bullet fade delay-1"><span class="check">✓</span><p><b>4 rôles utilisateurs</b> : Direction, Technicien, Chef de chantier, Salarié.</p></div>
-      <div class="bullet fade delay-2"><span class="check">✓</span><p><b>Horaires standard par chantier</b> — paiement automatique uniquement dans la fenêtre prévue.</p></div>
-      <div class="bullet fade delay-2"><span class="check">✓</span><p><b>Scan de la pause déjeuner optionnel</b> — au choix par chantier (2 ou 4 scans/jour).</p></div>
-      <div class="bullet fade delay-2"><span class="check">✓</span><p><b>Fiches d'heures générées automatiquement</b> à partir des pointages QR.</p></div>
-      <div class="bullet fade delay-2"><span class="check">✓</span><p><b>Validation double niveau</b> (chef → technicien) avec signature électronique.</p></div>
-      <div class="bullet fade delay-3"><span class="check">✓</span><p><b>Journal de chantier</b> : notes, photos, incidents, horodatés.</p></div>
-      <div class="bullet fade delay-3"><span class="check">✓</span><p><b>Réception de livraisons</b> avec photo + signature du livreur.</p></div>
-      <div class="bullet fade delay-3"><span class="check">✓</span><p><b>Demandes de congés</b> avec validation hiérarchique.</p></div>
-      <div class="bullet fade delay-3"><span class="check">✓</span><p><b>Export Excel multi-fiches</b> compatible Sage, Crésus, Bexio.</p></div>
-      <div class="bullet fade delay-4"><span class="check">✓</span><p><b>Self-inscription des salariés</b> via code d'invitation + validation par mail.</p></div>
-      <div class="bullet fade delay-4"><span class="check">✓</span><p><b>Mobile-first</b> : fonctionne sur tous les smartphones, même en 4G basique.</p></div>
-      <div class="bullet fade delay-4"><span class="check">✓</span><p><b>Sécurité</b> : hashage bcrypt, JWT, hébergement Suisse Infomaniak.</p></div>
-    </div>
-  </section>
-
-  <!-- POUR QUI -->
-  <section class="forwhom">
-    <h2 class="fade">Stafflow est conçu pour les entreprises BTP qui veulent professionnaliser leur gestion.</h2>
+    <h2 class="fade">Ce que Stafflow vous rapporte concrètement.</h2>
+    <p class="lead fade delay-1">Chaque bénéfice résout un problème quotidien vécu sur le terrain.</p>
     <div class="cards-3">
       <div class="card fade delay-1">
-        <span class="icon" aria-hidden="true">🏗️</span>
-        <h3>Entreprises générales du bâtiment</h3>
-        <p>5 à 50 salariés. Gros œuvre, second œuvre, rénovation. Vous avez besoin d'un outil simple à déployer qui suit votre rythme de croissance.</p>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg></span>
+        <h3>Fini les feuilles d'heures perdues</h3>
+        <p>Vos ouvriers scannent un QR en arrivant sur chantier. Les heures, les heures sup et le dimanche se calculent tout seuls. Vous ne courez plus après les feuilles le vendredi soir.</p>
       </div>
       <div class="card fade delay-2">
-        <span class="icon" aria-hidden="true">🎨</span>
-        <h3>Artisans spécialisés</h3>
-        <p>Peinture, plâtrerie, électricité, plomberie, charpente. Vous gérez 2 à 10 chantiers en parallèle&nbsp;? Stafflow centralise tout sans complexité.</p>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg></span>
+        <h3>La paie sans la corvée</h3>
+        <p>Les fiches se génèrent depuis les pointages, votre chef valide, et un clic envoie le fichier à votre fiduciaire. Ce qui prenait des heures prend des minutes.</p>
       </div>
       <div class="card fade delay-3">
-        <span class="icon" aria-hidden="true">🏘️</span>
-        <h3>Promoteurs et entreprises de rénovation</h3>
-        <p>Plusieurs équipes, plusieurs chantiers, plusieurs clients. Vous avez besoin de visibilité sans paperasse.</p>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span>
+        <h3>Plus jamais un litige fournisseur</h3>
+        <p>Le livreur et votre chef signent sur l'écran à la réception. Photo du bon, horodatage, archivage. La contestation «&nbsp;vous me devez X&nbsp;» devient impossible.</p>
       </div>
-    </div>
-    <div class="card card-neg fade delay-4">
-      <h3>Stafflow n'est pas pour vous si&hellip;</h3>
-      <ul>
-        <li>Vous êtes seul indépendant sans salariés (l'outil sera surdimensionné).</li>
-        <li>Vous avez plus de 200 salariés (un ERP métier sera plus adapté).</li>
-        <li>Vous travaillez exclusivement à la journée sans organisation par chantier.</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- COMMENT CA MARCHE -->
-  <section class="howit" id="howitworks">
-    <h2 class="fade">De la signature du chantier à la paie, en 5 étapes&nbsp;:</h2>
-    <div class="howit-steps">
-      <div class="howit-step fade delay-1">
-        <span class="num">01</span>
-        <h3>Création du chantier</h3>
-        <p>Votre technicien crée le projet en 2 minutes : nom, client, lieu, dates, horaires standard. Il assigne un chef de chantier et son équipe.</p>
+      <div class="card fade delay-1">
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+        <h3>Une amende&nbsp;? Vous savez qui en 5 secondes</h3>
+        <p>Plus de jours d'enquête après chaque PV. Tapez la date, trouvez le conducteur. Alertes contrôle technique et assurance, et votre carnet de route fiscal suisse se tient tout seul.</p>
       </div>
-      <div class="howit-step fade delay-2">
-        <span class="num">02</span>
-        <h3>Pointage quotidien</h3>
-        <p>Vos salariés scannent un QR à l'arrivée et au départ avec leur téléphone. Le chef de chantier supervise depuis sa tablette en temps réel.</p>
+      <div class="card fade delay-2">
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span>
+        <h3>Les congés et acomptes sans paperasse</h3>
+        <p>Vos équipes demandent, vous validez en un clic depuis votre téléphone. Congés, acomptes, notes de frais, documents. Tout est tracé, rien ne se perd.</p>
       </div>
-      <div class="howit-step fade delay-3">
-        <span class="num">03</span>
-        <h3>Journal et livraisons</h3>
-        <p>Le chef ajoute notes, photos, incidents au fil de la semaine. Il réceptionne les livraisons fournisseurs avec signature numérique.</p>
-      </div>
-      <div class="howit-step fade delay-4">
-        <span class="num">04</span>
-        <h3>Validation des heures</h3>
-        <p>En fin de semaine, Stafflow génère automatiquement les fiches. Le chef valide niveau 1, votre technicien valide niveau 2.</p>
-      </div>
-      <div class="howit-step fade delay-4">
-        <span class="num">05</span>
-        <h3>Export comptable</h3>
-        <p>Un clic pour générer le fichier Excel. Vous l'envoyez à votre comptable. La paie est faite en quelques minutes, pas en quelques heures.</p>
+      <div class="card fade delay-3">
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
+        <h3>Chacun travaille dans sa langue</h3>
+        <p>FR, DE, IT, EN et 7 autres langues. Vos ouvriers lusophones, italophones ou germanophones utilisent l'app sans barrière. Idéal pour les équipes suisses.</p>
       </div>
     </div>
   </section>
 
-  <!-- PRICING -->
-  <section class="pricing">
-    <h2 class="fade">Un tarif unique, sur-mesure pour votre entreprise.</h2>
-    <p class="lead fade delay-1">Stafflow n'est pas un SaaS générique vendu au volume. C'est une solution sur-mesure développée par Neexus Agency, déployée sous votre nom, avec vos couleurs, à votre domaine. Le tarif dépend de la taille de votre équipe et des éventuelles personnalisations souhaitées.</p>
-    <div class="pricing-wrap">
-      <div class="pricing-custom fade delay-2">
-        <div class="price-block">
-          <h4>Ce qui est toujours inclus</h4>
-          <ul>
-            <li>Installation complète sur votre propre domaine</li>
-            <li>Migration de vos données existantes (employés, chantiers en cours)</li>
-            <li>Formation de votre équipe (1 session de 1h)</li>
-            <li>Hébergement Suisse sécurisé pendant 12 mois</li>
-            <li>Support technique et corrections de bugs</li>
-          </ul>
-        </div>
-        <div class="price-block">
-          <h4>Ce qui peut s'ajouter selon vos besoins</h4>
-          <ul>
-            <li>Intégration directe avec votre logiciel de paie</li>
-            <li>Branding personnalisé (logo, couleurs, nom de domaine)</li>
-            <li>Modules supplémentaires (devis, facturation, planning)</li>
-            <li>Maintenance et évolutions au-delà de la 1ère année</li>
-          </ul>
-        </div>
-        <div class="pricing-cta-wrap">
-          <a class="btn btn-primary" href="/#cta">Demander un devis adapté &rarr;</a>
-        </div>
+  <!-- UNE APP QUI PARLE VOTRE LANGAGE METIER -->
+  <section class="forwhom">
+    <h2 class="fade">Une app qui parle votre langage métier.</h2>
+    <p class="lead fade delay-1">Stafflow s'adapte au vocabulaire de votre corps de métier. Vos devis, vos chantiers, vos équipes — dans VOS termes.</p>
+    <div class="trades-grid">
+      <div class="trade fade delay-1"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span>Électricité</span></div>
+      <div class="trade fade delay-1"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg></span><span>Plomberie / sanitaire</span></div>
+      <div class="trade fade delay-2"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg></span><span>Plâtrerie / placo</span></div>
+      <div class="trade fade delay-2"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="6" x="2" y="2" rx="2"/><path d="M10 16v-2a2 2 0 0 1 2-2h8a2 2 0 0 0 2-2V5"/><rect width="4" height="6" x="8" y="16" rx="1"/></svg></span><span>Peinture</span></div>
+      <div class="trade fade delay-3"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg></span><span>Pose de sol</span></div>
+      <div class="trade fade delay-3"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/><path d="M3 12h18"/></svg></span><span>Carrelage / faïence</span></div>
+      <div class="trade fade delay-4"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg></span><span>Menuiserie intérieure</span></div>
+      <div class="trade fade delay-4"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span>Faux-plafonds / isolation</span></div>
+    </div>
+  </section>
+
+  <!-- LA DIFFERENCE CONCRETE AU QUOTIDIEN -->
+  <section class="compare-section">
+    <h2 class="fade">La différence concrète au quotidien.</h2>
+    <div class="compare">
+      <div class="compare-col neg fade delay-1">
+        <h3>Avant Stafflow</h3>
+        <ul>
+          <li>Fiches d'heures sur WhatsApp et papier</li>
+          <li>Litiges fournisseurs impossibles à prouver</li>
+          <li>Marge découverte 3 mois trop tard</li>
+          <li>Historique perdu quand un chef part</li>
+          <li>800 messages WhatsApp par jour</li>
+        </ul>
       </div>
+      <div class="compare-col pos fade delay-2">
+        <h3>Avec Stafflow</h3>
+        <ul>
+          <li>Heures pointées et calculées automatiquement</li>
+          <li>Bons de livraison signés et archivés</li>
+          <li>Chaque chantier suivi en temps réel</li>
+          <li>Mémoire de l'entreprise préservée</li>
+          <li>Tout centralisé, rien ne se perd</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section class="final" id="howitworks">
+    <span class="eyebrow fade">Sans inscription · 5 rôles à explorer</span>
+    <h2 class="fade delay-1">Testez l'app comme si vous y étiez.</h2>
+    <div class="final-cta fade delay-2">
+      <p>Choisissez votre rôle (Direction, Conducteur travaux, Chef de chantier, Ouvrier ou Administration), explorez l'app avec des données réelles d'un chantier suisse. Aucun mot de passe demandé.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="https://app.stafflow.ch/demo" target="_blank" rel="noopener">Lancer la démo gratuite &rarr;</a>
+      </div>
+      <p class="reass">Démo hébergée sur app.stafflow.ch · données fictives · aucun compte créé</p>
     </div>
   </section>
 
   <!-- FAQ -->
   <section class="faq">
-    <h2 class="fade">Vous vous demandez peut-être&hellip;</h2>
+    <h2 class="fade">Vos questions, nos réponses.</h2>
     <div class="faq-list">
       <div class="faq-item fade delay-1">
-        <button class="faq-q" type="button" aria-expanded="false">Mes salariés doivent installer une application&nbsp;?<span class="icon">+</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Non. Stafflow fonctionne directement dans le navigateur (Chrome, Safari, Firefox). Ils peuvent ajouter un raccourci à leur écran d'accueil pour que ça ressemble à une appli, mais aucune installation depuis un App Store.</div></div>
+        <button class="faq-q" type="button" aria-expanded="false">Mes données sont-elles en sécurité&nbsp;?<span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Hébergement suisse, isolation totale entre entreprises, conforme nLPD. Vos données ne quittent jamais la Suisse.</div></div>
       </div>
       <div class="faq-item fade delay-1">
-        <button class="faq-q" type="button" aria-expanded="false">Et la connexion internet sur le chantier&nbsp;?<span class="icon">+</span></button>
-        <div class="faq-a"><div class="faq-a-inner">La 4G suffit largement. Stafflow est conçu pour fonctionner même avec une connexion lente. Pour les chantiers en zone blanche, un mode hors-ligne permet de pointer sans réseau et de synchroniser au retour du signal.</div></div>
+        <button class="faq-q" type="button" aria-expanded="false">Mes équipes vont-elles s'y mettre&nbsp;?<span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Interface pensée pour le terrain, prise en main en quelques minutes, accompagnement inclus le premier mois.</div></div>
       </div>
       <div class="faq-item fade delay-2">
-        <button class="faq-q" type="button" aria-expanded="false">Mes données sont-elles en sécurité&nbsp;?<span class="icon">+</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Oui. Hébergement Suisse chez Infomaniak (entreprise certifiée ISO 27001), chiffrement HTTPS, mots de passe hashés bcrypt cost 12, authentification JWT. Chaque entreprise a son environnement totalement isolé. Aucune donnée n'est partagée avec un tiers.</div></div>
+        <button class="faq-q" type="button" aria-expanded="false">Et si j'ai déjà un logiciel comptable&nbsp;?<span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Stafflow nourrit votre fiduciaire, il ne la remplace pas. Export Excel en un clic, compatible avec tous les logiciels comptables suisses.</div></div>
       </div>
       <div class="faq-item fade delay-2">
-        <button class="faq-q" type="button" aria-expanded="false">Combien de temps pour la mise en place&nbsp;?<span class="icon">+</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Comptez environ 5 heures de notre côté pour l'installation et la configuration + 1 heure de formation pour vous et votre équipe. Vous êtes opérationnel en moins d'une journée.</div></div>
-      </div>
-      <div class="faq-item fade delay-3">
-        <button class="faq-q" type="button" aria-expanded="false">J'ai déjà un logiciel de paie. C'est compatible&nbsp;?<span class="icon">+</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Oui. L'export Excel de Stafflow est compatible avec tous les logiciels de paie suisses (Sage, Crésus, Bexio, Abacus). Sur demande, on peut développer une intégration directe pour automatiser le transfert.</div></div>
-      </div>
-      <div class="faq-item fade delay-3">
-        <button class="faq-q" type="button" aria-expanded="false">Et si je veux personnaliser l'application&nbsp;?<span class="icon">+</span></button>
-        <div class="faq-a"><div class="faq-a-inner">C'est notre métier. Stafflow est développé sur-mesure pour chaque client : logo, couleurs, nom de domaine, fonctionnalités spécifiques. On adapte l'outil à votre organisation, pas l'inverse.</div></div>
-      </div>
-      <div class="faq-item fade delay-4">
-        <button class="faq-q" type="button" aria-expanded="false">Que se passe-t-il si Neexus Agency disparaît&nbsp;?<span class="icon">+</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Vous récupérez l'intégralité du code source de votre instance Stafflow. C'est inclus dans la prestation. Vous n'êtes jamais prisonnier d'un éditeur.</div></div>
+        <button class="faq-q" type="button" aria-expanded="false">C'est pour quelle taille d'entreprise&nbsp;?<span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Pour toutes les PME à partir de 10 salariés. L'app s'adapte à votre structure, du petit atelier de second œuvre aux entreprises bien établies.</div></div>
       </div>
     </div>
   </section>
 
-  <!-- CTA FINAL -->
+  <!-- VOTRE APPLICATION A VOTRE IMAGE -->
   <section class="final">
-    <h2 class="fade">Découvrez Stafflow en 5 minutes.</h2>
+    <h2 class="fade">Votre application, à votre image.</h2>
     <div class="final-cta fade delay-1">
-      <p>Aucune inscription, aucun engagement. Cliquez sur le bouton ci-dessous, choisissez un rôle (Direction, Technicien, Chef de chantier ou Salarié) et explorez librement l'application avec des données fictives.</p>
+      <p>Stafflow s'adapte à votre entreprise : vos couleurs, votre logo, votre vocabulaire métier. Ce n'est pas un logiciel de plus, c'est votre outil.</p>
       <div class="ctas">
-        <a class="btn btn-primary" href="https://stafflow.ch" target="_blank" rel="noopener">Tester la démo maintenant &rarr;</a>
-        <a class="btn btn-ghost" href="/#cta">Demander une démo par visio</a>
+        <a class="btn btn-primary" href="https://app.stafflow.ch/demo" target="_blank" rel="noopener">Essayer la démo &rarr;</a>
+        <a class="btn btn-ghost" href="https://app.stafflow.ch/demo" target="_blank" rel="noopener">Demander une présentation</a>
       </div>
-      <p class="reass">Nous reviendrons vers vous sous 24h ouvrées. Aucune obligation de souscription après le rendez-vous.</p>
     </div>
   </section>
 
