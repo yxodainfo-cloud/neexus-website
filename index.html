@@ -1520,7 +1520,7 @@ img { -webkit-user-drag: none; }
       <a href="#constat" data-cursor-hover>Constat</a>
       <a href="#services" data-cursor-hover>Services</a>
       <a href="#methode" data-cursor-hover>Méthode</a>
-      <a href="#resultats" data-cursor-hover>Résultats</a>
+      <a href="#resultats" data-cursor-hover style="display:none">Résultats</a>
       <a href="/projets" data-cursor-hover>Projets</a>
     </nav>
     <a href="#cta" class="btn btn-primary" data-cursor-hover>
@@ -1543,7 +1543,7 @@ img { -webkit-user-drag: none; }
     <a href="#constat">Constat</a>
     <a href="#services">Services</a>
     <a href="#methode">Méthode</a>
-    <a href="#resultats">Résultats</a>
+    <a href="#resultats" style="display:none">Résultats</a>
     <a href="/projets">Projets</a>
   </nav>
   <a href="#cta" class="btn btn-primary">Audit gratuit <span class="arrow">→</span></a>
@@ -1797,7 +1797,8 @@ img { -webkit-user-drag: none; }
 </section>
 
 <!-- RÉSULTATS -->
-<section class="resultats" id="resultats">
+<!-- ⏸ SECTION MASQUÉE TEMPORAIREMENT — pour réafficher : supprimer style="display:none" ci-dessous -->
+<section class="resultats" id="resultats" style="display:none">
   <div class="container">
     <div class="section-header reveal">
       <div class="section-meta">
@@ -1831,7 +1832,8 @@ img { -webkit-user-drag: none; }
 </section>
 
 <!-- ÉTUDES DE CAS -->
-<section class="cases" id="cas">
+<!-- ⏸ SECTION MASQUÉE TEMPORAIREMENT — pour réafficher : supprimer style="display:none" ci-dessous -->
+<section class="cases" id="cas" style="display:none">
   <div class="container">
     <div class="section-header reveal">
       <div class="section-meta">
@@ -1905,7 +1907,7 @@ img { -webkit-user-drag: none; }
   <div class="container cta-grid">
     <div class="cta-content reveal">
       <div class="section-meta" style="margin-bottom: 1.25rem;">
-        <span class="section-num">07 · Réserver</span>
+        <span class="section-num">04 · Réserver</span>
       </div>
       <h2 class="display">
         30 minutes.<br/>
@@ -1985,8 +1987,8 @@ img { -webkit-user-drag: none; }
         <h4>Agence</h4>
         <ul>
           <li><a href="#methode">Méthode</a></li>
-          <li><a href="#resultats">Résultats</a></li>
-          <li><a href="#cas">Études de cas</a></li>
+          <li style="display:none"><a href="#resultats">Résultats</a></li>
+          <li style="display:none"><a href="#cas">Études de cas</a></li>
           <li><a href="/projets">Projets en cours</a></li>
           <li><a href="#stack">Stack</a></li>
           <li><a href="#cta">Audit gratuit</a></li>
