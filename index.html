@@ -1015,7 +1015,7 @@ section {
 }
 .resultats-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1px;
   background: var(--border);
   border: 1px solid var(--border);
@@ -1069,175 +1069,101 @@ section {
   color: var(--ink-muted);
   max-width: 30ch;
 }
+.stat .stat-num .stat-unit {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.6vw, 1.4rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  margin-left: 0.4rem;
+  color: var(--ink-muted);
+  -webkit-text-fill-color: var(--ink-muted);
+}
 
-@media (max-width: 880px) {
+@media (max-width: 1080px) {
+  .resultats-stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
   .resultats-stats { grid-template-columns: 1fr; }
 }
 
-.testimonials-wrap {
-  position: relative;
-  margin: 0 calc(var(--gutter) * -1);
-  padding: 0.5rem 0;
+/* ============================================
+   ÉTUDES DE CAS
+============================================ */
+.cases { border-top: 1px solid var(--border); }
+.cases .section-header { margin-bottom: 3rem; }
+.cases-intro {
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  color: var(--ink-muted);
+  max-width: 54ch;
+  line-height: 1.6;
+  margin-top: 1.25rem;
 }
-.testimonials-wrap::before,
-.testimonials-wrap::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: clamp(2rem, 6vw, 5rem);
-  z-index: 2;
-  pointer-events: none;
-}
-.testimonials-wrap::before {
-  left: 0;
-  background: linear-gradient(to right, var(--bg), transparent);
-}
-.testimonials-wrap::after {
-  right: 0;
-  background: linear-gradient(to left, var(--bg), transparent);
-}
-
-.testimonials {
-  display: flex;
-  gap: 1.25rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-padding-left: var(--gutter);
-  padding: 0.5rem var(--gutter) 1.5rem;
-  cursor: grab;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  -webkit-overflow-scrolling: touch;
-}
-.testimonials::-webkit-scrollbar { display: none; }
-.testimonials.dragging { cursor: grabbing; scroll-snap-type: none; }
-.testimonials.dragging .testimonial { pointer-events: none; }
-
-.testimonial {
-  background: var(--bg-card);
+.cases-intro strong { color: var(--ink); font-weight: 500; }
+.case {
+  padding: clamp(1.75rem, 4vw, 3rem);
   border: 1px solid var(--border);
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  transition: all 0.5s var(--ease-out);
+  border-radius: 24px;
+  background: var(--bg-card);
   position: relative;
   overflow: hidden;
-  transform-style: preserve-3d;
-  will-change: transform;
-  flex: 0 0 clamp(280px, 32vw, 400px);
-  scroll-snap-align: start;
-  user-select: none;
 }
-.testimonial::before {
+.case + .case { margin-top: 1.5rem; }
+.case::before {
   content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), var(--accent-glow), transparent 60%);
-  opacity: 0;
-  transition: opacity 0.5s var(--ease-out);
-  pointer-events: none;
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--accent-glow), transparent 55%);
+  opacity: 0; transition: opacity 0.6s var(--ease-out); pointer-events: none;
 }
-.testimonial:hover {
-  border-color: var(--accent);
-  box-shadow: 0 30px 60px -20px rgba(99, 102, 241, 0.25);
+.case:hover::before { opacity: 1; }
+.case > * { position: relative; z-index: 1; }
+.case-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem; margin-bottom: 1.75rem;
 }
-.testimonial:hover::before { opacity: 1; }
-.testimonial > * { position: relative; z-index: 1; }
-.testimonial .metric {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-style: italic;
-  font-size: 1.5rem;
-  background: var(--gradient);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+.case-name {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.75rem, 3vw, 2.5rem); letter-spacing: -0.02em;
 }
-
-/* Drag indicator */
-.testimonials-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--gutter);
-  margin-top: 1rem;
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+.case-tag {
+  font-family: var(--font-mono); font-size: 0.7rem;
+  letter-spacing: 0.16em; text-transform: uppercase;
   color: var(--ink-muted);
+  padding: 0.45rem 0.85rem; border: 1px solid var(--border);
+  border-radius: 100px; white-space: nowrap;
 }
-.testimonials-indicator .hint {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.case-blocks { display: grid; gap: 1.75rem; }
+@media (min-width: 860px) { .case-blocks { grid-template-columns: repeat(3, 1fr); } }
+.case-block h4 {
+  font-family: var(--font-mono); font-size: 0.72rem;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent-bright); margin-bottom: 0.75rem;
 }
-.testimonials-indicator .hint svg {
-  width: 14px;
-  height: 14px;
-  animation: hintSlide 2s ease-in-out infinite;
+.case-block p { color: var(--ink-muted); font-size: 0.95rem; line-height: 1.65; }
+.case-block.is-result h4 { color: var(--accent-violet); }
+.case-actions {
+  display: flex; flex-wrap: wrap; gap: 0.85rem 1.5rem; align-items: center;
+  margin-top: 2rem;
 }
-@keyframes hintSlide {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(4px); }
+.case-cta {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.85rem 1.5rem; border-radius: 100px;
+  background: var(--gradient); color: #fff;
+  font-size: 0.9rem; font-weight: 500;
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
 }
-.testimonials-nav {
-  display: flex;
-  gap: 0.5rem;
+.case-cta:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(99, 102, 241, 0.45); }
+.case-cta .arrow { transition: transform 0.3s var(--ease-out); }
+.case-cta:hover .arrow { transform: translateX(4px); }
+.case-link {
+  font-family: var(--font-mono); font-size: 0.78rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-muted); display: inline-flex; align-items: center; gap: 0.5rem;
+  transition: color 0.3s, gap 0.3s;
 }
-.testimonials-nav button {
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--border-strong);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s var(--ease-out);
-  color: var(--ink-muted);
-}
-.testimonials-nav button:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-glow);
-}
-.testimonials-nav button:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-.testimonials-nav button svg { width: 14px; height: 14px; }
-.testimonial blockquote {
-  color: var(--ink);
-  font-size: 0.9375rem;
-  line-height: 1.55;
-  position: relative;
-}
-.testimonial blockquote::before {
-  content: '"';
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  color: var(--accent);
-  opacity: 0.3;
-  position: absolute;
-  top: -1rem;
-  left: -0.25rem;
-}
-.testimonial cite {
-  font-style: normal;
-  font-size: 0.8125rem;
-  color: var(--ink-muted);
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
-.testimonial cite strong { color: var(--ink); font-weight: 500; }
+.case-link:hover { color: var(--ink); gap: 0.8rem; }
 
 /* ============================================
    CTA / FORM
@@ -1576,7 +1502,7 @@ img { -webkit-user-drag: none; }
 
   <div class="hero-footer">
     <div class="hero-footer-meta">
-      Paris · Genève · Casablanca · New York
+      Genève · Suisse
     </div>
     <div class="scroll-cue">
       <span>Scroll</span>
@@ -1799,85 +1725,92 @@ img { -webkit-user-drag: none; }
 
     <div class="resultats-stats reveal-stagger">
       <div class="stat">
-        <div class="stat-num"><span data-count="2400" data-suffix="+">2400+</span></div>
-        <div class="stat-label">heures de tâches répétitives économisées chaque mois pour nos clients</div>
+        <div class="stat-num"><span data-count="2" data-suffix="">2</span></div>
+        <div class="stat-label">produits SaaS actifs sur le terrain en Suisse — et 3 autres en production</div>
       </div>
       <div class="stat">
-        <div class="stat-num"><em><span data-count="47" data-suffix="">47</span></em></div>
-        <div class="stat-label">solutions digitales déployées en production</div>
+        <div class="stat-num"><span data-count="1" data-suffix="">1</span><span class="stat-unit">jour / sem.</span></div>
+        <div class="stat-label">récupéré sur l'administratif d'une PME du second œuvre (estimation CAPEB : 8 à 12 h hebdomadaires perdues en tâches administratives)</div>
       </div>
       <div class="stat">
-        <div class="stat-num"><span data-count="98" data-suffix="%">98%</span></div>
-        <div class="stat-label">de satisfaction client sur l'ensemble de nos missions</div>
+        <div class="stat-num"><span data-count="11" data-suffix="">11</span></div>
+        <div class="stat-label">langues disponibles dans nos applications terrain</div>
       </div>
+      <div class="stat">
+        <div class="stat-num"><span data-count="10" data-suffix="">10</span><span class="stat-unit">jours</span></div>
+        <div class="stat-label">pour recevoir votre premier livrable concret après l'audit</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ÉTUDES DE CAS -->
+<section class="cases" id="cas">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-meta">
+        <span class="section-num">06 · Études de cas</span>
+      </div>
+      <h2 class="display">
+        Deux produits utilisés<br/>
+        chaque jour sur le <em>terrain</em>.
+      </h2>
+      <p class="cases-intro">
+        Pas des maquettes, pas des promesses : des outils utilisés chaque jour sur des chantiers et dans des agences suisses. Et le premier se teste <strong>sans même créer de compte</strong>.
+      </p>
     </div>
 
-    <div class="testimonials-wrap reveal">
-      <div class="testimonials" id="testimonials">
-        <div class="testimonial">
-          <div class="metric">+35% de RDV hors heures d'ouverture</div>
-          <blockquote>L'agent vocal IA encaisse les réservations à 21h, le dimanche, à 7h du matin. Sans embaucher personne.</blockquote>
-          <cite>
-            <strong>Sofia L.</strong>
-            Fondatrice · Salon Atelier 9, Lyon
-          </cite>
+    <article class="case reveal">
+      <div class="case-head">
+        <span class="case-name">Stafflow</span>
+        <span class="case-tag">BTP second œuvre · Suisse</span>
+      </div>
+      <div class="case-blocks">
+        <div class="case-block">
+          <h4>Le problème terrain</h4>
+          <p>Dans une PME du second œuvre, les heures arrivent par WhatsApp et sur papier, les bons de livraison se contestent faute de preuve, et la marge d'un chantier se découvre trois mois trop tard. La CAPEB chiffre la perte à 8–12 h par semaine d'administratif.</p>
         </div>
-        <div class="testimonial">
-          <div class="metric">3 ETP économisés en 6 mois</div>
-          <blockquote>Trois équivalents temps plein redéployés sur le commercial. Le ROI était positif à la fin du trimestre.</blockquote>
-          <cite>
-            <strong>Vincent T.</strong>
-            Directeur ops · Helvetia Logistique, Genève
-          </cite>
+        <div class="case-block">
+          <h4>Ce qu'on a construit</h4>
+          <p>Une plateforme complète de gestion de chantier : pointage par QR code dynamique, fiches d'heures auto-générées avec double validation, bons de livraison signés à l'écran et horodatés, journal de chantier, suivi de marge en temps réel, export Excel pour la fiduciaire. Interface en 11 langues pour les équipes multilingues, vocabulaire adapté à 8 corps de métier. Hébergement suisse, conforme nLPD.</p>
         </div>
-        <div class="testimonial">
-          <div class="metric">Temps de résolution &minus;64%</div>
-          <blockquote>Le chatbot a pris 60% des demandes de niveau 1 et appris à escalader les vraies urgences. Le NPS est remonté.</blockquote>
-          <cite>
-            <strong>Camille D.</strong>
-            Head of Support · Quanteo, Paris
-          </cite>
-        </div>
-        <div class="testimonial">
-          <div class="metric">×2 sur le taux de conversion</div>
-          <blockquote>Les automatisations de relance ont doublé le taux de conversion entre devis et signature. Sans toucher au commercial.</blockquote>
-          <cite>
-            <strong>Nadia B.</strong>
-            CEO · Atlas Trading, Casablanca
-          </cite>
-        </div>
-        <div class="testimonial">
-          <div class="metric">−4h / jour sur l'admin</div>
-          <blockquote>Quatre heures par jour récupérées sur la saisie et les rapprochements. Mon équipe respire enfin.</blockquote>
-          <cite>
-            <strong>Marc P.</strong>
-            Gérant · BTP Sud, Marseille
-          </cite>
-        </div>
-        <div class="testimonial">
-          <div class="metric">+28% de leads qualifiés</div>
-          <blockquote>Le scoring IA a transformé la prospection. On parle aux bons contacts, au bon moment, avec le bon message.</blockquote>
-          <cite>
-            <strong>Julien R.</strong>
-            Dir. commercial · Quadra B2B, Bordeaux
-          </cite>
+        <div class="case-block is-result">
+          <h4>Le résultat</h4>
+          <p>Environ une journée par semaine rendue au gérant, zéro litige fournisseur grâce aux bons signés, et la mémoire de l'entreprise qui ne part plus avec un chef d'équipe.</p>
         </div>
       </div>
-      <div class="testimonials-indicator">
-        <div class="hint">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          <span>Glissez pour voir plus</span>
+      <div class="case-actions">
+        <a class="case-cta" href="https://app.stafflow.ch/demo" target="_blank" rel="noopener" data-cursor-hover>
+          Testez la démo vous-même — sans inscription, sans engagement
+          <span class="arrow">→</span>
+        </a>
+        <a class="case-link" href="https://www.stafflow.ch" target="_blank" rel="noopener">Voir le site →</a>
+      </div>
+    </article>
+
+    <article class="case reveal">
+      <div class="case-head">
+        <span class="case-name">SheetFlow</span>
+        <span class="case-tag">Travail temporaire · Suisse</span>
+      </div>
+      <div class="case-blocks">
+        <div class="case-block">
+          <h4>Le problème terrain</h4>
+          <p>Les agences d'intérim suisses reçoivent les fiches d'heures en photos WhatsApp et feuilles papier : ressaisie manuelle, erreurs de calcul jour/nuit, allers-retours interminables avant la paie et la facturation.</p>
         </div>
-        <div class="testimonials-nav">
-          <button id="testiPrev" aria-label="Précédent" disabled>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>
-          </button>
-          <button id="testiNext" aria-label="Suivant">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </button>
+        <div class="case-block">
+          <h4>Ce qu'on a construit</h4>
+          <p>Une application mobile où le temporaire saisit ses heures sur son téléphone et signe à l'écran ; les calculs jour/nuit se font automatiquement ; l'agence valide en un clic et exporte en PDF + Excel vers sa comptabilité. Hébergement suisse.</p>
+        </div>
+        <div class="case-block is-result">
+          <h4>Le résultat</h4>
+          <p>Le circuit complet — du téléphone du temporaire au tableau de bord de la comptable — sans papier ni ressaisie.</p>
         </div>
       </div>
-    </div>
+      <div class="case-actions">
+        <a class="case-link" href="https://www.sheetflow.ch" target="_blank" rel="noopener">Voir le projet →</a>
+      </div>
+    </article>
   </div>
 </section>
 
@@ -1886,7 +1819,7 @@ img { -webkit-user-drag: none; }
   <div class="container cta-grid">
     <div class="cta-content reveal">
       <div class="section-meta" style="margin-bottom: 1.25rem;">
-        <span class="section-num">06 · Réserver</span>
+        <span class="section-num">07 · Réserver</span>
       </div>
       <h2 class="display">
         30 minutes.<br/>
@@ -1967,6 +1900,7 @@ img { -webkit-user-drag: none; }
         <ul>
           <li><a href="#methode">Méthode</a></li>
           <li><a href="#resultats">Résultats</a></li>
+          <li><a href="#cas">Études de cas</a></li>
           <li><a href="/projets">Projets en cours</a></li>
           <li><a href="#stack">Stack</a></li>
           <li><a href="#cta">Audit gratuit</a></li>
@@ -1976,7 +1910,8 @@ img { -webkit-user-drag: none; }
         <h4>Contact</h4>
         <ul>
           <li><a href="mailto:contact@neexusds.com">contact@neexusds.com</a></li>
-          <li><a href="tel:+19178142210">+1 917 814 2210</a></li>
+          <li><a href="https://wa.me/41784603103" target="_blank" rel="noopener">WhatsApp · +41 78 460 31 03</a></li>
+          <li><a href="https://www.linkedin.com/in/afneexus/" target="_blank" rel="noopener">LinkedIn</a></li>
           <li><a href="#cta">Formulaire rapide</a></li>
         </ul>
       </div>
@@ -2153,7 +2088,7 @@ magnetics.forEach(el => {
 });
 
 // ============================================
-// MOUSE TRACKING — constat + testimonial glow
+// MOUSE TRACKING — constat + stat glow
 // ============================================
 document.querySelectorAll('.constat-item, .stat').forEach(el => {
   el.addEventListener('mousemove', (e) => {
@@ -2164,90 +2099,6 @@ document.querySelectorAll('.constat-item, .stat').forEach(el => {
     el.style.setProperty('--my', y + '%');
   });
 });
-
-// ============================================
-// TESTIMONIALS — drag to scroll + nav buttons
-// ============================================
-const testiTrack = document.getElementById('testimonials');
-const testiPrev = document.getElementById('testiPrev');
-const testiNext = document.getElementById('testiNext');
-
-if (testiTrack) {
-  // Drag to scroll
-  let isDown = false;
-  let startX = 0;
-  let scrollLeft = 0;
-  let hasMoved = false;
-
-  testiTrack.addEventListener('mousedown', (e) => {
-    isDown = true;
-    hasMoved = false;
-    startX = e.pageX - testiTrack.offsetLeft;
-    scrollLeft = testiTrack.scrollLeft;
-  });
-  testiTrack.addEventListener('mouseleave', () => {
-    isDown = false;
-    testiTrack.classList.remove('dragging');
-  });
-  testiTrack.addEventListener('mouseup', () => {
-    isDown = false;
-    setTimeout(() => testiTrack.classList.remove('dragging'), 50);
-  });
-  testiTrack.addEventListener('mousemove', (e) => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - testiTrack.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    if (Math.abs(walk) > 5) {
-      hasMoved = true;
-      testiTrack.classList.add('dragging');
-    }
-    testiTrack.scrollLeft = scrollLeft - walk;
-  });
-
-  // Click prevention after drag
-  testiTrack.querySelectorAll('.testimonial').forEach(card => {
-    card.addEventListener('click', (e) => {
-      if (hasMoved) { e.preventDefault(); e.stopPropagation(); }
-    });
-  });
-
-  // Mouse glow tracking on cards
-  testiTrack.querySelectorAll('.testimonial').forEach(el => {
-    el.addEventListener('mousemove', (e) => {
-      const rect = el.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      el.style.setProperty('--mx', x + '%');
-      el.style.setProperty('--my', y + '%');
-    });
-  });
-
-  // Nav buttons
-  const cardWidth = () => {
-    const first = testiTrack.querySelector('.testimonial');
-    if (!first) return 320;
-    const gap = parseFloat(getComputedStyle(testiTrack).gap) || 20;
-    return first.offsetWidth + gap;
-  };
-
-  testiPrev?.addEventListener('click', () => {
-    testiTrack.scrollBy({ left: -cardWidth(), behavior: 'smooth' });
-  });
-  testiNext?.addEventListener('click', () => {
-    testiTrack.scrollBy({ left: cardWidth(), behavior: 'smooth' });
-  });
-
-  // Update button states
-  const updateNavState = () => {
-    const maxScroll = testiTrack.scrollWidth - testiTrack.clientWidth;
-    if (testiPrev) testiPrev.disabled = testiTrack.scrollLeft <= 5;
-    if (testiNext) testiNext.disabled = testiTrack.scrollLeft >= maxScroll - 5;
-  };
-  testiTrack.addEventListener('scroll', updateNavState, { passive: true });
-  window.addEventListener('resize', updateNavState);
-  updateNavState();
-}
 
 // ============================================
 // SMOOTH SCROLL (for anchor links)
